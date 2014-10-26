@@ -1,0 +1,10 @@
+// Demo project specific stuff
+eclipse {
+   project {
+      name = "UrlShortener2014.demo"
+   }
+}
+
+dependencies {
+   compile project(":common")
+}

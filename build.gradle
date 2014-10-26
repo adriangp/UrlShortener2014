@@ -1,0 +1,35 @@
+// Build script
+buildscript {
+  ext {
+    springVersion = '1.1.8.RELEASE'
+  }
+  repositories {
+    mavenLocal()
+    maven { url "http://repo.spring.io/libs-snapshot" }
+    mavenCentral()
+  }
+  dependencies {
+    classpath "org.springframework.boot:spring-boot-gradle-plugin:$springVersion"
+  }
+}
+
+
+// Instructions for all projects
+allprojects {
+   apply plugin: "eclipse"
+}
+
+// Instructions for each sub project
+subprojects {
+  apply plugin: 'java'
+  apply plugin: 'spring-boot'
+  repositories {
+    mavenLocal()
+    maven { url 'http://repository.codehaus.org' }
+    maven { url 'http://repo.spring.io/milestone' }
+    mavenCentral()
+  }
+}
+
+
+
