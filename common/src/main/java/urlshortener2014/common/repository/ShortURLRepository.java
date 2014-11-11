@@ -1,4 +1,4 @@
-package urlshortener2014.common.respository;
+package urlshortener2014.common.repository;
 
 import urlshortener2014.common.domain.ShortURL;
 

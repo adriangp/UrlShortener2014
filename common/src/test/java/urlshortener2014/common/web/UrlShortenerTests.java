@@ -1,5 +1,14 @@
 package urlshortener2014.common.web;
 
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -7,18 +16,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
-import static org.mockito.Mockito.*;
-import static org.hamcrest.Matchers.*;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-
 import urlshortener2014.common.domain.ShortURL;
-import urlshortener2014.common.respository.ShortURLRepository;
+import urlshortener2014.common.repository.ShortURLRepository;
 
 
 
@@ -43,7 +45,7 @@ public class UrlShortenerTests {
 
 	@Test
 	public void thatRedirectToReturnsTemporaryRedirectIfKeyExists() throws Exception {
-		when(repository.findByKey("someKey")).thenReturn(new ShortURL("someKey", "http://example.com/", null));
+		when(repository.findByKey("someKey")).thenReturn(new ShortURL("someKey", "http://example.com/", null, null, null, 307));
 		
 		mockMvc.perform(get("/{id}", "someKey"))
 				.andDo(print())

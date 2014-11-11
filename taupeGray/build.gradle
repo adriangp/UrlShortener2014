@@ -1,0 +1,9 @@
+eclipse {
+   project {
+      name = "UrlShortener2014.taupeGray"
+   }
+}
+
+dependencies {
+   compile project(":common")
+}
