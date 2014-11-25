@@ -62,7 +62,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 	}
 
 	@Override
-	public Click save(Click cl) {
+	public Click save(final Click cl) {
 		try {
 			KeyHolder holder = new GeneratedKeyHolder();
 			jdbc.update(new PreparedStatementCreator() {
