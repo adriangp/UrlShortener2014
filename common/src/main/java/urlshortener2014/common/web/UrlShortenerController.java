@@ -34,7 +34,7 @@ public class UrlShortenerController {
 	@Autowired
 	EntityLinks entityLinks;
 
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/l{id}", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectTo(@PathVariable String id) {
 		ShortURL l = repository.findByKey(id);
 		if (l != null) {
@@ -46,7 +46,7 @@ public class UrlShortenerController {
 		}
 	}
 
-	@RequestMapping(method = RequestMethod.POST)
+	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(
 			@RequestParam MultiValueMap<String, String> form) {
 		String url = form.getFirst("url");
