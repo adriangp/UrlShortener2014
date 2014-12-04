@@ -47,7 +47,7 @@ public class UrlShortenerTests {
 	public void thatRedirectToReturnsTemporaryRedirectIfKeyExists() throws Exception {
 		when(repository.findByKey("someKey")).thenReturn(new ShortURL("someKey", "http://example.com/", null, null, null, 307));
 		
-		mockMvc.perform(get("/{id}", "someKey"))
+		mockMvc.perform(get("/l{id}", "someKey"))
 				.andDo(print())
 				.andExpect(status().isTemporaryRedirect())
 				.andExpect(redirectedUrl("http://example.com/"));
@@ -57,7 +57,7 @@ public class UrlShortenerTests {
 	public void thatRedirecToReturnsNotFoundIdIfKeyDoesNotExist() throws Exception {
 		when(repository.findByKey("someKey")).thenReturn(null);
 		
-		mockMvc.perform(get("/{id}", "someKey"))
+		mockMvc.perform(get("/l{id}", "someKey"))
 				.andDo(print())
 				.andExpect(status().isNotFound());
 	}
@@ -66,12 +66,12 @@ public class UrlShortenerTests {
 	public void thatShortenerCreatesARedirectIfTheURLisOK() throws Exception {
 		configureTransparentSave();
 		
-		mockMvc.perform(post("/").param("url", "http://example.com/"))
+		mockMvc.perform(post("/link").param("url", "http://example.com/"))
 				.andDo(print())
-				.andExpect(redirectedUrl("http://localhost/f684a3c4"))
+				.andExpect(redirectedUrl("http://localhost/lf684a3c4"))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.hash", is("f684a3c4")))
-				.andExpect(jsonPath("$.uri", is("http://localhost/f684a3c4")))
+				.andExpect(jsonPath("$.uri", is("http://localhost/lf684a3c4")))
 				.andExpect(jsonPath("$.target", is("http://example.com/")));
 	}
 
@@ -80,7 +80,7 @@ public class UrlShortenerTests {
 	public void thatShortenerFailsIfTheURLisWrong() throws Exception {
 		configureTransparentSave();
 		
-		mockMvc.perform(post("/").param("url", "someKey"))
+		mockMvc.perform(post("/link").param("url", "someKey"))
 				.andDo(print())
 				.andExpect(status().isBadRequest());
 	}
@@ -89,7 +89,7 @@ public class UrlShortenerTests {
 	public void thatShortenerFailsIfTheRepositoryReturnsNull() throws Exception {
 		when(repository.save(org.mockito.Matchers.any(ShortURL.class))).thenReturn(null);
 
-		mockMvc.perform(post("/").param("url", "someKey"))
+		mockMvc.perform(post("/link").param("url", "someKey"))
 				.andDo(print())
 				.andExpect(status().isBadRequest());
 	}

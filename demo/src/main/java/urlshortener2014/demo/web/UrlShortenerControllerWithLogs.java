@@ -18,17 +18,15 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
 	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
 	
-	@Override
 	public ResponseEntity<?> redirectTo(@PathVariable String id) {
 		logger.info("Requested redirection with hash "+id);
 		return super.redirectTo(id);
 	}
 
-	@Override
-	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(
 			@RequestParam MultiValueMap<String, String> form) {
 		logger.info("Requested new short for uri "+form.getFirst("url"));
 		return super.shortener(form);
 	}
 }
+
