@@ -1,4 +1,4 @@
-package urlshortener2014.demo.web;
+package urlshortener2014.bangladeshgreen.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

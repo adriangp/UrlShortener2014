@@ -1,4 +1,4 @@
-package urlshortener2014.demo.config;
+package urlshortener2014.bangladeshgreen.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
