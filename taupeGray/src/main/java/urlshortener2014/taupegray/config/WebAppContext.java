@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableWebMvc
 @EnableEntityLinks
 @ComponentScan(basePackages = {
-        "urlshortener2014.demo.web"
+        "urlshortener2014.taupegray.web"
 })
 public class WebAppContext extends WebMvcConfigurerAdapter {
 
