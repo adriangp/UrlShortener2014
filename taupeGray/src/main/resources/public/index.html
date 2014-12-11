@@ -15,16 +15,22 @@
 				<label for="uri">Long URL</label> <input type="text"
 					class="form-control" id="uri" placeholder="Long URL" name="url" />
 			</div>
+			<div class="form-group">
+				<label for="sponsoruri">Sponsor URL (optional)</label> <input
+					type="text" class="form-control" id="sponsoruri"
+					placeholder="Sponsor URL" name="sponsor" />
+			</div>
 			<button type="submit" class="btn btn-lg btn-primary">Make
 				short!</button>
 		</form>
-		<p/>
+		<p />
 		<div id="result"></div>
 	</div>
 	<script type="text/javascript"
 		src="webjars/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-	<script>
-	 $(document).ready(function() {
+	<script>	
+
+	$(document).ready(function() {
 		$("#shortener").submit(function(event){
 			event.preventDefault();
 			$.ajax({
@@ -32,7 +38,20 @@
 				url : "/link",
 				data : $(this).serialize(),
 				success : function(msg) {
-					$("#result").html("<a target='_blank' href='"+msg.uri+"' class='btn btn-default btn-lg' role='button'>"+msg.uri+"</a>")
+					$("#result").html("<a target='_blank' href='"+msg.uri+"' class='btn btn-default btn-lg' role='button'>"+msg.uri+"</a>"+
+									  "<form role='form' id='qrgetter'><button type='submit' class='btn btn-lg btn-primary'>Get QR!</button></form>"+
+									  "<div id='qrimage'></div>");
+					
+					$("#qrgetter").submit(function(event) {
+						//$("#qrimage").html("<img src='/qr"+msg.hash+"' />");
+						$("#qrimage").html("<img src='https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl="+encodeURIComponent(msg.uri)+"' />");
+					});
+					
+					$("#qrgetter").submit(function(event){
+						event.preventDefault();
+						
+					});
+					
 				},
 				error : function() {
 					alert("failure");

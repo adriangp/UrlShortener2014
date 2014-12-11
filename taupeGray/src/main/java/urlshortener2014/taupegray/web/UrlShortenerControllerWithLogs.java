@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,5 +27,11 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			@RequestParam MultiValueMap<String, String> form) {
 		logger.info("Requested new short for uri "+form.getFirst("url"));
 		return super.shortener(form);
+	}
+	
+	@RequestMapping(value = "/qr{id}", method = RequestMethod.GET)
+	public ResponseEntity<?> QRGenerator(@PathVariable String id) {
+		logger.info("Requested QR for short uri "+id);
+		return super.redirectTo(id);
 	}
 }
