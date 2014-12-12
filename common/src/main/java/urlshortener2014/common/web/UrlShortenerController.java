@@ -53,7 +53,7 @@ public class UrlShortenerController {
 		}
 	}
 
-	private void createAndSaveClick(String hash, String ip) {
+	protected void createAndSaveClick(String hash, String ip) {
 		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()),
 				null, null, null, ip, null);
 		clickRepository.save(cl);
