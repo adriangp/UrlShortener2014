@@ -43,8 +43,8 @@
 									  "<div id='qrimage'></div>");
 					
 					$("#qrgetter").submit(function(event) {
-						//$("#qrimage").html("<img src='/qr"+msg.hash+"' />");
-						$("#qrimage").html("<img src='https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl="+encodeURIComponent(msg.uri)+"' />");
+						$("#qrimage").html("<img src='/qr"+msg.hash+"' />");
+						//$("#qrimage").html("<img src='https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl="+encodeURIComponent(msg.uri)+"' />");
 					});
 					
 					$("#qrgetter").submit(function(event){
