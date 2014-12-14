@@ -10,8 +10,13 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClientHttpRequest<Type> {
+	
+	private static final Logger logger = LoggerFactory
+			.getLogger(ClientHttpRequest.class);
 	
 	protected interface Converter<T> {
 	    T converFrom(HttpEntity entity);
@@ -29,7 +34,7 @@ public class ClientHttpRequest<Type> {
 		try {
             HttpGet httpget = new HttpGet(url);
 
-            System.out.println("Executing request " + httpget.getRequestLine());
+            logger.info("Executing request " + httpget.getRequestLine());
 
             ResponseHandler<Type> responseHandler = new ResponseHandler<Type>() {
 
