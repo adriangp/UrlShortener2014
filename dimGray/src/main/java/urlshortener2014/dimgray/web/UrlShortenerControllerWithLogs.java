@@ -1,5 +1,7 @@
 package urlshortener2014.dimgray.web;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,17 +20,18 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
 	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
 	
-	@Override
-	public ResponseEntity<?> redirectTo(@PathVariable String id) {
+	public ResponseEntity<?> redirectTo(@PathVariable String id, 
+			HttpServletRequest request) {
 		logger.info("Requested redirection with hash "+id);
-		return super.redirectTo(id);
+		return super.redirectTo(id, request);
 	}
 
-	@Override
-	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<ShortURL> shortener(
-			@RequestParam MultiValueMap<String, String> form) {
-		logger.info("Requested new short for uri "+form.getFirst("url"));
-		return super.shortener(form);
+	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
+			@RequestParam(value = "sponsor", required = false) String sponsor,
+			@RequestParam(value = "brand", required = false) String brand,
+			HttpServletRequest request) {
+		logger.info("Requested new short for uri "+url);
+		return super.shortener(url, sponsor, brand, request);
 	}
 }
+
