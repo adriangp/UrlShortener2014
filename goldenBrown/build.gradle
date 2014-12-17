@@ -6,4 +6,8 @@ eclipse {
 
 dependencies {
    compile project(":common")
+     // Provides java script libraries for static content
+   compile("org.webjars:bootstrap:3.0.3")
+   compile("org.webjars:jquery:2.0.3-1")
+   compile "commons-httpclient:commons-httpclient:3.1"
 }
