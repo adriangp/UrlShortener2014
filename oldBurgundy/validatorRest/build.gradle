@@ -1,0 +1,21 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+
+repositories {
+   mavenCentral()                                               
+}
+
+dependencies {
+	compile 'commons-httpclient:commons-httpclient:3.1'
+   compile 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:2.3.1'
+}
+
+
+task server(type: JavaExec) {
+	standardInput 	= System.in  
+    group 			= 'Hello World Service'
+    description 	= 'Start a REST endpoint'
+    main 			= 'rest.validator.Server'
+	classpath 		= sourceSets.main.runtimeClasspath
+}
