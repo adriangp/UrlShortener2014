@@ -6,4 +6,7 @@ eclipse {
 
 dependencies {
    compile project(":common")
+   compile 'org.apache.velocity:velocity:1.7'
+   compile 'org.springframework:spring-support:2.0.8'
+   
 }

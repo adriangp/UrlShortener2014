@@ -23,15 +23,16 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	@Autowired
 	private ShortURLRepository shortURLRepository;
 	
+	@Autowired
+	private IntersicialEndPoint inter;
+
 	public ResponseEntity<?> redirectTo(@PathVariable String id, 
 			HttpServletRequest request) {
 		logger.info("Requested redirection with hash "+id);
 		if(shortURLRepository.findByKey(id).getSponsor() == null){
 			return super.redirectTo(id, request);
 		}else{
-			IntersicialEndPoint inter = new IntersicialEndPoint(id,request);
-			inter.redireccionarPubli();
-			return null;
+			return inter.redireccionarPubli(id);
 		}
 	}
 
