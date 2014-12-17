@@ -1,0 +1,30 @@
+<html>
+<head><title>Wait a moment</title></head>
+
+<body style="overflow-y:hidden;background-color:#58FA58">
+<script type="text/javascript">
+var num = 10
+function cuentaAtras(){
+	if(num > 0){
+		document.getElementById('ca').firstChild.nodeValue = num
+		num--
+		setTimeout('cuentaAtras()',1000)
+	}else{
+		window.location = "$target"
+	}
+}
+function escribe(){
+	document.getElementById("ca").innerHTML = num; 
+}
+</script>
+
+<div style="width: 100%;">
+<h1>En <span id="ca"></span> segundos sera redireccionado...</h1>
+</div>
+<iframe src="$sponsor" width="100%"  height=100%"></iframe>
+<script>
+	document.getElementById("ca").innerHTML = num; 
+	cuentaAtras();
+</script>
+</body>
+</html>
