@@ -7,29 +7,25 @@ Run the code with ```gradle server``` and then navigate to [http://localhost:808
 The code of the service is:
 ```java
 
-	@GET
-	@Path("/uri/{url}/{protocolo}")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String validateUrl(@PathParam("url") String url,
-			@PathParam("protocolo") int protocolo)  {
+@POST
+	@Path("/uri")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String validateUrlPOst(Uri url)  {
 		HttpClient httpClient = null;  // Objeto a traves del cual realizamos las peticiones
-		HttpMethodBase request = null;     // Objeto para realizar las peticiines HTTP GET o POST
+		HttpMethodBase request = null;     // Objeto para realizar las peticiones HTTP GET o POST
 		int status = 0;         // Codigo de la respuesta HTTP
 		//String targetURL = "https://google.es";		
 		// Instanciamos el objeto
 		httpClient = new HttpClient();
 		
 		// Invocamos por Get
-		if (protocolo==1)
-			request = new GetMethod("https://" + url); 
-		else if (protocolo==2)
-			request = new GetMethod("http://" + url); 
+		if (url.getProtocol()==1)
+			request = new GetMethod("https://" + url.getUrl()); 
+		else if (url.getProtocol()==2)
+			request = new GetMethod("http://" + url.getUrl()); 
 		else
-			return "Error: protocolo no soportado";
-		
-		if (request.getFollowRedirects()){
-			System.out.println("Hay redireccion");
-		}
+			return "Error: protocol not suported";
+
 		request.setFollowRedirects(false);
 		
 		// Indicamos reintente en caso de que haya errores.
@@ -43,9 +39,12 @@ The code of the service is:
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			
-		}catch (UnknownHostException e){
+		} catch (UnknownHostException e){
 			e.printStackTrace();
-			return "Error: url mal formada";
+			return "Error: url bad formed";
+		} catch (ConnectException e){
+			e.printStackTrace();
+			return "Error: Acces https not posible";
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
