@@ -1,4 +1,4 @@
-package urlshortener2014.goldenBrown.web;
+package urlshortener2014.goldenbrown.web;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.web.UrlShortenerController;
-import urlshortener2014.goldenBrown.urlAlcanzable.URLAlcanzable;
+import urlshortener2014.goldenbrown.urlAlcanzable.ReachableURL;
 
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
@@ -32,10 +32,11 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			@RequestParam(value = "brand", required = false) String brand,
 			HttpServletRequest request) {
 		logger.info("Requested new short for uri "+url);
-		if(URLAlcanzable.isURLachievable(url)){
-			return super.shortener(url, sponsor, brand, request);
-		}
-		return null;
+		return super.shortener(url, sponsor, brand, request);
+//		if(URLAlcanzable.isURLachievable(url)){
+//			return super.shortener(url, sponsor, brand, request);
+//		}
+//		return null;
 	}
 	
 }

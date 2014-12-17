@@ -27,19 +27,65 @@
 	 $(document).ready(function() {
 		$("#shortener").submit(function(event){
 			event.preventDefault();
-			$.ajax({
-				type : "POST",
-				url : "/link",
-				data : $(this).serialize(),
-				success : function(msg) {
-					$("#result").html("<a target='_blank' href='"+msg.uri+"' class='btn btn-default btn-lg' role='button'>"+msg.uri+"</a>")
-				},
-				error : function() {
-					alert("failure");
-				}
-			});
+			isUrlReachable($(this).serialize());
+			//isUrlReachable($("#uri").val());
 		});
 	});
+	
+	function isUrlReachable(link){
+		alert("isUrlReachable: "+link);
+		$.ajax({
+			type : "POST",
+			url : "/reachableurl",
+			data : link,
+			success : function(msg) {
+				alert("success isUrlReachable:"+msg);
+				if (msg == "OK"){
+					queryLink(link);
+				}
+				else{
+					alert("reachableurl returned FALSE");
+				}
+				return true;
+				//$("#result").html("<a target='_blank' href='"+msg.uri+"' class='btn btn-default btn-lg' role='button'>"+msg.uri+"</a>")
+			},
+			error : function() {
+				alert("failure isUrlReachable");
+				return false;
+			}
+		});
+	}
+	
+	function queryLink(link){
+		$.ajax({
+			type : "POST",
+			url : "/link",
+			data : link,
+			success : function(msg) {
+				$("#result").html("<a target='_blank' href='"+msg.uri+"' class='btn btn-default btn-lg' role='button'>"+msg.uri+"</a>")
+			},
+			error : function() {
+				alert("failure");
+			}
+		});
+	}
+	// Por si acaso
+	 /* $(document).ready(function() {
+			$("#shortener").submit(function(event){
+				event.preventDefault();
+				$.ajax({
+					type : "POST",
+					url : "/link",
+					data : $(this).serialize(),
+					success : function(msg) {
+						$("#result").html("<a target='_blank' href='"+msg.uri+"' class='btn btn-default btn-lg' role='button'>"+msg.uri+"</a>")
+					},
+					error : function() {
+						alert("failure");
+					}
+				});
+			});
+		}); */
 	</script>
 </body>
 </html>

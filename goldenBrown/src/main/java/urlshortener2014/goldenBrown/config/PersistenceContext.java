@@ -1,4 +1,4 @@
-package urlshortener2014.goldenBrown.config;
+package urlshortener2014.goldenbrown.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
