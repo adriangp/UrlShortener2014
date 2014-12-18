@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.web.UrlShortenerController;
-import urlshortener2014.goldenbrown.urlAlcanzable.ReachableURL;
+import urlshortener2014.goldenbrown.reachableurl.ReachableURL;
 
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {

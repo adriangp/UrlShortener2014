@@ -1,4 +1,4 @@
-package urlshortener2014.goldenbrown.urlAlcanzable;
+package urlshortener2014.goldenbrown.reachableurl;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
