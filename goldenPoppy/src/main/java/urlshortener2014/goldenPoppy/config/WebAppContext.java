@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
-@EnableWebMvc
+//@EnableWebMvc
 @EnableEntityLinks
 @ComponentScan(basePackages = {
         "urlshortener2014.goldenPoppy.web"
