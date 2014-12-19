@@ -27,18 +27,20 @@ public class ClickRepositoryTests {
 
 	@Before
 	public void setup() {
-		db = new EmbeddedDatabaseBuilder().setType(HSQL).addScript("schema-hsqldb.sql").build();
+		db = new EmbeddedDatabaseBuilder().setType(HSQL)
+				.addScript("schema-hsqldb.sql").build();
 		jdbc = new JdbcTemplate(db);
 		ShortURLRepository shortUrlRepository = new ShortURLRepositoryImpl(jdbc);
 		shortUrlRepository.save(url1());
 		shortUrlRepository.save(url2());
 		repository = new ClickRepositoryImpl(jdbc);
 	}
-	
+
 	@Test
 	public void thatSavePersistsTheClickURL() {
 		Click click = repository.save(click(url1()));
-		assertSame(jdbc.queryForObject("select count(*) from CLICK", Integer.class), 1);
+		assertSame(jdbc.queryForObject("select count(*) from CLICK",
+				Integer.class), 1);
 		assertNotNull(click);
 		assertNotNull(click.getId());
 	}
@@ -46,7 +48,8 @@ public class ClickRepositoryTests {
 	@Test
 	public void thatErrorsInSaveReturnsNull() {
 		assertNull(repository.save(click(badUrl())));
-		assertSame(jdbc.queryForObject("select count(*) from CLICK", Integer.class), 0);
+		assertSame(jdbc.queryForObject("select count(*) from CLICK",
+				Integer.class), 0);
 	}
 
 	@Test
@@ -56,8 +59,8 @@ public class ClickRepositoryTests {
 		repository.save(click(url1()));
 		repository.save(click(url2()));
 		repository.save(click(url1()));
-		assertEquals(repository.findByHash(url1().getHash()).size(),3);
-		assertEquals(repository.findByHash(url2().getHash()).size(),2);
+		assertEquals(repository.findByHash(url1().getHash()).size(), 3);
+		assertEquals(repository.findByHash(url2().getHash()).size(), 2);
 	}
 
 	@Test
@@ -67,12 +70,12 @@ public class ClickRepositoryTests {
 		repository.save(click(url1()));
 		repository.save(click(url2()));
 		repository.save(click(url1()));
-		assertEquals(repository.findByHash(badUrl().getHash()).size(),0);
+		assertEquals(repository.findByHash(badUrl().getHash()).size(), 0);
 	}
 
 	@After
 	public void shutdown() {
 		db.shutdown();
 	}
-	
+
 }
