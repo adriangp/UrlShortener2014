@@ -3,7 +3,16 @@ package urlshortener2014.oldBurgundy.web.rest.validator;
 public class Url {
 	
 	private String url;
-	private int protocol;
+	private String sponsor;
+	
+	public Url(){
+		
+	}
+	
+	public Url(String url, String sponsor){
+		this.url = url;
+		this.sponsor = sponsor;
+	}
 	
 	public String getUrl() {
 		return url;
@@ -13,12 +22,8 @@ public class Url {
 		this.url = url;
 	}
 	
-	public int getProtocol() {
-		return protocol;
-	}
-	
-	public void setProtocol(int protocol) {
-		this.protocol = protocol;
+	public String getSponsor() {
+		return sponsor;
 	}
 	
 }
