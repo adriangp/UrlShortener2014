@@ -66,7 +66,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return shortener(sUrl,sponsor,null,request);
 	}
 	
-	//@RequestMapping(value = "/isalive", method = RequestMethod.POST)
+	@RequestMapping(value = "/isalive", method = RequestMethod.GET)
 	@MessageMapping("/isalive")
     @SendTo("/topic/isalive")
     public Response isalive(URL url) throws Exception {
