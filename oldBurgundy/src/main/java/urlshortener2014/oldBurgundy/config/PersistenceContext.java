@@ -9,6 +9,8 @@ import urlshortener2014.common.repository.ClickRepository;
 import urlshortener2014.common.repository.ClickRepositoryImpl;
 import urlshortener2014.common.repository.ShortURLRepository;
 import urlshortener2014.common.repository.ShortURLRepositoryImpl;
+import urlshortener2014.oldBurgundy.repository.csv.ConsumingWorks;
+import urlshortener2014.oldBurgundy.repository.csv.WorksRepository;
 
 @Configuration
 public class PersistenceContext {
@@ -26,4 +28,10 @@ public class PersistenceContext {
 		return new ClickRepositoryImpl(jdbc);
 	}
 	
+	@Bean
+	WorksRepository worksRepository(){
+		WorksRepository worksRepository = new WorksRepository();
+		new Thread(new ConsumingWorks(worksRepository)).start();
+		return worksRepository;
+	}
 }
