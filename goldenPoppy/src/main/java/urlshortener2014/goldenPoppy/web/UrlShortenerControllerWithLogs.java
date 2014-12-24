@@ -1,12 +1,27 @@
 package urlshortener2014.goldenPoppy.web;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +29,7 @@ import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.repository.ShortURLRepository;
 import urlshortener2014.common.web.UrlShortenerController;
 import urlshortener2014.goldenPoppy.intesicial.IntersicialEndPoint;
+import urlshortener2014.goldenPoppy.isAlive.*;
 
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
@@ -25,7 +41,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	
 	@Autowired
 	private IntersicialEndPoint inter;
-
+	
 	public ResponseEntity<?> redirectTo(@PathVariable String id, 
 			HttpServletRequest request) {
 		logger.info("Requested redirection with hash "+id);
@@ -56,4 +72,27 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			HttpServletRequest request){
 		return shortener(sUrl,sponsor,null,request);
 	}
+	
+	@RequestMapping(value = "/isalive", method = RequestMethod.GET)
+	@MessageMapping("/isalive")
+    @SendTo("/topic/isalive")
+    public Response isalive(URL url) throws Exception {
+
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<String> future = executor.submit(new CompruebaUrl(url));
+
+        try {
+        	String s = future.get(2, TimeUnit.SECONDS);
+        	executor.shutdownNow();
+            return new Response(s);
+        } catch (TimeoutException e ) {
+        	executor.shutdownNow();
+        	return new Response("Le está costando responder...");
+        } catch (Exception e){
+        	executor.shutdownNow();
+        	return new Response("La url no está viva");
+        }
+
+        
+    }
 }
