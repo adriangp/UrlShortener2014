@@ -24,6 +24,7 @@ import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.repository.ShortURLRepository;
 import urlshortener2014.common.web.UrlShortenerController;
 import urlshortener2014.taupegray.qr.QRFetcher;
+import urlshortener2014.taupegray.safebrowsing.SafeBrowsing;
 
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
@@ -41,7 +42,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	}
 
 	protected ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL l) {
-		boolean safe = l.getSafe();
+		boolean safe = SafeBrowsing.isSafe(l.getTarget());
 		if (l.getSponsor() == null) {
 			if(safe) {
 				HttpHeaders h = new HttpHeaders();
