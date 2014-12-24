@@ -1,9 +1,16 @@
 package urlshortener2014.goldenPoppy.web;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -34,7 +41,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	
 	@Autowired
 	private IntersicialEndPoint inter;
-
+	
 	public ResponseEntity<?> redirectTo(@PathVariable String id, 
 			HttpServletRequest request) {
 		logger.info("Requested redirection with hash "+id);
@@ -70,16 +77,22 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	@MessageMapping("/isalive")
     @SendTo("/topic/isalive")
     public Response isalive(URL url) throws Exception {
-    	// TODO Implementar el timer
-    	
-    	HttpClient client = HttpClientBuilder.create().build();
-    	HttpHead request = new HttpHead(url.getUrl());
-    	HttpResponse response = client.execute(request);
-    	
-    	int resultado = response.getStatusLine().getStatusCode();
-    	String phrase = response.getStatusLine().getReasonPhrase();
-    	
-    	
-        return new Response(resultado + " " + phrase);
+
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<String> future = executor.submit(new CompruebaUrl(url));
+
+        try {
+        	String s = future.get(2, TimeUnit.SECONDS);
+        	executor.shutdownNow();
+            return new Response(s);
+        } catch (TimeoutException e ) {
+        	executor.shutdownNow();
+        	return new Response("Le está costando responder...");
+        } catch (Exception e){
+        	executor.shutdownNow();
+        	return new Response("La url no está viva");
+        }
+
+        
     }
 }
