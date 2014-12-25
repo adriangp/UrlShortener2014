@@ -11,16 +11,10 @@ angular.module('shortener', ['ui.router'])
             $urlRouterProvider.otherwise('inicio');
         })
 
-    /*.factory('todos', [function(){
-        var o = {
-            todos: []
-        };
-        return o;
-    }])*/
-
     .controller('MainCtrl', [ '$scope', '$http', function($scope,$http){
         //TEST
         $scope.noresult = true;
+        $scope.qrcheck = false;
         $scope.qruri = undefined;
 
         $scope.shortenURL = function(){
@@ -40,12 +34,18 @@ angular.module('shortener', ['ui.router'])
                 $scope.noresult = false;
                 if($scope.qrcheck){
                     $scope.shorturl = data.uri;
+
                     $scope.qruri = 'http://10.3.14.76:8080/qr'+data.hash;
                 }else{
                     $scope.shorturl = data.uri;
                 }
             })
 
+        }
+
+        $scope.qrrize= function(){
+            console.log("Changed QR status");
+            $scope.qrcheck = ! $scope.qrcheck;
         }
 
         $scope.ShortURLtoQR = function(){

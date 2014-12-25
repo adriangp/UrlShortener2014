@@ -60,6 +60,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         HttpEntity<String> entity = new HttpEntity<>(headers);
+        System.out.println("\n"+su.getUri()+"\n");
         //TODO improve this thing
         String url = "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=http://10.3.14.76:8080/l"+su.getHash()+"&choe=UTF-8";
         ResponseEntity<?> re = restTemplate.exchange(

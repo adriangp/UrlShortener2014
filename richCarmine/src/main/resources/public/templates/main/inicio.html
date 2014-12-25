@@ -15,7 +15,7 @@
 					<a href="#/acerca">About</a>
 				</li>
                 <li>
-                    <a href="https://github.com/PistachoSoft/Shortener">Code</a>
+                    <a href="https://github.com/SAReyes/UrlShortener2014">Code</a>
                 </li>
 				<li>
 					<a href="http://www.pistachosoft.com">Back to PistachoSoft!</a>
@@ -46,12 +46,15 @@
                         <form class="form-group" ng-submit="shortenURL()">
                             <div class="input-group">
                                 <input type="url" class="form-control" placeholder="Place here your long URL" ng-model="longurl" ng-click="longurl = null" required/>
+                                <span class="input-group-btn" ng-show="qrcheck">
+                                    <a class="btn btn-success" ng-click="qrrize()">Get QR</a>
+                                </span>
+                                <span class="input-group-btn" ng-hide="qrcheck">
+                                    <a class="btn btn-default" ng-click="qrrize()">Get QR</a>
+                                </span>
                                 <span class="input-group-btn">
                                     <button class="btn btn-primary" type="submit">Shorten!</button>
                                 </span>
-                            </div>
-                            <div class="input-group" style="text-align: center">
-                                Gimme a cool QR code too! <input type="checkbox" ng-model="qrcheck">
                             </div>
                         </form>
                         <!-- Result -->
@@ -74,30 +77,11 @@
     </div>
 
     <!-- Two more functionalities -->
-    <div class="row">
+    <div class="row" ng-hide="true">
         <div class="col-md-10 col-md-offset-1">
             <div class="row">
-
-                <!-- QR functionality -->
-                <div class="col-md-6">
-                    <div class="modal-header">
-                        <h3>Get a QR</h3>
-                    </div>
-                    <div class="jumbotron">
-                        <form class="form-group" ng-submit="ShortURLtoQR()">
-                            <div class="input-group">
-                                <input type="url" class="form-control" placeholder="Place here your long URL" ng-model="form_shorturl" ng-click="form_shorturl = null" required/>
-                                <span class="input-group-btn">
-                                    <button class="btn btn-primary" type="submit">QRrize!</button>
-                                </span>
-                            </div>
-                        </form>
-
-                    </div>
-                </div>
-
                 <!-- CSV functionality -->
-                <div class="col-md-6">
+                <div class="col-md-8 col-md-offset-2">
                     <div class="modal-header">
                         <h3>Submit longURL CSV to get shortURLs!</h3>
                     </div>
