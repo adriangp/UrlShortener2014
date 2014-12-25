@@ -15,41 +15,44 @@ angular.module('shortener', ['ui.router'])
         //TEST
         $scope.noresult = true;
         $scope.qrcheck = false;
-        $scope.qruri = undefined;
+        $scope.qruri = "img/spinner.gif";
 
         $scope.shortenURL = function(){
 
             $scope.noresult = true;
-            $scope.qruri = undefined;
-            console.log($scope.qrcheck);
-            $http({
-                method: 'POST',
-                url: 'http://10.3.14.76:8080/qr',
-                data: 'url='+$scope.longurl,
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
+            $scope.qruri = "img/spinner.gif";
 
-            }).success(function(data){
-                $scope.noresult = false;
-                if($scope.qrcheck){
+            if($scope.qrcheck){
+                $http({
+                    method: 'POST',
+                    url: 'http://10.3.14.76:8080/qr',
+                    data: 'url='+$scope.longurl,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }).success(function(data){
+                    $scope.noresult = false;
                     $scope.shorturl = data.uri;
-
                     $scope.qruri = 'http://10.3.14.76:8080/qr'+data.hash;
-                }else{
+                })
+            }else{
+                $http({
+                    method: 'POST',
+                    url: 'http://10.3.14.76:8080/link',
+                    data: 'url='+$scope.longurl,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }).success(function(data){
+                    $scope.noresult = false;
                     $scope.shorturl = data.uri;
-                }
-            })
-
+                })
+            }
         }
 
         $scope.qrrize= function(){
             console.log("Changed QR status");
             $scope.qrcheck = ! $scope.qrcheck;
-        }
-
-        $scope.ShortURLtoQR = function(){
-
         }
 
         $scope.CSVtoShortURL = function(){

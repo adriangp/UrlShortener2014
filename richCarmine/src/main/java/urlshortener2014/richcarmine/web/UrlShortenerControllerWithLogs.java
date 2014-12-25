@@ -1,5 +1,9 @@
 package urlshortener2014.richcarmine.web;
 
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -55,14 +59,13 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     public ResponseEntity<byte[]> redirectQR(@PathVariable String id,
            HttpServletRequest request) {
         logger.info("Requested qr: qr"+id);
-        ShortURL su = shortURLRepository.findByKey(id);
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        System.out.println("\n"+su.getUri()+"\n");
         //TODO improve this thing
-        String url = "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=http://10.3.14.76:8080/l"+su.getHash()+"&choe=UTF-8";
+        String uri  = linkTo(methodOn(UrlShortenerController.class).redirectTo(id, null)).toUri().toString();
+        String url = "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl="+uri+"&choe=UTF-8";
         ResponseEntity<?> re = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
