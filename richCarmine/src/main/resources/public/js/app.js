@@ -25,7 +25,7 @@ angular.module('shortener', ['ui.router'])
             if($scope.qrcheck){
                 $http({
                     method: 'POST',
-                    url: 'http://10.3.14.76:8080/qr',
+                    url: 'http://'+window.location.host+'/qr',
                     data: 'url='+$scope.longurl,
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -33,12 +33,12 @@ angular.module('shortener', ['ui.router'])
                 }).success(function(data){
                     $scope.noresult = false;
                     $scope.shorturl = data.uri;
-                    $scope.qruri = 'http://10.3.14.76:8080/qr'+data.hash;
+                    $scope.qruri = 'http://'+window.location.host+'/qr'+data.hash;
                 })
             }else{
                 $http({
                     method: 'POST',
-                    url: 'http://10.3.14.76:8080/link',
+                    url: 'http://'+window.location.host+'/link',
                     data: 'url='+$scope.longurl,
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
