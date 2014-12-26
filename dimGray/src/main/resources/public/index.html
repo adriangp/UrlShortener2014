@@ -8,7 +8,12 @@
 </head>
 <body>
 	<script type="text/javascript" src="webjars/jquery/2.0.3/jquery.min.js"></script>
-	<div class="jumbotron">
+	<script type="text/javascript" src="js/bootstrap-filestyle.js"></script>
+	<script type="text/javascript" src="js/shortener.js"></script>
+	<script type="text/javascript" src="js/upload.js"></script>
+	<script type="text/javascript" src="js/Blob.js"></script>
+	<script type="text/javascript" src="js/FileSaver.js"></script>
+	<div class="jumbotron" id="mainDiv">
 		<h1>URL Shortener</h1>
 		<form role="form" id="shortener">
 			<div class="form-group">
@@ -20,26 +25,17 @@
 		</form>
 		<p/>
 		<div id="result"></div>
-	</div>
+		<form role="form" id="csvupload">
+			<label for="upload">File to Upload</label>
+            <input type="file" class="filestyle" data-buttonName="btn-primary" id="csvfile" name="file">
+            <button type="submit" class="btn btn-lg btn-primary" >Upload</button>
+            Upload a file of URLs and get their shortened URLs.
+		</form>
+		<div id="resultcsv"></div>
+		</div>
+	
+		
 	<script type="text/javascript"
-		src="webjars/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-	<script>
-	 $(document).ready(function() {
-		$("#shortener").submit(function(event){
-			event.preventDefault();
-			$.ajax({
-				type : "POST",
-				url : "/link",
-				data : $(this).serialize(),
-				success : function(msg) {
-					$("#result").html("<a target='_blank' href='"+msg.uri+"' class='btn btn-default btn-lg' role='button'>"+msg.uri+"</a>")
-				},
-				error : function() {
-					alert("failure");
-				}
-			});
-		});
-	});
-	</script>
+		src="webjars/bootstrap/3.0.3/js/bootstrap.min.js">
 </body>
 </html>
