@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -14,17 +13,19 @@ import java.util.concurrent.Future;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import urlshortener2014.common.domain.ShortURL;
@@ -81,6 +82,22 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		
+	}
+	
+	
+	@RequestMapping(value = "/qr", method = RequestMethod.GET)
+	public ResponseEntity<byte[]> qrImage(@RequestParam("url") String url, 
+			HttpServletRequest request) {
+		byte[] png = null;
+		
+		logger.info("Requested qr for: "+url);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.IMAGE_PNG);
+		RestTemplate rt = new RestTemplate();
+		String imagePath = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl="+url+"&choe=UTF-8";
+		png = rt.getForObject(imagePath, byte[].class);
+		png = Base64.encodeBase64(png);
+		return new ResponseEntity<>(png,headers,HttpStatus.CREATED);
 	}
 }
 
