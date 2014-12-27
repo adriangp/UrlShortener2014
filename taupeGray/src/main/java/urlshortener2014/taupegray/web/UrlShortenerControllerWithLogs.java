@@ -19,12 +19,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.repository.ShortURLRepository;
 import urlshortener2014.common.web.UrlShortenerController;
 import urlshortener2014.taupegray.qr.QRFetcher;
 import urlshortener2014.taupegray.safebrowsing.SafeBrowsing;
+import urlshortener2014.taupegray.sponsor.WebToStringWrapper;
 
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
@@ -47,19 +50,20 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			if(safe) {
 				HttpHeaders h = new HttpHeaders();
 				h.setLocation(URI.create(l.getTarget()));
+				
 				return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
 			}
 			else {
-				return new ResponseEntity<>("WarningWebpage", HttpStatus.valueOf(l.getMode()));
+				return new ResponseEntity<>("WarningWebpage", HttpStatus.OK);
 			}
 		}
 		else {
-			if(safe) {
-				return new ResponseEntity<>("SponsorWebpage", HttpStatus.valueOf(l.getMode()));
-			}
-			else {
-				return new ResponseEntity<>("SponsorWarningWebpage", HttpStatus.valueOf(l.getMode()));
-			}
+			ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+			HttpServletRequest request = sra.getRequest();
+			request.setAttribute("safe", safe);
+			request.setAttribute("id", l.getHash());
+			//request.setAttribute("sponsorsafe", SafeBrowsing.isSafe(l.getSponsor())); //Prueba para avisar que el sponsor no es seguro
+			return new ResponseEntity<>(new WebToStringWrapper("/WEB-INF/sponsor.jsp",request,sra.getResponse()).getContent(), HttpStatus.OK);
 		}
 	}
 
