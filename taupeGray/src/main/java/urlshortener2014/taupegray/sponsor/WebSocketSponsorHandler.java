@@ -22,6 +22,11 @@ public class WebSocketSponsorHandler extends TextWebSocketHandler {
 			.getLogger(WebSocketSponsorHandler.class);
 	
 	@Override
+	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+		logger.info("New connection: "+session.getId());
+	}
+	
+	@Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) {
 		logger.info("Request from "+session.getId()+" : "+message.getPayload());
 		switch(message.getPayload()) {
