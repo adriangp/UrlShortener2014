@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class ReachableURL {
+public class ReachableURLService {
 	
 	//http://hc.apache.org/httpclient-3.x/tutorial.html
 	@RequestMapping(value = "/reachableurl", method = RequestMethod.POST)
