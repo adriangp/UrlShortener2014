@@ -79,18 +79,20 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     public Response isalive(URL url) throws Exception {
 
 		ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<String> future = executor.submit(new CompruebaUrl(url));
-
+        Future<Integer> future = executor.submit(new CompruebaUrl(url));
+        
+        int timeout = url.getTimeout();
+        logger.info("isAlive: timeout requested "+timeout);
         try {
-        	String s = future.get(2, TimeUnit.SECONDS);
+        	int s = future.get(timeout, TimeUnit.SECONDS);
         	executor.shutdownNow();
             return new Response(s);
         } catch (TimeoutException e ) {
         	executor.shutdownNow();
-        	return new Response("Le está costando responder...");
+        	return new Response(0);
         } catch (Exception e){
         	executor.shutdownNow();
-        	return new Response("La url no está viva");
+        	return new Response(-1);
         }
 
         
