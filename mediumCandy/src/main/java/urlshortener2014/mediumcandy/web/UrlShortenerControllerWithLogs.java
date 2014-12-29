@@ -38,5 +38,34 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return super.shortener(url, sponsor, brand, request);
 	}
 	
+	/**
+	 * Pings a HTTP URL. This effectively sends a HEAD request and returns TRUE if the response code is in 
+	 * the 200-399 range.
+	 * @param urlIn The HTTP URL to be pinged.
+	 * @return TRUE if the given HTTP URL has returned response code 200-399 on a HEAD request within the
+	 * given timeout, otherwise FALSE.
+	 */
+	private static boolean ping(String urlIn) {
+		// Otherwise an exception may be thrown on invalid SSL certificates.
+	    String url = urlIn.replaceFirst("https", "http");
+	    
+	    // The timeout in millis for both the connection timeout and the response read timeout. 
+		// Note that the total timeout is effectively two times the given timeout.
+	    int timeout = 2000;
+
+	    try {
+	    	
+	        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+	        connection.setConnectTimeout(timeout);
+	        connection.setReadTimeout(timeout);
+	        connection.setRequestMethod("HEAD");
+	        int responseCode = connection.getResponseCode();
+	        
+	        return (200 <= responseCode && responseCode <= 399);
+	        
+	    } catch (IOException exception) {
+	        return false;
+	    }
+	}
 }
 
