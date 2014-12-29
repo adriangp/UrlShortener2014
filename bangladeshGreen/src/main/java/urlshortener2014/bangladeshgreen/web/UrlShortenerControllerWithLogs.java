@@ -56,6 +56,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				clickRepository.update(clickFinal);
 			}
 		}
+		
 		return response;
 	}
 
