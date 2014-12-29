@@ -13,4 +13,5 @@ public class URL {
 	public int getTimeout(){
 		return timeout;
 	}
+	
 }

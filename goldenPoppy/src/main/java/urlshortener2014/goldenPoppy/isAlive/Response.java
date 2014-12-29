@@ -8,7 +8,7 @@ public class Response {
 	 * MUERTA -> -1
 	 */
 	private int status;
-	
+		
 	public Response(int status){
 		this.status = status;
 	}

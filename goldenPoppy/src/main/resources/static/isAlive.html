@@ -2,17 +2,22 @@
 <html>
 <head>
     <title>Url is Alive?</title>
+
+	<link rel="stylesheet" type="text/css"
+	href="webjars/bootstrap/3.0.3/css/bootstrap.min.css" />
+
     <script type="text/javascript" src="webjars/stomp-websocket/2.3.1-1/stomp.js"></script>
 	<script type="text/javascript" src="webjars/sockjs-client/0.3.4-1/sockjs.js"></script>
     <script type="text/javascript">
         var stompClient = null;
 
         function connect() {
+
             var socket = new SockJS('/isalive');
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function(frame) {
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/topic/isalive', function(response){
+                stompClient.subscribe('/user/topic/isalive', function(response){
                     showResponse(JSON.parse(response.body).status);
                 });
             });
@@ -24,21 +29,22 @@
         }
 
         function sendUrl(timeout) {
+		// Borramos resultado anterior
+		var presp = document.getElementById('presp');
+		presp.innerHTML = "";
             var url = document.getElementById('url').value;
-            stompClient.send("/app/isalive", {}, JSON.stringify({ 'url': url , 'timeout' : timeout }));
+            stompClient.send("/app/isalive", {}, JSON.stringify({ 'url': url , 'timeout' : timeout}));
         }
 
         function showResponse(message) {
+
             var response = document.getElementById('response');
-            var p = document.createElement('p');
-            p.style.wordWrap = 'break-word';
+			var presp = document.getElementById('presp');
 			if (message == 1){
-				p.appendChild(document.createTextNode("La url está viva"));
-				response.appendChild(p);
+				presp.innerHTML = "La url está viva";
 			}
 			else if ( message == -1){
-				p.appendChild(document.createTextNode("La url NO está viva"));
-				response.appendChild(p);
+				presp.innerHTML = "La url NO está viva";
 			}
 			else{ // Es 0 (TIMEOUT)
 				if (confirm("Le está costando responder... ¿Quieres intentarlo con más tiempo?")){
@@ -70,11 +76,14 @@
 <body onLoad="connect()" onUnLoad="disconnect()">
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being enabled. Please enable
     Javascript and reload this page!</h2></noscript>
-<div>
-    <div id="conversationDiv">
-        <label>Enter a URL</label><input type="text" id="url" />
-        <button id="sendUrl" onclick="sendUrl(2);">Send</button>
-        <p id="response"></p>
+<div class="jumbotron">
+	<h1>URL is Alive?</h1>
+    <div role="form" id="conversationDiv">
+        <label for="uri">Enter a URL</label><input class="form-control" type="text" id="url" placeholder="Ej. http://www.unizar.es" name="url"/>
+        <button id="sendUrl" class="btn btn-lg btn-primary" onclick="sendUrl(2);">Send</button>
+        <div id="response">
+		<p id="presp"></p>
+	</div>
     </div>
 </div>
 </body>

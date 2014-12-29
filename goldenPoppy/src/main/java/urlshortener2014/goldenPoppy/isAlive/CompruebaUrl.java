@@ -26,8 +26,6 @@ public class CompruebaUrl implements Callable<Integer>{
     	
     	if (resultado == 200){
     		return 1;
-    	}else if (resultado == 501){
-    		return 1;
     	}else{
     		return -1;
     	}
