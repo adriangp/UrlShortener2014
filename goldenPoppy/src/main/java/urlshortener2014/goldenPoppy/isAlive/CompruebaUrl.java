@@ -7,7 +7,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-public class CompruebaUrl implements Callable<String>{
+public class CompruebaUrl implements Callable<Integer>{
 	
 	private URL url;
 	public CompruebaUrl(URL url){
@@ -15,7 +15,7 @@ public class CompruebaUrl implements Callable<String>{
 	}
 	
 	@Override
-    public String call() throws Exception {
+    public Integer call() throws Exception {
 		HttpClient client = HttpClientBuilder.create().build();
     	//HttpHead request = new HttpHead(url.getUrl());
     	HttpGet request = new HttpGet(url.getUrl());
@@ -25,11 +25,11 @@ public class CompruebaUrl implements Callable<String>{
     	int resultado = response.getStatusLine().getStatusCode();
     	
     	if (resultado == 200){
-    		return "La Url "+url.getUrl()+" está viva";
+    		return 1;
     	}else if (resultado == 501){
-    		return "Hubo un problema al comprobar la URL";
+    		return 1;
     	}else{
-    		return "La Url "+url.getUrl()+" NO está viva";
+    		return -1;
     	}
         
     }
