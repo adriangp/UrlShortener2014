@@ -10,17 +10,15 @@
 	<script type="text/javascript" src="webjars/sockjs-client/0.3.4-1/sockjs.js"></script>
     <script type="text/javascript">
         var stompClient = null;
-		var sessionId = "";
 
         function connect() {
-			// Calculamos el id de la sesion
-			sessionId = Math.random();
+
             var socket = new SockJS('/isalive');
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function(frame) {
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/topic/isalive', function(response){
-                    showResponse(JSON.parse(response.body).status, JSON.parse(response.body).sessionId);
+                stompClient.subscribe('/user/topic/isalive', function(response){
+                    showResponse(JSON.parse(response.body).status);
                 });
             });
         }
@@ -35,13 +33,11 @@
 		var presp = document.getElementById('presp');
 		presp.innerHTML = "";
             var url = document.getElementById('url').value;
-            stompClient.send("/app/isalive", {}, JSON.stringify({ 'url': url , 'timeout' : timeout , 'sessionId' : sessionId}));
+            stompClient.send("/app/isalive", {}, JSON.stringify({ 'url': url , 'timeout' : timeout}));
         }
 
-        function showResponse(message, id) {
-			if(id != sessionId){
-				return; // El mensaje no va para ti y no haces nada
-			}
+        function showResponse(message) {
+
             var response = document.getElementById('response');
 			var presp = document.getElementById('presp');
 			if (message == 1){

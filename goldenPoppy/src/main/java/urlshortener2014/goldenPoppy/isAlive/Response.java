@@ -8,19 +8,13 @@ public class Response {
 	 * MUERTA -> -1
 	 */
 	private int status;
-	
-	private String sessionId;
-	
-	public Response(int status, String sessionId){
+		
+	public Response(int status){
 		this.status = status;
-		this.sessionId = sessionId;
 	}
 	
 	public int getStatus(){
 		return status;
 	}
 	
-	public String getSessionId(){
-		return sessionId;
-	}
 }

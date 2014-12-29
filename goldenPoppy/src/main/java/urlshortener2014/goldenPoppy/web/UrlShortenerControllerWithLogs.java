@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -73,29 +74,26 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return shortener(sUrl,sponsor,null,request);
 	}
 	
-	@RequestMapping(value = "/isalive", method = RequestMethod.GET)
 	@MessageMapping("/isalive")
-    @SendTo("/topic/isalive")
+    @SendToUser("/topic/isalive")
     public Response isalive(URL url) throws Exception {
 
 		ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<Integer> future = executor.submit(new CompruebaUrl(url));
         
         int timeout = url.getTimeout();
-        
-        String sessionId = url.getSessionId();
-        
+                
         logger.info("isAlive: timeout requested "+timeout);
         try {
         	int s = future.get(timeout, TimeUnit.SECONDS);
         	executor.shutdownNow();
-            return new Response(s,sessionId);
+            return new Response(s);
         } catch (TimeoutException e ) {
         	executor.shutdownNow();
-        	return new Response(0, sessionId);
+        	return new Response(0);
         } catch (Exception e){
         	executor.shutdownNow();
-        	return new Response(-1, sessionId);
+        	return new Response(-1);
         }
 
         

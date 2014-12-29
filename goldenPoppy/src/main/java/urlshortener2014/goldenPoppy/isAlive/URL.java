@@ -6,12 +6,6 @@ public class URL {
 	
 	private int timeout;
 	
-	/*
-	 * Para distinguir entre sesiones. Meter Math.random() y
-	 * comprobar a la vuelta que sea el mismo.
-	 */
-	private String sessionId;
-	
 	public String getUrl(){
 		return url;
 	}
@@ -20,7 +14,4 @@ public class URL {
 		return timeout;
 	}
 	
-	public String getSessionId(){
-		return sessionId;
-	}
 }
