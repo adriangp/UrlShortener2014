@@ -9,12 +9,18 @@ public class Response {
 	 */
 	private int status;
 	
-	public Response(int status){
+	private String sessionId;
+	
+	public Response(int status, String sessionId){
 		this.status = status;
+		this.sessionId = sessionId;
 	}
 	
 	public int getStatus(){
 		return status;
 	}
 	
+	public String getSessionId(){
+		return sessionId;
+	}
 }
