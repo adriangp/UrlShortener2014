@@ -82,17 +82,20 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         Future<Integer> future = executor.submit(new CompruebaUrl(url));
         
         int timeout = url.getTimeout();
+        
+        String sessionId = url.getSessionId();
+        
         logger.info("isAlive: timeout requested "+timeout);
         try {
         	int s = future.get(timeout, TimeUnit.SECONDS);
         	executor.shutdownNow();
-            return new Response(s);
+            return new Response(s,sessionId);
         } catch (TimeoutException e ) {
         	executor.shutdownNow();
-        	return new Response(0);
+        	return new Response(0, sessionId);
         } catch (Exception e){
         	executor.shutdownNow();
-        	return new Response(-1);
+        	return new Response(-1, sessionId);
         }
 
         
