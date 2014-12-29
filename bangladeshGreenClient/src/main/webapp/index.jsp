@@ -28,9 +28,9 @@
 
 <body>
 	<h2>Ejemplo de AJAX con JSP y Servelts</h2>
-	<form id="form1" enctype="multipart/form-data">
-		Nombre:<input type="file" id="nombre" /> <br> <input
-			type="button" id="submit" value="Añadir" />
+	<form id="form1" >
+		Nombre:<input type="file" id="nombre" /> <br> 
+		<input type="button" id="submit" value="Añadir" />
 	<br>
 	<div id="respuesta"></div>
 	<div id="res2"></div>
