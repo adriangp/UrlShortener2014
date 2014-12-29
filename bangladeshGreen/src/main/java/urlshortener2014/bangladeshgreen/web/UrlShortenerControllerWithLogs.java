@@ -28,10 +28,9 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	private ShortURLRepository SURLR;
 	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
 	
-	@Override
 	public ResponseEntity<?> redirectTo(@PathVariable String id) {
 		logger.info("Requested redirection with hash "+id);
-		return super.redirectTo(id);
+		return super.redirectTo(id, null);
 	}
 
 	@Override
@@ -50,12 +49,16 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				.request(MediaType.TEXT_HTML)
 				.get();
 		
-		if(response.getStatus()==204){
+		if(response.getStatus()==200)
 			SURLR.mark(su.getBody(), false);//marcar como no segura
-		}
-		
+
 		return su;
 	}
+
+	public void recibirCSV(File csv){
+		
+	}
+	
 	
 	
 	private static String parse(String a) {
