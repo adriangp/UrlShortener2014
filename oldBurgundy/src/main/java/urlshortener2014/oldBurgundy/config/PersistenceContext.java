@@ -11,6 +11,8 @@ import urlshortener2014.common.repository.ShortURLRepository;
 import urlshortener2014.common.repository.ShortURLRepositoryImpl;
 import urlshortener2014.oldBurgundy.repository.csv.ConsumingWorks;
 import urlshortener2014.oldBurgundy.repository.csv.WorksRepository;
+import urlshortener2014.oldBurgundy.repository.sponsor.ConsumingWorksSponsor;
+import urlshortener2014.oldBurgundy.repository.sponsor.WorksRepositorySponsor;
 
 @Configuration
 public class PersistenceContext {
@@ -32,6 +34,13 @@ public class PersistenceContext {
 	WorksRepository worksRepository(){
 		WorksRepository worksRepository = new WorksRepository();
 		new Thread(new ConsumingWorks(worksRepository)).start();
+		return worksRepository;
+	}
+	
+	@Bean
+	WorksRepositorySponsor worksRepositorySponsor(){
+		WorksRepositorySponsor worksRepository = new WorksRepositorySponsor();
+		new Thread(new ConsumingWorksSponsor(worksRepository)).start();
 		return worksRepository;
 	}
 }
