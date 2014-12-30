@@ -1,7 +1,13 @@
 package urlshortener2014.bangladeshgreen.web;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -89,8 +95,28 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return su;
 	}
 
-	public void recibirCSV(File csv){
-		
+	@SuppressWarnings("resource")
+	public void recibirCSV(File csv,
+			@RequestParam(value = "sponsor", required = false) String sponsor,
+			@RequestParam(value = "brand", required = false) String brand,
+			HttpServletRequest request) throws IOException{
+		BufferedReader br=new BufferedReader(new FileReader(csv));
+		List<ShortURL> listaUrlAcortadas=new ArrayList<ShortURL>();
+		String linea="";
+		while((linea = br.readLine()) != null){
+			String []listaURL=linea.split(",");
+			for(String url: listaURL){
+				ResponseEntity<ShortURL> urlAcortada=shortener(url,sponsor,brand,request);
+				listaUrlAcortadas.add(urlAcortada.getBody());
+			}
+		}
+		File csvAcortado=new File("temporal.csv");
+		PrintWriter fileResul=new PrintWriter(csvAcortado);
+		for(ShortURL url: listaUrlAcortadas){
+			//Obtener la URI y copiarla recortada
+			fileResul.write(url.getUri().toString()+",\n");
+		}
+		fileResul.close();
 	}
 	
 	
