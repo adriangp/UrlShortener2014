@@ -79,6 +79,9 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	    }
 	}
 	
+	/**
+	 * Creates and shaves a new shortened URL if the given URL is valid AND also can be reached.
+	 */
 	protected ShortURL createAndSaveIfValidAndReachable(String url, String sponsor,
 			String brand, String owner, String ip) {
 		
