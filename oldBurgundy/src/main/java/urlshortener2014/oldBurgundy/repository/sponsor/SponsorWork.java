@@ -5,11 +5,18 @@ import org.springframework.web.socket.WebSocketSession;
 public class SponsorWork {
 	
 	private int id = -1;
-	private String url, shortUrl;
-	private WorkStatus state;
+	private String Url,shortUrl;
+	private WebSocketSession session;
+	private SponsorWorkStatus state;
 		
-	public SponsorWork(String url) {
-		this.url = url;
+	public SponsorWork(String Url,String shortUrl) {
+		this.setUrl(Url);
+		this.shortUrl = shortUrl;
+	}
+	
+	public SponsorWork(String shortUrl,WebSocketSession session) {
+		this.setSession(session);
+		this.shortUrl = shortUrl;
 	}
 
 	public int getId() {
@@ -20,14 +27,6 @@ public class SponsorWork {
 		this.id = id;
 	}
 
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
 	public String getShortUrl() {
 		return shortUrl;
 	}
@@ -36,11 +35,27 @@ public class SponsorWork {
 		this.shortUrl = shortUrl;
 	}
 
-	public WorkStatus getState() {
+	public SponsorWorkStatus getState() {
 		return state;
 	}
 
-	public void setState(WorkStatus state) {
+	public void setState(SponsorWorkStatus state) {
 		this.state = state;
+	}
+
+	public String getUrl() {
+		return Url;
+	}
+
+	public void setUrl(String url) {
+		Url = url;
+	}
+
+	public WebSocketSession getSession() {
+		return session;
+	}
+
+	public void setSession(WebSocketSession session) {
+		this.session = session;
 	}
 }
