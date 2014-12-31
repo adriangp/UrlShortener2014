@@ -13,7 +13,6 @@ function setUrlSubmition() {
     var url = getUrl();  
     shortenURL(url);
     e.preventDefault(); //stop form submission
-    clearUrlInput();
   });
 }
 
@@ -41,12 +40,14 @@ function shortenURL(url) {
 	url : SERVICE_URI + "linkreachable?url=" + url,
 	dataType : "json",
 	//data : url,		
-	success : function(response) {      
-      console.log(response);
+	success : function(response) {
+      console.log(response); // JSON object sent by server
       console.log("exito!");
+      // things to do after call
+      clearUrlInput();
     },    
     error : function(error) {
-      console.log(error);
+       console.log("Oops! RESPONSE Status:  " + error.status);
     }
   });
 }
