@@ -1,3 +1,5 @@
+var SERVICE_URI = "http://localhost:8080/";
+
 /* Document Ready Functionality (jQuery stuff) */
 $( document ).ready(function() { 
   setUrlSubmition();
@@ -9,7 +11,7 @@ $( document ).ready(function() {
 function setUrlSubmition() {
   $("form").on('submit', function (e) {
     var url = getUrl();  
-    alert("Your URL: " + url); //ajax call here    
+    shortenURL(url);
     e.preventDefault(); //stop form submission
     clearUrlInput();
   });
@@ -24,4 +26,27 @@ function getUrl() {
 
 function clearUrlInput() {
   $( '#urlInput' ).val('');
+}
+
+
+/* API CALLS */
+
+/*
+ * Shortens an URL.
+ */
+function shortenURL(url) {
+  $.ajax({
+    type : 'POST',
+	contentType : 'application/json',
+	url : SERVICE_URI + "linkreachable?url=" + url,
+	dataType : "json",
+	//data : url,		
+	success : function(response) {      
+      console.log(response);
+      console.log("exito!");
+    },    
+    error : function(error) {
+      console.log(error);
+    }
+  });
 }
