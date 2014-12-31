@@ -19,7 +19,7 @@ public class ReachableURLService {
 	
 	//http://hc.apache.org/httpclient-3.x/tutorial.html
 	@RequestMapping(value = "/reachableurl", method = RequestMethod.POST)
-	public static String isUrlReachable(@RequestParam("url") String url){
+	public String isUrlReachable(@RequestParam("url") String url){
 		String ok = "OK", error = "ERROR";
 //		URL = parseURL(URL);
 	    // Create an instance of HttpClient.
@@ -70,12 +70,4 @@ public class ReachableURLService {
 			method.releaseConnection();
 		}
 	}
-
-//	private static String parseURL(String url) {
-//		if (!url.startsWith("http://") && !url.startsWith("https://")){
-//			url = "http://"+url;
-//		}
-//		return url;
-//	}
-
 }

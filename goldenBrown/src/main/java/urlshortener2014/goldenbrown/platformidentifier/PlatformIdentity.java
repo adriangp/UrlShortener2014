@@ -1,5 +1,7 @@
 package urlshortener2014.goldenbrown.platformidentifier;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import nl.bitwalker.useragentutils.Browser;
 import nl.bitwalker.useragentutils.OperatingSystem;
 import nl.bitwalker.useragentutils.UserAgent;
@@ -7,23 +9,40 @@ import nl.bitwalker.useragentutils.Version;
 
 public class PlatformIdentity {
 	private UserAgent agent;
-//	private Browser browser;
-//	private Version version;
-//	private OperatingSystem os;
+	@JsonProperty("browser")
+	private String browser;
+	@JsonProperty("version")
+	private String version;
+	@JsonProperty("os")
+	private String os;
 	
-	public PlatformIdentity(String userAgentString){
-		this.agent = UserAgent.parseUserAgentString(userAgentString);
+	// Dummy constructor needed to be Jackson-parseable
+	public PlatformIdentity(){}
+	
+	public PlatformIdentity(String us) throws IllegalArgumentException{
+		if (us != null){
+			this.agent = UserAgent.parseUserAgentString(us);
+			this.browser = agent.getBrowser().toString();
+			this.version = agent.getBrowserVersion().toString();
+			this.os = agent.getOperatingSystem().toString();
+		}
+		else{
+			new IllegalArgumentException("User-Agent cannot be null.");
+		}
 	}
-
-	public Browser getBrowser() {
-		return agent.getBrowser();
+	
+	@JsonProperty("browser")
+	public String getBrowser() {
+		return this.browser;
 	}
-
-	public Version getVersion() {
-		return  agent.getBrowserVersion();
+	
+	@JsonProperty("version")
+	public String getVersion() {
+		return this.version;
 	}
-
-	public OperatingSystem getOs() {
-		return agent.getOperatingSystem();
+	
+	@JsonProperty("os")
+	public String getOs() {
+		return this.os;
 	}
 }
