@@ -80,30 +80,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	}
 	
 	/**
-	 * Creates and shaves a new shortened URL if the given URL is valid AND also can be reached.
-	 */
-	protected ShortURL createAndSaveIfValidAndReachable(String url, String sponsor,
-			String brand, String owner, String ip) {
-		
-		UrlValidator urlValidator = new UrlValidator(new String[] { "http",
-				"https" });
-		boolean isReachableUrl = ping(url);
-		if ( urlValidator.isValid(url) && isReachableUrl ) {
-			String id = Hashing.murmur3_32()
-					.hashString(url, StandardCharsets.UTF_8).toString();
-			ShortURL su = new ShortURL(id, url,
-					linkTo(
-							methodOn(UrlShortenerController.class).redirectTo(
-									id, null)).toUri(), sponsor, new Date(
-							System.currentTimeMillis()), owner,
-					HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
-			return shortURLRepository.save(su);
-		} else {
-			return null;
-		}
-	}
-	
-	/**
 	 * Shortens a given URL if this URL is reachable via HTTP.
 	 */
 	@RequestMapping(value = "/linkreachable", method = RequestMethod.POST)
@@ -111,9 +87,13 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand,
 			HttpServletRequest request) {
+		ShortURL su = null;
+		boolean isReachableUrl = ping(url);
 		
-		ShortURL su = createAndSaveIfValidAndReachable(url, sponsor, brand, UUID
-				.randomUUID().toString(), extractIP(request));
+		if (isReachableUrl){
+			su = createAndSaveIfValid(url, sponsor, brand, UUID
+					.randomUUID().toString(), extractIP(request));
+		}
 		
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
