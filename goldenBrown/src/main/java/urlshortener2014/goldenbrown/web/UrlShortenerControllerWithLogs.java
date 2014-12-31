@@ -1,12 +1,18 @@
 package urlshortener2014.goldenbrown.web;
 
 import java.sql.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.SpringVersion;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
@@ -15,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import urlshortener2014.common.domain.Click;
 import urlshortener2014.common.domain.ShortURL;
@@ -49,9 +56,26 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			HttpServletRequest request) {
 		ShortURL l = shortURLRepository.findByKey(id);
 		// TODO: Hacer una petición al servicio PlatformIdentifierService
-		String browser = "", platform = "";	
-
-		if (l != null) {
+//		System.out.println("Version: "+SpringVersion.getVersion());
+		String useragentstring = "", browser = "", platform = "";	
+		useragentstring = request.getHeader("User-Agent");
+//		final String uri = "http://localhost:8080/platformidentifier/{useragentstring}";
+		final String uri = "http://localhost:8080/platformidentifier/?us={us}";
+//		Map<String,String> params = new HashMap<>();
+//		params.put("us", useragentstring);
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity entity = new HttpEntity(headers);
+		RestTemplate restTemplate = new RestTemplate();
+//		ResponseEntity<PlatformIdentity> resp = restTemplate.exchange(uri, HttpMethod.GET, entity, PlatformIdentity.class, useragentstring);
+		ResponseEntity<PlatformIdentity> response = restTemplate.getForEntity(
+						uri,
+						PlatformIdentity.class,
+						useragentstring);
+		System.out.println(response);
+		PlatformIdentity pi = response.getBody();
+		browser = pi.getBrowser();
+		platform = pi.getOs();
+        if (l != null) {
 			createAndSaveClick(id, extractIP(request), browser, platform);
 			return createSuccessfulRedirectToResponse(l);
 		} else {
