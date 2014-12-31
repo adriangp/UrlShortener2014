@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityLinks;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,13 +32,10 @@ import com.google.common.hash.Hashing;
 public class UrlShortenerController {
 
 	@Autowired
-	private ShortURLRepository shortURLRepository;
+	protected ShortURLRepository shortURLRepository;
 
 	@Autowired
-	private ClickRepository clickRepository;
-
-	@Autowired
-	EntityLinks entityLinks;
+	protected ClickRepository clickRepository;
 
 	@RequestMapping(value = "/l{id}", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectTo(@PathVariable String id,
@@ -59,7 +55,7 @@ public class UrlShortenerController {
 		clickRepository.save(cl);
 	}
 
-	private String extractIP(HttpServletRequest request) {
+	protected String extractIP(HttpServletRequest request) {
 		return request.getRemoteAddr();
 	}
 
