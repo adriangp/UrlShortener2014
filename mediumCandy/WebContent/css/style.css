@@ -42,7 +42,21 @@ input[type="text"].dream-search:focus {
   margin: 0 auto;
 }
 
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 470px) {
+    input[type="text"].dream-search {
+      letter-spacing: 0.25px;
+      font-size: 1em;
+      width: 250px;
+      padding-left: 25px;
+    }
+
+    input[type="text"].dream-search:focus {
+      width: 350px;
+      transition: ease-in-out,width .35s ease-in-out;
+      border-color: #FF9900;
+    }
+  
+  @media screen and (max-width: 370px) {
     input[type="text"].dream-search {
       letter-spacing: 0.25px;
       font-size: 1em;
