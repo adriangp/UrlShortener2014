@@ -19,12 +19,16 @@ public class PlatformIdentity {
 	// Dummy constructor needed to be Jackson-parseable
 	public PlatformIdentity(){}
 	
-	public PlatformIdentity(String us){
-		this.agent = UserAgent.parseUserAgentString(us);
-		
-		this.browser = agent.getBrowser().toString();
-		this.version = agent.getBrowserVersion().toString();
-		this.os = agent.getOperatingSystem().toString();
+	public PlatformIdentity(String us) throws IllegalArgumentException{
+		if (us != null){
+			this.agent = UserAgent.parseUserAgentString(us);
+			this.browser = agent.getBrowser().toString();
+			this.version = agent.getBrowserVersion().toString();
+			this.os = agent.getOperatingSystem().toString();
+		}
+		else{
+			new IllegalArgumentException("User-Agent cannot be null.");
+		}
 	}
 	
 	@JsonProperty("browser")

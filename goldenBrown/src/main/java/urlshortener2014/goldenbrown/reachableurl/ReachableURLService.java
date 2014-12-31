@@ -70,12 +70,4 @@ public class ReachableURLService {
 			method.releaseConnection();
 		}
 	}
-
-//	private static String parseURL(String url) {
-//		if (!url.startsWith("http://") && !url.startsWith("https://")){
-//			url = "http://"+url;
-//		}
-//		return url;
-//	}
-
 }
