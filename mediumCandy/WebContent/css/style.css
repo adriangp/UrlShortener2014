@@ -16,6 +16,7 @@ body {
 .logo {
   text-align: center;
   padding: 20px;
+  padding-top: 30px;
 }
 
 /* Styles for expanding search element */
