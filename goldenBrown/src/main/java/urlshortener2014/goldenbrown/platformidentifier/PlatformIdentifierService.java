@@ -24,7 +24,7 @@ public class PlatformIdentifierService {
 			return new ResponseEntity<PlatformIdentity>(pi, HttpStatus.OK);
 		}
 		catch(IllegalArgumentException e){
-			return new ResponseEntity<PlatformIdentity>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<PlatformIdentity>(HttpStatus.BAD_REQUEST);
 		}
 		
 		
