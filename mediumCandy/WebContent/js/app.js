@@ -9,10 +9,14 @@ $( document ).ready(function() {
  * This function is called everytime the user submits the form.
  */
 function setUrlSubmition() {
+  // jQuery way!
   $("form").on('submit', function (e) {
     var url = getUrl();  
-    shortenURL(url);
-    e.preventDefault(); //stop form submission
+    
+    if ( ! emptyUserInput(url) ) {
+      shortenURL(url);
+      e.preventDefault(); //stop form submission
+    }
   });
 }
 
@@ -23,8 +27,30 @@ function getUrl() {
   return $( '#urlInput' ).val();
 }
 
+/*
+ * Clears all text in #urlInput.
+ */
 function clearUrlInput() {
   $( '#urlInput' ).val('');
+}
+
+/*
+ * Returns TRUE if 'input' is an empty String.
+ */
+function emptyUserInput(input) {
+  return input == "";
+}
+
+function showShortenedUri(objUri) {
+  var shortenUri = objUri.uri;
+  var targetUri = objUri.target;
+  // DOM insertion
+  $( '#shortened-url' ).text( '' );
+  $( '#target-url' ).text( '' );
+  $( '#shortened-url' ).html( '<a href="' + targetUri + '">' + shortenUri + '</a>');
+  $( '#target-url' ).text( targetUri );
+  // animation when shown! :-)
+  $( '.shorten-url-block' ).slideDown();
 }
 
 
@@ -37,14 +63,15 @@ function shortenURL(url) {
   $.ajax({
     type : 'POST',
 	contentType : 'application/json',
-	url : SERVICE_URI + "linkreachable?url=" + url,
+	url : SERVICE_URI + "link?url=" + url,
 	dataType : "json",
 	//data : url,		
 	success : function(response) {
-      console.log(response); // JSON object sent by server
-      console.log("exito!");
+      // update DOM with response data
+      showShortenedUri(response);
       // things to do after call
       clearUrlInput();
+      console.log('exito!');
     },    
     error : function(error) {
        console.log("Oops! RESPONSE Status:  " + error.status);

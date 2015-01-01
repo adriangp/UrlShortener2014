@@ -1,3 +1,4 @@
+/* Medium Candy HEX code = #E2062C */
 body {
   background: -webkit-radial-gradient(circle, #000, #121212, #000); /* Safari 5.1 to 6.0 */
   background: -o-radial-gradient(circle, #000, #121212, #000); /* For Opera 11.6 to 12.0 */
@@ -17,6 +18,34 @@ body {
   text-align: center;
   padding: 20px;
   padding-top: 30px;
+}
+
+.shorten-url-block {
+  display: none;
+  padding: 20px;
+  width: 500px;
+  clear: both;
+}
+
+.shorten-url-block .img-block {
+  padding: 8px;
+  float: left;
+  width: 20%;
+}
+
+.shorten-url-block .details-block {
+  padding-left: 5px;
+  float: left;
+  width: 80%;
+}
+
+.shorten-url-block .details-block #shortened-url {
+  font-size: 1.5em;
+}
+
+.shorten-url-block .details-block #target-url{
+  color: #FFF;
+  font-size: 0.95em;
 }
 
 /* Styles for expanding search element */
