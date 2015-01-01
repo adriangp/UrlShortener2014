@@ -30,6 +30,11 @@ function getUrl() {
   return $( '#urlInput' ).val();
 }
 
+function setUrlInput(objectUri) {
+  var shortenedUri = objectUri.uri;
+  $( '#urlInput' ).val( shortenedUri );
+}
+
 /*
  * Clears all text in #urlInput.
  */
@@ -73,6 +78,9 @@ function showShortenedUri(objUri) {
   $( '.shorten-url-block' ).slideDown();
 }
 
+function selectUserInput() {
+  $( '#urlInput' ).select();
+}
 
 /* API CALLS */
 
@@ -90,7 +98,8 @@ function shortenURL(url) {
       // update DOM with response data
       showShortenedUri(response);
       // things to do after call
-      clearUrlInput();
+      setUrlInput(response);
+      selectUserInput();
       console.log('exito!');
     },    
     error : function(error) {
