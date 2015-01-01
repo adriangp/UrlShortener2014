@@ -32,6 +32,7 @@ import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.web.UrlShortenerController;
 import urlshortener2014.dimgray.concurrent.UrlShortenerTask;
 import urlshortener2014.dimgray.domain.UrlPair;
+import urlshortener2014.dimgray.domain.UrlPairs;
 
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
@@ -55,7 +56,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	}
 	
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	public ResponseEntity<List<UrlPair>> csvShortener(@RequestParam("file") MultipartFile file,
+	public ResponseEntity<UrlPairs> csvShortener(@RequestParam("file") MultipartFile file,
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand,
 			HttpServletRequest request) {
@@ -75,7 +76,9 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				UrlPair pair = future.get();
 				list.add(pair);
 			}
-			return new ResponseEntity<>(list,HttpStatus.OK);
+			 UrlPairs ups = new UrlPairs();
+			 ups.setUrlPairs(list);
+			return new ResponseEntity<>(ups ,HttpStatus.OK);
 		} catch (IOException | InterruptedException | ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

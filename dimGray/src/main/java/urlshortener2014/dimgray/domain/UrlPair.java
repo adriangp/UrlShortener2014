@@ -7,6 +7,9 @@ public class UrlPair {
 	private String url;
 	private URI shortenedUrl;
 	
+	public UrlPair() {
+	}
+	
 	public UrlPair(String url, URI shortenedUrl) {
 		this.url = url;
 		this.shortenedUrl = shortenedUrl;

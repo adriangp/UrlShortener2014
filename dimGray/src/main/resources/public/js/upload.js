@@ -18,7 +18,8 @@ $(document).ready(function() {
 				data : formData,
 				processData: false,
 				contentType: false,
-				success : function(msg) {
+				success : function(message) {
+					var msg = message.urlPairs;
 					list = "";
 					$("#resultcsv").html("<table class='table table-bordered' id='csvtable'> <tr> <td>Url</td> <td>ShortenedUrl</td></tr></table>");
 					var trHTML='';
