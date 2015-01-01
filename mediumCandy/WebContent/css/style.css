@@ -17,7 +17,7 @@ body {
 .logo {
   text-align: center;
   padding: 20px;
-  padding-top: 30px;
+  padding-top: 100px;
 }
 
 .shorten-url-block {
@@ -40,12 +40,26 @@ body {
 }
 
 .shorten-url-block .details-block #shortened-url {
-  font-size: 1.5em;
+  font-size: 1.4em;
 }
 
-.shorten-url-block .details-block #target-url{
+.shorten-url-block .details-block #shortened-url a:hover {
+  color: #008CBA;
+}
+
+.shorten-url-block .details-block #target-url a {
   color: #FFF;
   font-size: 0.95em;
+}
+
+.shorten-url-block .details-block #target-url a:hover {
+  text-decoration: underline;
+}
+
+#alert-box {
+  display: none;
+  position: absolute;
+  width: 100%;
 }
 
 /* Styles for expanding search element */
@@ -63,7 +77,7 @@ input[type="text"].dream-search {
 input[type="text"].dream-search:focus {
   width: 450px;
   transition: ease-in-out,width .35s ease-in-out;
-  border-color: #FF9900;
+  border-color: #008CBA;
 }
 
 .center-row ul{
