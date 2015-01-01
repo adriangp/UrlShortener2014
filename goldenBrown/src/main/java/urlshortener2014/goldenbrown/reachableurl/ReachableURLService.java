@@ -23,7 +23,7 @@ public class ReachableURLService {
 		HttpURLConnection huc = null;
 		int code = -1;
 		try{
-			url = new URL(parseURL(urlString));
+			url = new URL(urlString);
 			huc =  (HttpURLConnection)  url.openConnection(); 
 		    huc.setRequestMethod("HEAD"); 
 		    huc.setInstanceFollowRedirects(false);

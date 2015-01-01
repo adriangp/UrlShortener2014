@@ -28,7 +28,12 @@
 		$("#shortener").submit(function(event){
 			event.preventDefault();
 			var link = $(this).serialize();
-			isUrlReachable(link);
+			if (checkValidProtocol(link)){
+				isUrlReachable(link);
+			}
+			else{
+				showError('You must specify the protocol: "http://" or "https://"');
+			}
 		});
 	});
 	
@@ -54,6 +59,9 @@
 				if(result){
 					queryLink(link);
 				}
+				else{
+					showError("URL not reachable!");
+				}
 			}
 		});
 	}
@@ -67,27 +75,24 @@
 				$("#result").html("<a target='_blank' href='"+msg.uri+"' class='btn btn-default btn-lg' role='button'>"+msg.uri+"</a>")
 			},
 			error : function() {
-				alert("failure");
+				showError("An error occurred!");
 			}
 		});
 	}
-	// Por si acaso
-	 /* $(document).ready(function() {
-			$("#shortener").submit(function(event){
-				event.preventDefault();
-				$.ajax({
-					type : "POST",
-					url : "/link",
-					data : $(this).serialize(),
-					success : function(msg) {
-						$("#result").html("<a target='_blank' href='"+msg.uri+"' class='btn btn-default btn-lg' role='button'>"+msg.uri+"</a>")
-					},
-					error : function() {
-						alert("failure");
-					}
-				});
-			});
-		}); */
+	
+	function showError(errorMsg){
+		$("#result").html("<label>"+errorMsg+"</label>")
+	}
+	
+	function checkValidProtocol(link){
+		if ((decodeURIComponent(link)).match("^url=https://") || 
+			(decodeURIComponent(link)).match("^url=http://")){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
 	</script>
 </body>
 </html>
