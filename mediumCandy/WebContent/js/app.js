@@ -1,5 +1,8 @@
 var SERVICE_URI = "http://localhost:8080/";
 
+/* Alert Messages */
+var ALERT_SHORTEN_URL = "Unable to shorten that link. It is not a valid or reachable url.";
+
 /* Document Ready Functionality (jQuery stuff) */
 $( document ).ready(function() { 
   setUrlSubmition();
@@ -41,14 +44,31 @@ function emptyUserInput(input) {
   return input == "";
 }
 
+/* 
+ * Shows the alert box with the given 'alertMessage' text in it, and 
+ * automatically hides after 5 seconds - if isn't already visible.
+ */
+function showAlert(alertMessage) {
+  if ( elementIsVisible( '#alert-box' ) ) {
+    $( '#alert-box' ).html(alertMessage);
+    $( '#alert-box' ).slideDown().delay(5000).slideUp();
+  }
+}
+
+function elementIsVisible(element) {
+  return $( element ).css('display') == 'none';
+}
+
 function showShortenedUri(objUri) {
   var shortenUri = objUri.uri;
   var targetUri = objUri.target;
+  
   // DOM insertion
   $( '#shortened-url' ).text( '' );
   $( '#target-url' ).text( '' );
   $( '#shortened-url' ).html( '<a href="' + targetUri + '">' + shortenUri + '</a>');
-  $( '#target-url' ).text( targetUri );
+  $( '#target-url' ).html( '<a href="' + targetUri + '">' + targetUri + '</a>');
+  
   // animation when shown! :-)
   $( '.shorten-url-block' ).slideDown();
 }
@@ -74,7 +94,8 @@ function shortenURL(url) {
       console.log('exito!');
     },    
     error : function(error) {
-       console.log("Oops! RESPONSE Status:  " + error.status);
+      showAlert(ALERT_SHORTEN_URL);
+      console.log("Oops! RESPONSE Status:  " + error.status);
     }
   });
 }

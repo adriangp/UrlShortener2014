@@ -2227,6 +2227,7 @@ meta.foundation-mq-topbar {
   content: "/"; }
 
 .alert-box {
+  text-align: center;
   border-style: solid;
   border-width: 1px;
   display: block;
@@ -2261,8 +2262,8 @@ meta.foundation-mq-topbar {
     border-color: #3a945b;
     color: #FFFFFF; }
   .alert-box.alert {
-    background-color: #f04124;
-    border-color: #de2d0f;
+    background-color: #E2062C;
+    border-color: #CB0528;
     color: #FFFFFF; }
   .alert-box.secondary {
     background-color: #e7e7e7;
