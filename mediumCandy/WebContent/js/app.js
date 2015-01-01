@@ -4,6 +4,9 @@ var SERVICE_URI = "http://localhost:8080/";
 var ALERT_SHORTEN_URL = "Unable to shorten that link. It is not a valid or reachable url.";
 var ALERT_ALREADY_SHORTEN = "That is already a shortened link!";
 
+/* Vars */
+var shortenedUriList = [];
+
 /* Document Ready Functionality (jQuery stuff) */
 $( document ).ready(function() { 
   setUrlSubmition();
@@ -66,14 +69,66 @@ function elementIsVisible(element) {
 }
 
 function showShortenedUri(objUri) {
-  var shortenUri = objUri.uri;
+  var shortUri = objUri.uri;
   var targetUri = objUri.target;
+  var shortenedUri = {uri: shortUri, target:targetUri};
   
   // DOM insertion
-  $( '#shortened-url' ).html( shortenUri );
-  $( '#target-url' ).html( '<a href="' + targetUri + '">' + targetUri + '</a>');
+  insertShortenedUriInDOM(shortenedUri);
+}
+
+function insertShortenedUriInDOM(shortenedUri) {
+  // 1. Insert to latest uri details block
+  insertLatestShortenedUriInDOM(shortenedUri);
   
+  // 2. If there were other uris shortened before, prepend the one
+  //    shown in latest uri details block to the list of shortened uris
+  if ( shortenedUriList.length > 0 ) {
+    // if the list is empty, it will be hidden, we have to show it
+    if ( shortenedUriList.length == 1 ) {
+      $( '.shortened-url-block' ).show();
+    }
+    // 2.1. get first array elem (we need it!)
+    var latest = shortenedUriList.shift();
+    // and insert it where it was ('shift()' method deleted it! from the array)
+    shortenedUriList.unshift(latest);
+    console.log(latest);
+    // 2.2. update the shortened uris list (DOM)
+    prependLatestShortenedUriInDOM(latest);
+  }
+  
+  // 3. add new shortened uri to the array of shortened uris
+  shortenedUriList.unshift(shortenedUri);
+}
+
+function prependLatestShortenedUriInDOM(shortenedUri) {
+  var uri = $(  '<div class="shorten-url-elem">' +
+                  '<div class="img-block">' +
+                    '<img src="/img/href_small.png">' +
+                  '</div>' +
+                  '<div class="details-block">' +
+                    '<div class="shortened-url">' + shortenedUri.uri + '</div>' +
+                    '<div class="target-url"><a target="_blank" href="' + shortenedUri.target + '">' + shortenedUri.target + '</a></div>' +
+                  '</div>' +
+                '</div><br>');
+  
+  $( '.shortened-url-block' ).prepend( uri );
+}
+
+function insertLatestShortenedUriInDOM(shortenedUri) {
+  var uri = $(  '<div class="shorten-url-elem">' +
+                  '<div class="img-block">' +
+                    '<img src="/img/href.png">' + 
+                  '</div>' +
+                  '<div class="details-block">' +
+                    '<div class="shortened-url">' + shortenedUri.uri + '</div>' +
+                    '<div class="target-url"><a target="_blank" href="' + shortenedUri.target + '">' + shortenedUri.target + '</a></div>' +
+                  '</div>' +
+                '</div><br>');
+  
+  $( '.shorten-url-block' ).html( uri );
   // animation when shown! :-)
+  $( '.shorten-url-block' ).hide();
   $( '.shorten-url-block' ).slideDown();
 }
 

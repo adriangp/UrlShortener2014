@@ -20,8 +20,9 @@ body {
   padding-top: 100px;
 }
 
+/* last shortened uri */
 .shorten-url-block {
-  /*display: none;*/
+  display: none;
   padding: 20px;
   width: 500px;
   clear: both;
@@ -39,7 +40,27 @@ body {
   width: 100%;
 }
 
-.shorten-url-block .details-block #shortened-url {
+/* Shortened uris list */
+.shortened-url-block {
+  display: none;
+  padding: 5px;
+  width: 325px;
+  clear: both;
+}
+
+.shortened-url-block .img-block {
+  padding: 8px;
+  float: left;
+  width: 20%;
+}
+
+.shortened-url-block .details-block {
+  float: clear;
+  width: 100%;
+}
+
+/* last shortened uri details */
+.shortened-url {
   font-size: 1.4em;
   color: #008CBA;
   /* wrapping para titulos demasiado largos */
@@ -48,22 +69,48 @@ body {
   text-overflow: ellipsis;
 }
 
-.shorten-url-block .details-block #target-url {
+.target-url {
+  color: #FFF;
+  font-size: 0.9em;
   /* wrapping para titulos demasiado largos */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.shorten-url-block .details-block #target-url a {
+.target-url a {
   color: #FFF;
   font-size: 0.95em;
 }
 
-.shorten-url-block .details-block #target-url a:hover {
+.target-url a:hover {
   text-decoration: underline;
 }
 
+/* shortened uris list details */
+.shortened-url-block .shortened-url {
+  font-size: .95em;
+  color: #008CBA;
+  /* wrapping para titulos demasiado largos */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shortened-url-block .target-url {
+  color: #FFF;
+  /* wrapping para titulos demasiado largos */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shortened-url-block .target-url a {
+  color: #FFF;
+  font-size: 0.75em;
+}
+
+/* alert box */
 #alert-box {
   display: none;
   position: absolute;
