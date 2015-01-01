@@ -2,6 +2,7 @@ var SERVICE_URI = "http://localhost:8080/";
 
 /* Alert Messages */
 var ALERT_SHORTEN_URL = "Unable to shorten that link. It is not a valid or reachable url.";
+var ALERT_ALREADY_SHORTEN = "That is already a shortened link!";
 
 /* Document Ready Functionality (jQuery stuff) */
 $( document ).ready(function() { 
@@ -69,9 +70,7 @@ function showShortenedUri(objUri) {
   var targetUri = objUri.target;
   
   // DOM insertion
-  $( '#shortened-url' ).text( '' );
-  $( '#target-url' ).text( '' );
-  $( '#shortened-url' ).html( '<a href="' + targetUri + '">' + shortenUri + '</a>');
+  $( '#shortened-url' ).html( shortenUri );
   $( '#target-url' ).html( '<a href="' + targetUri + '">' + targetUri + '</a>');
   
   // animation when shown! :-)
@@ -80,6 +79,11 @@ function showShortenedUri(objUri) {
 
 function selectUserInput() {
   $( '#urlInput' ).select();
+}
+
+function isShortenUri(url) {
+  var subUri = url.substring(0, 22);
+  return subUri == SERVICE_URI;
 }
 
 /* API CALLS */
@@ -93,7 +97,6 @@ function shortenURL(url) {
 	contentType : 'application/json',
 	url : SERVICE_URI + "link?url=" + url,
 	dataType : "json",
-	//data : url,		
 	success : function(response) {
       // update DOM with response data
       showShortenedUri(response);
@@ -103,7 +106,11 @@ function shortenURL(url) {
       console.log('exito!');
     },    
     error : function(error) {
-      showAlert(ALERT_SHORTEN_URL);
+      if ( isShortenUri(url) ) {
+        showAlert(ALERT_ALREADY_SHORTEN);
+      } else {
+        showAlert(ALERT_SHORTEN_URL);
+      }
       console.log("Oops! RESPONSE Status:  " + error.status);
     }
   });
