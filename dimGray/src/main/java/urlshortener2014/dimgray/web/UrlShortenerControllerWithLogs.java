@@ -34,6 +34,12 @@ import urlshortener2014.dimgray.concurrent.UrlShortenerTask;
 import urlshortener2014.dimgray.domain.UrlPair;
 import urlshortener2014.dimgray.domain.UrlPairs;
 
+/**
+ * Clase que contiene los diferentes servicios web que se han implementado.
+ * Acortador, redireccionador, CSV, QR y de bolcado de la BD.
+ * @author Ivan y Paulo
+ *
+ */
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
@@ -55,6 +61,16 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return super.shortener(url, sponsor, brand, request);
 	}
 	
+	
+	/**
+	 * Servicio web que ejecuta llamadas de forma asíncrona gracias a un Thread Pool 
+	 * y devuelve un objeto de la clase URLPairs como resultado de la operación.
+	 * @param file Fichero csv con las urls a acortar. 
+	 * @param sponsor Esponsor
+	 * @param brand Marca
+	 * @param request petición
+	 * @return objeto de la URLPairs con los resultados.
+	 */
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
 	public ResponseEntity<UrlPairs> csvShortener(@RequestParam("file") MultipartFile file,
 			@RequestParam(value = "sponsor", required = false) String sponsor,
@@ -87,7 +103,12 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		
 	}
 	
-	
+	/**
+	 * Servicio QR que permite adquirir una imagen qr dada una url acortada.
+	 * @param url Url acortada de la que hay que conseguir la imagen qr.
+	 * @param request
+	 * @return Un array de bytes en base64 con la imagen.
+	 */
 	@RequestMapping(value = "/qr", method = RequestMethod.GET)
 	public ResponseEntity<byte[]> qrImage(@RequestParam("url") String url, 
 			HttpServletRequest request) {
