@@ -67,14 +67,14 @@ body {
   width: 0;
 }
 
-input[type="text"].dream-search {
+input[type="search"].dream-search {
   letter-spacing: 0.25px;
   font-size: 1em;
   width: 350px;
   padding-left: 25px;
 }
 
-input[type="text"].dream-search:focus {
+input[type="search"].dream-search:focus {
   width: 450px;
   transition: ease-in-out,width .35s ease-in-out;
   border-color: #008CBA;
@@ -86,30 +86,26 @@ input[type="text"].dream-search:focus {
 }
 
 @media screen and (max-width: 470px) {
-    input[type="text"].dream-search {
-      letter-spacing: 0.25px;
-      font-size: 1em;
+    input[type="search"].dream-search {
+      letter-spacing: 0.15px;
+      font-size: 0.9em;
       width: 250px;
-      padding-left: 25px;
+      padding-left: 15px;
     }
 
-    input[type="text"].dream-search:focus {
+    input[type="search"].dream-search:focus {
       width: 350px;
-      transition: ease-in-out,width .35s ease-in-out;
-      border-color: #FF9900;
     }
   
   @media screen and (max-width: 370px) {
-    input[type="text"].dream-search {
-      letter-spacing: 0.25px;
-      font-size: 1em;
+    input[type="search"].dream-search {
+      letter-spacing: 0.05px;
+      font-size: 0.8em;
       width: 150px;
-      padding-left: 25px;
+      padding-left: 10px;
     }
 
-    input[type="text"].dream-search:focus {
+    input[type="search"].dream-search:focus {
       width: 250px;
-      transition: ease-in-out,width .35s ease-in-out;
-      border-color: #FF9900;
     }
 }
