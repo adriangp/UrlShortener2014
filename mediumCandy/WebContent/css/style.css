@@ -21,7 +21,7 @@ body {
 }
 
 .shorten-url-block {
-  display: none;
+  /*display: none;*/
   padding: 20px;
   width: 500px;
   clear: both;
@@ -35,16 +35,24 @@ body {
 
 .shorten-url-block .details-block {
   padding-left: 5px;
-  float: left;
-  width: 80%;
+  float: clear;
+  width: 100%;
 }
 
 .shorten-url-block .details-block #shortened-url {
   font-size: 1.4em;
+  color: #008CBA;
+  /* wrapping para titulos demasiado largos */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.shorten-url-block .details-block #shortened-url {
-  color: #008CBA;
+.shorten-url-block .details-block #target-url {
+  /* wrapping para titulos demasiado largos */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .shorten-url-block .details-block #target-url a {
