@@ -17,7 +17,37 @@ body {
 .logo {
   text-align: center;
   padding: 20px;
-  padding-top: 100px;
+  padding-top: 65px;
+  padding-bottom: 0px;
+}
+
+.container {
+  padding-top: 20px;
+}
+
+/* Link Menu */
+.menu-links {
+  padding: 10px;
+  padding-top: 0px;
+}
+
+.menu-links ul li {
+  padding: 5px;
+}
+
+.menu-links ul li a {
+  padding: 10px;
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #FFF;
+}
+
+.menu-links ul li a:hover {
+  color: #008CBA;
+}
+
+.menu-links ul li a.selected-link {
+  color: #008CBA;
 }
 
 /* last shortened uri */
@@ -126,7 +156,7 @@ input[type="search"].dream-search {
   letter-spacing: 0.25px;
   font-size: 1em;
   width: 350px;
-  padding-left: 25px;
+  padding-left: 15px;
 }
 
 input[type="search"].dream-search:focus {
