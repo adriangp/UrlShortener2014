@@ -1,9 +1,11 @@
 package urlshortener2014.goldenbrown.reachableurl;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,10 +34,10 @@ public class ReachableURLService {
 		    code = huc.getResponseCode();
 //		    if (DEBUG) { System.out.println("timeout: "+huc.getConnectTimeout()); }
 		    if (code == HttpURLConnection.HTTP_OK){
-		    	return new ResponseEntity<>(org.springframework.http.HttpStatus.OK);
+		    	return new ResponseEntity<>(HttpStatus.OK);
 		    }
 		    else{
-		    	return new ResponseEntity<>(org.springframework.http.HttpStatus.NOT_FOUND);
+		    	return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		    }
 		}
 		catch(IllegalArgumentException e){
@@ -44,13 +46,18 @@ public class ReachableURLService {
 		} catch (MalformedURLException e) {
 			System.err.println(e.getMessage());
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		catch(IOException e){
+		} catch (ConnectException e){
 			System.err.println(e.getMessage());
+			return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
+		} catch(IOException e){
+			System.err.println(e.getMessage());
+			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		finally{
-			huc.disconnect();
+			if(huc != null){
+				huc.disconnect();
+			}
 		}
 	}
 	
