@@ -22,9 +22,14 @@ public class PlatformIdentity {
 	public PlatformIdentity(String us) throws IllegalArgumentException{
 		if (us != null){
 			this.agent = UserAgent.parseUserAgentString(us);
-			this.browser = agent.getBrowser().toString();
-			this.version = agent.getBrowserVersion().toString();
 			this.os = agent.getOperatingSystem().toString();
+			this.browser = agent.getBrowser().toString();
+			if(agent.getBrowserVersion() != null){
+				this.version = agent.getBrowserVersion().toString();
+			}
+			else{
+				this.version = "UNKNOWN";
+			}
 		}
 		else{
 			new IllegalArgumentException("User-Agent cannot be null.");

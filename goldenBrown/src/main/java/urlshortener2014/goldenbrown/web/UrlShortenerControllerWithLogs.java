@@ -38,9 +38,15 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 						uri,
 						PlatformIdentity.class,
 						useragentstring);
+		
 		if (response.getStatusCode().equals(HttpStatus.OK)){
 			PlatformIdentity pi = response.getBody();
-			browser = pi.getBrowser() +" " + pi.getVersion();
+			if(pi.getVersion().equals("UNKNOWN")){
+				browser = pi.getBrowser();
+			}
+			else{
+				browser = pi.getBrowser() + " " + pi.getVersion();
+			}
 			platform = pi.getOs();
 		}
         if (l != null) {

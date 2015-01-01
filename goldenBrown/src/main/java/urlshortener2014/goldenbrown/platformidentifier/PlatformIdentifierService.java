@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PlatformIdentifierService {
 		
-	@RequestMapping(value = "/platformidentifier/", method = RequestMethod.GET)
+	@RequestMapping(value = "/platformidentifier", method = RequestMethod.GET)
 	public ResponseEntity<PlatformIdentity> getPlatform(
 			@RequestParam(value = "us", required = true) String us,
 			HttpServletRequest request)
