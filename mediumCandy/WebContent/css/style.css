@@ -23,9 +23,21 @@ body {
 }
 
 .container {
+  color: #FFF;
+  text-align: justify;
   margin: 0 auto;
   padding: 20px;
-  width: 550px;
+  padding-left: 40px;
+  width: 600px;
+}
+
+.container h1 {
+  color: #fff;
+  font-size: 1.5em;
+}
+
+.container p {
+  font-size: 0.9em;
 }
 
 .logo {
@@ -175,7 +187,7 @@ input[type="search"].dream-search:focus {
 
 @media screen and (max-width: 600px) {
   .container {
-    width: 400px;
+    width: 450px;
   }
 }
 
