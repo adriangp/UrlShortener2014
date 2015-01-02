@@ -29,10 +29,11 @@
 			event.preventDefault();
 			var link = $(this).serialize();
 			if (checkValidProtocol(link)){
+				showFeedback("Processing...");
 				isUrlReachable(link);
 			}
 			else{
-				showError('You must specify the protocol: "http://" or "https://"');
+				showFeedback('You must specify a valid protocol: "http://" or "https://"');
 			}
 		});
 	});
@@ -60,7 +61,7 @@
 					queryLink(link);
 				}
 				else{
-					showError("The provided URL is not reachable!");
+					showFeedback("The provided URL is not reachable!");
 				}
 			}
 		});
@@ -75,12 +76,12 @@
 				$("#result").html("<a target='_blank' href='"+msg.uri+"' class='btn btn-default btn-lg' role='button'>"+msg.uri+"</a>")
 			},
 			error : function() {
-				showError("An error occurred!");
+				showFeedback("An error occurred!");
 			}
 		});
 	}
 	
-	function showError(errorMsg){
+	function showFeedback(errorMsg){
 		$("#result").html("<label>"+errorMsg+"</label>")
 	}
 	
