@@ -20,7 +20,7 @@ This is the shared repository for the project developed in this course.
 * Copy the contents of `src\main\java` from `UrlShortener2014.demo` into your project.
 * Rename the package `urlshortener2014.demo` to your color. For example if your project is _BangladeshGreen_ you must rename it to `urlshortener2014.bangladeshgreen`.
 * Test that your program run using command line (`gradle run`) or within eclipse (either as Java application or as Gradle application).
-* Do `$ curl -v -d "url=http://www.unizar.es/" -X POST http://localhost:8080` and check that appears a line in the console that contains `u.d.web.UrlShortenerControllerWithLogs`
+* Do `$ curl -v -d "url=http://www.unizar.es/" -X POST http://localhost:8080/link` and check that appears a line in the console that contains `u.d.web.UrlShortenerControllerWithLogs`
 
 Now you can start to add new functionality to your project.
 
