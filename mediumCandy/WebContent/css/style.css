@@ -22,15 +22,17 @@ body {
   display: none;
 }
 
+.container {
+  margin: 0 auto;
+  padding: 20px;
+  width: 550px;
+}
+
 .logo {
   text-align: center;
   padding: 20px;
-  padding-top: 65px;
+  padding-top: 50px;
   padding-bottom: 0px;
-}
-
-.container {
-  padding-top: 20px;
 }
 
 /* Link Menu */
@@ -152,15 +154,12 @@ body {
 }
 
 /* Styles for expanding search element */
-.search-field {
-  width: 0;
-}
-
 input[type="search"].dream-search {
   letter-spacing: 0.25px;
   font-size: 1em;
   width: 350px;
   padding-left: 15px;
+  margin-top: 30px;
 }
 
 input[type="search"].dream-search:focus {
@@ -174,7 +173,17 @@ input[type="search"].dream-search:focus {
   margin: 0 auto;
 }
 
+@media screen and (max-width: 600px) {
+  .container {
+    width: 400px;
+  }
+}
+
 @media screen and (max-width: 470px) {
+  .container {
+    width: 325px;
+  }
+  
   input[type="search"].dream-search {
     letter-spacing: 0.15px;
     font-size: 0.9em;
@@ -238,6 +247,10 @@ input[type="search"].dream-search:focus {
 }
   
 @media screen and (max-width: 370px) {
+  .container {
+    width: 255px;
+  }
+  
   input[type="search"].dream-search {
     letter-spacing: 0.05px;
     font-size: 0.8em;
