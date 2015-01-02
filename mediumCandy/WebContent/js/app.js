@@ -6,10 +6,12 @@ var ALERT_ALREADY_SHORTEN = "That is already a shortened link!";
 
 /* Vars */
 var shortenedUriList = [];
+var menuSelected = "shortener";
 
 /* Document Ready Functionality (jQuery stuff) */
 $( document ).ready(function() { 
   setUrlSubmition();
+  setMenuCallbacks();
 });
 
 /*
@@ -25,6 +27,55 @@ function setUrlSubmition() {
       e.preventDefault(); //stop form submission
     }
   });
+}
+
+function setMenuCallbacks() {
+  $( '#link-shortener' ).on('click', function (e) {
+    updateMenu('#link-shortener');
+    updatePage('#shortener');
+    menuSelected = "shortener";
+    // show
+    e.preventDefault();
+  });
+  
+  $( '#link-csv' ).on('click', function (e) {
+    updateMenu('#link-csv');
+    updatePage('#csv');
+    menuSelected = "csv";
+    // show
+    e.preventDefault();
+  });
+  
+  $( '#link-branded' ).on('click', function (e) {
+    updateMenu('#link-branded');
+    updatePage('#branded');
+    menuSelected = "branded";
+    // show
+    e.preventDefault();
+  });
+  
+  $( '#link-stats' ).on('click', function (e) {
+    updateMenu('#link-stats');
+    updatePage('#stats');
+    menuSelected = "stats";
+    // show
+    e.preventDefault();
+  });
+}
+
+function updateMenu(linkId) {
+  var oldLinkId = '#link-' + menuSelected;
+  // update menu css
+  $( oldLinkId ).css( "color", "#FFF");
+  $( linkId ).css( "color", "#E2062C");
+}
+
+function updatePage(pageId) {
+  var oldPageId = '#' + menuSelected;
+  if ( pageId != "#" + menuSelected ) {
+    $( oldPageId ).hide();
+    $( pageId ).slideDown();
+  }
 }
 
 /*
@@ -142,7 +193,6 @@ function isShortenUri(url) {
 }
 
 /* API CALLS */
-
 /*
  * Shortens an URL.
  */

@@ -6,12 +6,20 @@ body {
   background: radial-gradient(circle, #000, #121212, #000); /* Standard syntax */
 }
 
-.top-bar {
-  background-color: #000;
+/* Main containers */
+#shortener {
 }
 
-.top-bar-section li a{
-  background-color: #000;
+#csv {
+  display: none;
+}
+
+#branded{
+  display: none;
+}
+
+#stats{
+  display: none;
 }
 
 .logo {
@@ -42,12 +50,8 @@ body {
   color: #FFF;
 }
 
-.menu-links ul li a:hover {
-  color: #008CBA;
-}
-
-.menu-links ul li a.selected-link {
-  color: #008CBA;
+#link-shortener {
+  color: #E2062C;
 }
 
 /* last shortened uri */
