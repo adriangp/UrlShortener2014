@@ -1,1 +1,1 @@
-include ":common", ":demo", ":bangladeshGreen", ":bangladeshGreenClient"
+include ":common", ":demo", ":bangladeshGreen"
