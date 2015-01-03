@@ -29,6 +29,9 @@ function setUrlSubmition() {
   });
 }
 
+/*
+ * Set's up the functionality to make the page dynamically navigable.
+ */
 function setMenuCallbacks() {
   $( '#link-shortener' ).on('click', function (e) {
     updateMenu('#link-shortener');
@@ -63,6 +66,9 @@ function setMenuCallbacks() {
   });
 }
 
+/*
+ * Changes the menu link colors dynamically.
+ */
 function updateMenu(linkId) {
   var oldLinkId = '#link-' + menuSelected;
   // update menu css
@@ -70,6 +76,10 @@ function updateMenu(linkId) {
   $( linkId ).css( "color", "#E2062C");
 }
 
+/*
+ * Hides the page showing and dynamically shows the new page
+ * selected on the menu bar.
+ */
 function updatePage(pageId) {
   var oldPageId = '#' + menuSelected;
   if ( pageId != "#" + menuSelected ) {
@@ -85,6 +95,10 @@ function getUrl() {
   return $( '#urlInput' ).val();
 }
 
+/*
+ * Sets the content of the '#urlInput' input to the shortened
+ * uri contained inside the 'objectUri' object.
+ */
 function setUrlInput(objectUri) {
   var shortenedUri = objectUri.uri;
   $( '#urlInput' ).val( shortenedUri );
@@ -115,10 +129,17 @@ function showAlert(alertMessage) {
   }
 }
 
+/*
+ * Returns TRUE if the element 'element' is visible in the DOM, and
+ * FALSE if it is hidden.
+ */
 function elementIsVisible(element) {
   return $( element ).css('display') == 'none';
 }
 
+/*
+ * Shows the given 'objUri' object in the DOM.
+ */
 function showShortenedUri(objUri) {
   var shortUri = objUri.uri;
   var targetUri = objUri.target;
@@ -128,6 +149,9 @@ function showShortenedUri(objUri) {
   insertShortenedUriInDOM(shortenedUri);
 }
 
+/* 
+ * Inserts the given shortenedUri object in the DOM.
+ */
 function insertShortenedUriInDOM(shortenedUri) {
   // 1. Insert to latest uri details block
   insertLatestShortenedUriInDOM(shortenedUri);
@@ -152,6 +176,10 @@ function insertShortenedUriInDOM(shortenedUri) {
   shortenedUriList.unshift(shortenedUri);
 }
 
+/*
+ * Inserts the HTML of the given shortenedUri object in the DOM, inside
+ * the list of already shortened URLs.
+ */
 function prependLatestShortenedUriInDOM(shortenedUri) {
   var uri = $(  '<div class="shorten-url-elem">' +
                   '<div class="img-block">' +
@@ -166,6 +194,10 @@ function prependLatestShortenedUriInDOM(shortenedUri) {
   $( '.shortened-url-block' ).prepend( uri );
 }
 
+/*
+ * Inserts the HTML of the given shortenedUri object, inside
+ * the latest shortened URL block.
+ */
 function insertLatestShortenedUriInDOM(shortenedUri) {
   var uri = $(  '<div class="shorten-url-elem">' +
                   '<div class="img-block">' +
@@ -183,10 +215,17 @@ function insertLatestShortenedUriInDOM(shortenedUri) {
   $( '.shorten-url-block' ).slideDown();
 }
 
+/*
+ * Selects the content of the #urlInput input.
+ */
 function selectUserInput() {
   $( '#urlInput' ).select();
 }
 
+/*
+ * Returns TRUE if the given URL 'url' is already a shortened link,
+ * and TRUE if it is not.
+ */
 function isShortenUri(url) {
   var subUri = url.substring(0, 22);
   return subUri == SERVICE_URI;
