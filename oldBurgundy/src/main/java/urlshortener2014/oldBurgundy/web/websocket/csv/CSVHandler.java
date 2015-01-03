@@ -42,6 +42,8 @@ public class CSVHandler extends TextWebSocketHandler {
 			default:
 				logger.info("Solicitated url " + message.getPayload() + " with id " + session.getId());
 				try {
+					session.sendMessage(new TextMessage(this.worksRepository.takeIncomingWork().getShortUrl()));
+
 					session.sendMessage(new TextMessage("error::" + 400));
 				} catch (IOException e) {
 				}

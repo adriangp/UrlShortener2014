@@ -42,7 +42,8 @@ public class ValidatorWebService {
 	@RequestMapping(value = "/validator/{id}", method = RequestMethod.POST)
 	public ResponseEntity<?> validateUrlInternal(@PathVariable int id, @RequestBody Url url)  {
 		
-		logger.info("Server solicitation id: " + id + " - url " + url.getUrl() + " - sponsor " + url.getSponsor());
+		logger.info("Server solicitation id: " + id + " - url " + url.getUrl() + " - sponsor " + url.getSponsor()
+				);
 		
 		new Thread(new HttpRequestThread(id, url.getUrl(), url.getSponsor())).start();
 		

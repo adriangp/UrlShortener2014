@@ -2,11 +2,9 @@ package urlshortener2014.oldBurgundy.repository.sponsor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.socket.TextMessage;
 
-import urlshortener2014.oldBurgundy.web.rest.validator.Url;
+import urlshortener2014.oldBurgundy.web.websocket.sponsor.SponsorHandler;
 
 public class ConsumingSponsorWorks implements Runnable{
 
@@ -21,22 +19,45 @@ public class ConsumingSponsorWorks implements Runnable{
 	@Override
 	public void run() {
 		while(true){
-			SponsorWork work = this.worksRepository.takeIncomingWork();
-			logger.info("Requested new short for uri " + work.getUrl() + " shorUrl " + work.getShortUrl());
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			SponsorWork workBloq = this.worksRepository.takeIncomingWork();
+			logger.info("Requested new short for uri " + workBloq.getUrl() + " shorUrl " + workBloq.getShortUrl());
 			
-			this.worksRepository.addPendingWork(work);
-			/*try{
-				ResponseEntity<?> response = (new RestTemplate()).postForEntity("http://localhost:8080/validator/" + work.getId(), new Url(work.getUrl(), null), null);
-				if(response.getStatusCode().value() == 200){
-					
-				}
-				else{
-					//
+			Long tiempo = System.currentTimeMillis()-workBloq.getStamp();
+			if (tiempo < 10000){
+				logger.info("Not current time ");
+				workBloq.setState(workBloq.getState()+1);
+				if (workBloq.getState()<3)
+					this.worksRepository.addIncomingWork(workBloq);
+				else
+					logger.info("Client not conected, erase work ");
+			}
+			else{
+				SessionClient ws = this.worksRepository.takePendingWork(workBloq.getShortUrl());
+				SponsorHandler sh = new SponsorHandler();
+				try {
+					logger.info("Send url " + workBloq.getUrl()+ " "+workBloq.getShortUrl()+" to client session ");
+					sh.handleMessage(ws.getSession(), new TextMessage(workBloq.getUrl() + " ok" ));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					logger.info("Not exist id ");
 				}
 			}
-			catch(HttpClientErrorException e){
-				System.out.println(e.getStatusCode().toString());
-			}*/
+
+			//se redireccionara en breves
+			//take 
+			//syste curent actual resta...tiempo bloquin queue
+			//10 seg - ese tiempo...tiempo bloquin queue
+			//theat.sleep
+			//pasan 10 seg
+			//.get (id) consulta hashmap busca idurlcorta...contador veces metido
+			//null estampillamos tiemp de nuevo contador ++ 
+			//valiable session url larga
 			
 		}
 	}

@@ -18,11 +18,11 @@ public class WorksRepositorySponsor {
 		return this.incomingWorks.take();
 	}
 	
-	public void addPendingWork(SponsorWork work){
+	public void addPendingWork(SessionClient work){
 		this.pendingWorks.add(work);
 	}
 	
-	public SponsorWork takePendingWork(int id){
-		return this.pendingWorks.remove(id);
+	public SessionClient takePendingWork(String string){
+		return this.pendingWorks.remove(string);
 	}
 }

@@ -4,17 +4,17 @@ import java.util.HashMap;
 
 public class PendingSponsorWorks {
 
-	private HashMap<Integer, SponsorWork> pendingWorks;
+	private HashMap<Integer, SessionClient> pendingWorks;
 	
 	protected PendingSponsorWorks(){
-		this.pendingWorks = new HashMap<Integer, SponsorWork>(1000);
+		this.pendingWorks = new HashMap<Integer, SessionClient>(1000);
 	}
 	
-	protected synchronized void add(SponsorWork work){
+	protected synchronized void add(SessionClient work){
 		this.pendingWorks.put(work.getId(), work);
 	}
 	
-	protected synchronized SponsorWork remove(int id){
+	protected synchronized SessionClient remove(String id){
 		return this.pendingWorks.remove(id);
 	}
 }
