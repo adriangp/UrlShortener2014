@@ -48,9 +48,11 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		if(agent.indexOf("Chrome")!=-1) navegador="Chrome";
 		else if(agent.indexOf("Firefox")!=-1) navegador="Firefox";
 		else if(agent.indexOf("Safari")!=-1) navegador="Safari";
+		else navegador="Explorer";
 		
 		if(agent.indexOf("Windows")!=-1) SO="Windows";
 		else if(agent.indexOf("Linux")!=-1) SO="Linux";
+		else if(agent.indexOf("Macintosh")!=-1) SO="Macintosh";
 		
 	
 		logger.info("Requested redirection with hash "+id);
@@ -59,14 +61,18 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		// click con el navegador y SO, actualizar BD y return
 		ResponseEntity<?> response=super.redirectTo(id,request);
 		List<Click> listaClicks=clickRepository.findByHash(id);
-		for(int i=listaClicks.size()-1;i>0;i--){
+		logger.info("Tamaño: "+listaClicks.size()+"ip: "+ip);
+		for(int i=listaClicks.size()-1;i>=0;i--){
 			Click click=listaClicks.get(i);
+			logger.info("Click con ip: "+click.getIp());
 			if(click.getIp().equals(ip)){
 				String hash=click.getHash();
 				Long identificador=click.getId();
 				Date fecha=click.getCreated();
 				Click clickFinal=new Click(identificador,hash,fecha,null,navegador,SO,ip,null);
 				clickRepository.update(clickFinal);
+				logger.info("Actualizado Click con "+navegador+"SO: "+SO+" e ip:"+ip);
+				break;
 			}
 		}
 		
