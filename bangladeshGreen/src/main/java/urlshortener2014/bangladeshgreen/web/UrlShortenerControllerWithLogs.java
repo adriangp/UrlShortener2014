@@ -102,9 +102,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	}
 
 	@SuppressWarnings("resource")
-	public void recibirCSV(File csv,
-			@RequestParam(value = "sponsor", required = false) String sponsor,
-			@RequestParam(value = "brand", required = false) String brand,
+	public void analizarCSV(File csv,
 			HttpServletRequest request) throws IOException{
 		BufferedReader br=new BufferedReader(new FileReader(csv));
 		List<ShortURL> listaUrlAcortadas=new ArrayList<ShortURL>();
@@ -112,7 +110,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		while((linea = br.readLine()) != null){
 			String []listaURL=linea.split(",");
 			for(String url: listaURL){
-				ResponseEntity<ShortURL> urlAcortada=shortener(url,sponsor,brand,request);
+				ResponseEntity<ShortURL> urlAcortada=shortener(url,"","",request);
 				listaUrlAcortadas.add(urlAcortada.getBody());
 			}
 		}
