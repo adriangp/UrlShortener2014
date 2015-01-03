@@ -28,10 +28,19 @@ public class BlackListService {
 	@RequestMapping(value = "/onshortener", method = RequestMethod.GET)
 	public ResponseEntity<?> onShortener(@RequestParam("url") String urlString){
 		URL url = null;
+		String host= "";
+		boolean blacklisted = false;
 		try{
 			// Sanitize URL (If it's not valid, it will throw a MalformedURLException)
 			url = new URL(urlString);
-		    boolean blacklisted = isBlackListed(url);
+			host = url.getHost();
+			//Remove www. from domain (but not from www.com)
+			try{
+				host = host.replace("www.", "");
+			}
+			catch(NullPointerException e){ }
+			catch(Exception e){ }
+		    blacklisted = isBlackListed(host);
 		    if (!blacklisted){
 		    	return new ResponseEntity<>(HttpStatus.OK);
 		    }
@@ -60,16 +69,12 @@ public class BlackListService {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
-	@Cacheable(value="balcklist", key="#url")
-	private boolean isBlackListed(URL url){
-		String host = "";
+	@Cacheable(value="BlacklistCache", key="#host")
+	private boolean isBlackListed(String host){
 		boolean blacklisted = false;
 		final String[] antispamSites = {"zen.spamhaus.org",
 										"multi.surbl.org",
 										"black.uribl.com"};
-		host = url.getHost();
-		//Remove www. from domain (but not from www.com)
-		host = host.replace("www.", "");
 		DNSResolver dnsResolver = new DNSResolver(host, antispamSites);
 		return dnsResolver.doQuery();
 	}
