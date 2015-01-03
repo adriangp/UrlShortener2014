@@ -10,9 +10,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-
-
-import urlshortener2014.oldBurgundy.repository.sponsor.SponsorWork;
 import urlshortener2014.oldBurgundy.repository.sponsor.WorksRepositorySponsor;
 
 public class SponsorHandler extends TextWebSocketHandler {
@@ -35,7 +32,7 @@ public class SponsorHandler extends TextWebSocketHandler {
 		switch(msg.length){
 			case 1:
 				logger.info("Solicitated shorturl " + msg[0].trim() + " with id " + session.getId());
-				this.worksRepository.addIncomingWork(new SponsorWork(msg[0].trim(),session));
+				this.worksRepository.addPendingWork(msg[0].trim(), session);
 				break;
 			default:
 				logger.info("Solicitated shorturl " + message.getPayload() + " with id " + session.getId());

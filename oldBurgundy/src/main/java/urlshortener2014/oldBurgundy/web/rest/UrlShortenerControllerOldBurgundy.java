@@ -1,7 +1,5 @@
 package urlshortener2014.oldBurgundy.web.rest;
 
-import java.net.MalformedURLException;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -32,21 +30,27 @@ public class UrlShortenerControllerOldBurgundy extends UrlShortenerController {
 	public ResponseEntity<?> redirectTo(@PathVariable String id, 
 			HttpServletRequest request) {
 		logger.info("Request redirection firts with hash " + id);
-		if (shortURLRepository.findByKey(id)==null){
-			logger.info("Bad Rqequest");
-			return new ResponseEntity<>("<html><body>Bad Request: Poner bonito</body></html>", HttpStatus.BAD_REQUEST); 
-		}
-			ResponseEntity<?> response = super.redirectTo(id, request);
 		
-			String uri = shortURLRepository.findByKey(id).getTarget();
-			logger.info("Redirect uri " + uri);
-			SponsorWork work = new SponsorWork(uri,id);
-			worksRepositorySponsor.addIncomingWork(work);
+		ShortURL shortURL = shortURLRepository.findByKey(id);
+		
+		if (shortURL == null){
+			logger.info("Not found");
+			return new ResponseEntity<>("<html><body>Not found: Poner bonito</body></html>", HttpStatus.NOT_FOUND); 
+		}
+		
+		//ResponseEntity<?> response = super.redirectTo(id, request);
+	
+		String uri = shortURL.getTarget();
+		logger.info("Redirect uri " + uri);
+		
+		SponsorWork work = new SponsorWork(uri, id);
+		worksRepositorySponsor.addIncomingWork(work);
 
-		if (shortURLRepository.findByKey(id).getSponsor()==null || shortURLRepository.findByKey(id).getSponsor().isEmpty())
+		if (shortURL.getSponsor() == null || shortURL.getSponsor().isEmpty()){
 			return new ResponseEntity<String>("<html><body><iframe src=\"<html><body>none</body></html>\"></iframe></body></html>", HttpStatus.OK);
+		}
 			
-		return new ResponseEntity<String>("<html><body><iframe src="+shortURLRepository.findByKey(id).getSponsor()+"></iframe></body></html>", HttpStatus.OK);
+		return new ResponseEntity<String>("<html><body><iframe src=" + shortURL.getSponsor() + "></iframe></body></html>", HttpStatus.OK);
 	}
 
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
