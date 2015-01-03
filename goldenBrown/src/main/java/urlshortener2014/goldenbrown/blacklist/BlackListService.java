@@ -1,9 +1,9 @@
 package urlshortener2014.goldenbrown.blacklist;
 
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
+
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,30 +60,18 @@ public class BlackListService {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
+	@Cacheable(value="balcklist", key="#url")
 	private boolean isBlackListed(URL url){
-		String host = "", domain = "";
+		String host = "";
 		boolean blacklisted = false;
 		final String[] antispamSites = {"zen.spamhaus.org",
 										"multi.surbl.org",
 										"black.uribl.com"};
-		
-		
 		host = url.getHost();
-		//TODO: Remove www. from domain (but not from www.com)
+		//Remove www. from domain (but not from www.com)
 		host = host.replace("www.", "");
-		//TODO: Implement cache
-		
-		for (String site: antispamSites){
-			domain = host+"."+site+".";
-			//TODO: Do DNS query
-			try {
-				InetAddress ip = InetAddress.getByName(domain);
-				logger.info("ip="+ip);
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-			}
-		}
-		return blacklisted;
+		DNSResolver dnsResolver = new DNSResolver(host, antispamSites);
+		return dnsResolver.doQuery();
 	}
 	
 	
