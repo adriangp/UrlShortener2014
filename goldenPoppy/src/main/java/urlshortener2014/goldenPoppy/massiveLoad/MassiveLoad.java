@@ -1,6 +1,33 @@
+/*package urlshortener2014.goldenPoppy.massiveLoad;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean;
+
+public class MassiveLoad {
+
+	public static void main(String[] args){
+		List<String> list = new ArrayList<String>();
+		for (int i = 0; i < 100; i++)
+			list.add("hola: " + i);
+		ThreadPoolExecutorFactoryBean factory = new ThreadPoolExecutorFactoryBean();
+		factory.initialize();
+
+		for (int i = 0; i < 10; i++){
+			List<String> l = new ArrayList<String>(list.subList(i*10, i*10+10));
+			factory.createThread(new Load(l)).run();
+		}
+	}
+}
+
+
+
 package urlshortener2014.goldenPoppy.web;
 
-import java.io.IOException;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -12,11 +39,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,8 +57,7 @@ import urlshortener2014.goldenPoppy.intesicial.IntersicialEndPoint;
 import urlshortener2014.goldenPoppy.isAlive.CompruebaUrl;
 import urlshortener2014.goldenPoppy.isAlive.Response;
 import urlshortener2014.goldenPoppy.isAlive.URL;
-import urlshortener2014.goldenPoppy.massiveLoad.Content;
-import urlshortener2014.goldenPoppy.massiveLoad.Status;
+import urlshortener2014.goldenPoppy.massiveLoad.Load;
 
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
@@ -66,42 +95,43 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	 * @param request
 	 * @return
 	 */
+/*
 	public ResponseEntity<ShortURL> intersicial(@RequestParam("shorturl") String sUrl,
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			HttpServletRequest request){
 		return shortener(sUrl,sponsor,null,request);
 	}
 	
+	@RequestMapping(value = "/isalive", method = RequestMethod.GET)
 	@MessageMapping("/isalive")
-    @SendToUser("/topic/isalive")
+    @SendTo("/topic/isalive")
     public Response isalive(URL url) throws Exception {
 
 		ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<Integer> future = executor.submit(new CompruebaUrl(url));
-        
-        int timeout = url.getTimeout();
-                
-        logger.info("isAlive: timeout requested "+timeout);
+        Future<String> future = executor.submit(new CompruebaUrl(url));
+
         try {
-        	int s = future.get(timeout, TimeUnit.SECONDS);
+        	String s = future.get(2, TimeUnit.SECONDS);
         	executor.shutdownNow();
             return new Response(s);
         } catch (TimeoutException e ) {
         	executor.shutdownNow();
-        	return new Response(0);
+        	return new Response("Le está costando responder...");
         } catch (Exception e){
         	executor.shutdownNow();
-        	return new Response(-1);
-        }
+        	return new Response("La url no está viva");
+        } 
     }
 	
+	@RequestMapping(value = "/massiveload", method = RequestMethod.GET)
 	@MessageMapping("/massiveload")
 	@SendTo("/topic/massiveload")
-	public Status massiveLoad(Content c) throws IOException{
-		//DiskFileItem fu = new DiskFileItem("file", null, true, f.getName(), 0, f);
-		//ThreadPoolExecutorFactoryBean factory = new ThreadPoolExecutorFactoryBean();
-		//factory.createThread(new Load(new ArrayList<String>()));
-		logger.info("massiveLoad: File name: "+c.getFilename()+" - " + c.getContent());
-		return new Status(15.0, "Works");
+	public ResponseEntity<ShortURL> massiveLoad(File f) {
+		ThreadPoolExecutorFactoryBean factory = new ThreadPoolExecutorFactoryBean();
+		factory.createThread(new Load(new ArrayList<String>()));
+		System.out.println(f.getPath());
+		return new ResponseEntity<ShortURL>(HttpStatus.OK);
 	}
 }
+
+*/

@@ -6,11 +6,12 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.WebApplicationInitializer;
 
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
-public class Application extends SpringBootServletInitializer {
+public class Application extends SpringBootServletInitializer implements WebApplicationInitializer {
 	public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
