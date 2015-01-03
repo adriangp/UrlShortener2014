@@ -1,12 +1,9 @@
 package urlshortener2014.oldBurgundy.repository.sponsor;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.TextMessage;
-
-import urlshortener2014.oldBurgundy.web.websocket.sponsor.SponsorHandler;
+import org.springframework.web.socket.WebSocketSession;
 
 public class ConsumingSponsorWorks implements Runnable{
 
@@ -25,11 +22,11 @@ public class ConsumingSponsorWorks implements Runnable{
 			SponsorWork workBloq = this.worksRepository.takeIncomingWork();
 			logger.info("Requested new short for uri " + workBloq.getUrl() + " shorUrl " + workBloq.getShortUrl());
 			
-			Long tiempo = System.currentTimeMillis()-workBloq.getStamp();
+			long tiempo = System.currentTimeMillis() - workBloq.getStamp();
 			if (tiempo < 10000){
 				logger.info("Not current time ");
-				workBloq.setState(workBloq.getState()+1);
-				if (workBloq.getState()<3){
+				workBloq.setState(workBloq.getState() + 1);
+				if (workBloq.getState() < 3){
 					this.worksRepository.addIncomingWork(workBloq);
 					try {
 						Thread.sleep(10000);
@@ -43,18 +40,16 @@ public class ConsumingSponsorWorks implements Runnable{
 					
 			}
 			else{
-				SessionClient ws = this.worksRepository.takePendingWork(workBloq.getShortUrl());
+				WebSocketSession ws = this.worksRepository.takePendingWork(workBloq.getShortUrl());
 				if(ws!=null){
 					try {
-						logger.info("Send to ws "+workBloq.getUrl());
-						ws.getSession().sendMessage(new TextMessage("ok::" + workBloq.getUrl()));
+						logger.info("Send to ws " + workBloq.getUrl());
+						ws.sendMessage(new TextMessage("ok::" + workBloq.getUrl()));
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						logger.info("Not valid id ");
 					}
 				}
-
-
 			}
 
 			//se redireccionara en breves

@@ -4,31 +4,23 @@ import org.springframework.web.socket.WebSocketSession;
 
 public class SponsorWork {
 	
-	private int id = -1;
 	private long stamp;
-	private String url,shortUrl;
+	private String url, shortUrl;
 	private int state;
 		
-	public SponsorWork(String url,String shortUrl) {
+	public SponsorWork(String url, String shortUrl) {
 		this.url = url;
 		this.shortUrl = shortUrl;
-		this.setStamp(System.currentTimeMillis());
-		this.state =0;
+		this.stamp = System.currentTimeMillis();
+		this.state = 0;
 	}
-	public SponsorWork(String Url,WebSocketSession shortUrl) {
+	
+	public SponsorWork(String Url, WebSocketSession shortUrl) {
 		this.setUrl(Url);
 	}
 	
 	public SponsorWork(String shortUrl) {
 		this.shortUrl = shortUrl;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public String getShortUrl() {
@@ -45,7 +37,7 @@ public class SponsorWork {
 	}
 
 	public void setUrl(String url) {
-		url = url;
+		this.url = url;
 	}
 
 	public long getStamp() {

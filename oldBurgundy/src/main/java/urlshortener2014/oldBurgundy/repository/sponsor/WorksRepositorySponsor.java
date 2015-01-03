@@ -1,5 +1,7 @@
 package urlshortener2014.oldBurgundy.repository.sponsor;
 
+import org.springframework.web.socket.WebSocketSession;
+
 public class WorksRepositorySponsor {
 	
 	private IncomingSponsorWorks incomingWorks;
@@ -18,11 +20,11 @@ public class WorksRepositorySponsor {
 		return this.incomingWorks.take();
 	}
 	
-	public void addPendingWork(SessionClient work){
-		this.pendingWorks.add(work);
+	public void addPendingWork(String shortUrl, WebSocketSession session){
+		this.pendingWorks.add(shortUrl, session);
 	}
 	
-	public SessionClient takePendingWork(String string){
+	public WebSocketSession takePendingWork(String string){
 		return this.pendingWorks.remove(string);
 	}
 }
