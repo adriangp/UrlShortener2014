@@ -37,15 +37,6 @@ public class SponsorHandler extends TextWebSocketHandler {
 				logger.info("Solicitated shorturl " + msg[0].trim() + " with id " + session.getId());
 				this.worksRepository.addIncomingWork(new SponsorWork(msg[0].trim(),session));
 				break;
-			case 2:
-				logger.info("Url" + msg[0].trim() + " with id " + session.getId());
-			try {
-				session.sendMessage(new TextMessage("ok::" + msg[0].trim()));
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-				break;
 			default:
 				logger.info("Solicitated shorturl " + message.getPayload() + " with id " + session.getId());
 				try {
