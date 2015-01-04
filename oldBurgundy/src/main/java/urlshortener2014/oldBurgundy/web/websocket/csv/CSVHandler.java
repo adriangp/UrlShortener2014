@@ -30,24 +30,30 @@ public class CSVHandler extends TextWebSocketHandler {
 		
 		String[] msg = message.getPayload().split(",");
 		
-		switch(msg.length){
-			case 1:
-				logger.info("Solicitated url " + msg[0].trim() + " with id " + session.getId());
-				this.worksRepository.addIncomingWork(new Work(session, msg[0].trim(), null));
-				break;
-			case 2:
-				logger.info("Solicitated url " + msg[0].trim() + " - " + msg[1].trim() + " with id " + session.getId());
-				this.worksRepository.addIncomingWork(new Work(session, msg[0].trim(), msg[1].trim()));
-				break;
-			default:
-				logger.info("Solicitated url " + message.getPayload() + " with id " + session.getId());
-				try {
-					session.sendMessage(new TextMessage(this.worksRepository.takeIncomingWork().getShortUrl()));
-
-					session.sendMessage(new TextMessage("error::" + 400));
-				} catch (IOException e) {
-				}
-		}		
+		try{
+			switch(msg.length){
+				case 2:
+					logger.info("Solicitated url " + msg[1].trim() + " with id " + session.getId());
+					this.worksRepository.addIncomingWork(new Work(session, Integer.parseInt(msg[0].trim()), msg[1].trim(), null));
+					break;
+				case 3:
+					logger.info("Solicitated url " + msg[1].trim() + " - " + msg[2].trim() + " with id " + session.getId());
+					this.worksRepository.addIncomingWork(new Work(session, Integer.parseInt(msg[0].trim()), msg[1].trim(), msg[2].trim()));
+					break;
+				default:
+					logger.info("Solicitated url " + message.getPayload() + " with id " + session.getId());
+					try {
+						session.sendMessage(new TextMessage("error::" + 400));
+					} catch (IOException e) {
+					}
+			}	
+		} catch (NumberFormatException e){
+			logger.info("Solicitated url " + message.getPayload() + " with id " + session.getId());
+			try {
+				session.sendMessage(new TextMessage("error::" + 400));
+			} catch (IOException e1) {
+			}
+		}
     }
 
     @Override
