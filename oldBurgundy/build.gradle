@@ -15,4 +15,7 @@ dependencies {
 	// Provides java script libraries for static content
 	compile("org.webjars:bootstrap:3.0.3")
 	compile("org.webjars:jquery:2.0.3-1")
+	
+	testCompile "org.springframework.boot:spring-boot-starter-test"
+    testCompile "com.jayway.jsonpath:json-path"
 }

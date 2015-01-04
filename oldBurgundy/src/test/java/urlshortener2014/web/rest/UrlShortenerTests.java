@@ -29,7 +29,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.repository.ShortURLRepository;
 import urlshortener2014.oldBurgundy.Application;
-import urlshortener2014.oldBurgundy.repository.csv.Work;
 import urlshortener2014.oldBurgundy.repository.csv.WorksRepository;
 import urlshortener2014.oldBurgundy.repository.sponsor.WorksRepositorySponsor;
 import urlshortener2014.oldBurgundy.web.rest.UrlShortenerControllerOldBurgundy;
@@ -143,7 +142,6 @@ import urlshortener2014.oldBurgundy.web.rest.UrlShortenerControllerOldBurgundy;
 		}
 		@Test
 		public void thatShortener2CreatesARedirectIfTheURLisOK() throws Exception {
-			this.worksRepository.addPendingWork(new Work(null, null, null));
 			configureTransparentSave();
 			mockMvc.perform(post("/csv/rest/{id}",1)
 					.param("url", "http://example.com/"));
@@ -172,7 +170,6 @@ import urlshortener2014.oldBurgundy.web.rest.UrlShortenerControllerOldBurgundy;
 		public void thatShortener2FailsIfTheRepositoryReturnsNull() throws Exception {
 			when(shortURLRepository.save(org.mockito.Matchers.any(ShortURL.class)))
 					.thenReturn(null);
-			this.worksRepository.addPendingWork(new Work(null, null, null));
 			mockMvc.perform(post("/csv/rest/{id}",1).param("url", "someKey")).andDo(print());
 					//.andExpect(status().isInternalServerError());
 		}
