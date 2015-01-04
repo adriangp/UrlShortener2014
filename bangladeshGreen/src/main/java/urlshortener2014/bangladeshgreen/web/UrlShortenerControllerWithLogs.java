@@ -2,19 +2,29 @@ package urlshortener2014.bangladeshgreen.web;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +35,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.google.gson.Gson;
 
 import urlshortener2014.common.domain.Click;
 import urlshortener2014.common.domain.ShortURL;
@@ -40,6 +52,30 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	private ShortURLRepository SURLR;
 	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
 	
+	
+	@RequestMapping(value = "/Upload", method = RequestMethod.POST)
+	public String login(HttpServletRequest request) throws Exception{
+		Part part = request.getPart("fileToUpload");
+		BufferedReader reader = new BufferedReader(new InputStreamReader(part.getInputStream()));
+		
+    	File fichero=new File("fichero.csv");
+    	fichero.createNewFile();
+    	PrintWriter f = new PrintWriter(fichero);
+    	String linea="";
+    	while((linea = reader.readLine()) != null){
+    		if(linea.startsWith("www") || linea.startsWith("http")){
+    			String []listaURL=linea.split(",");
+				for(String url: listaURL){
+					//if(!url.isEmpty() || !url.equals(null))
+						f.write(url+",");
+				}
+				f.write("\n");
+    		}
+		}
+    	f.close();
+		return "File Uploaded!";
+	}
+	
 	public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
 		logger.info("Requested redirection with hash "+id);
 		String agent = request.getHeader("User-Agent");
@@ -53,7 +89,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		if(agent.indexOf("Windows")!=-1) SO="Windows";
 		else if(agent.indexOf("Linux")!=-1) SO="Linux";
 		else if(agent.indexOf("Macintosh")!=-1) SO="Macintosh";
-		
 	
 		logger.info("Requested redirection with hash "+id);
 		// Guardar en un objeto la llamada al padre, guardarme en una lista la consulta
@@ -79,12 +114,12 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return response;
 	}
 
-	@Override
-	@RequestMapping(method = RequestMethod.POST)
+	
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand,
 			HttpServletRequest request) {
+		
 		logger.info("Requested new short for uri "+"url");
 		ResponseEntity<ShortURL>su=super.shortener(url, brand, brand, request);
 		//comprobar si es segura
@@ -101,9 +136,11 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return su;
 	}
 
-	@SuppressWarnings("resource")
-	public void analizarCSV(File csv,
+	@RequestMapping(value = "/analizar", method = RequestMethod.POST)
+	public Response analizarCSV(@RequestParam("csv") File csv,
 			HttpServletRequest request) throws IOException{
+		
+		System.out.println("Llega a analizar");
 		BufferedReader br=new BufferedReader(new FileReader(csv));
 		List<ShortURL> listaUrlAcortadas=new ArrayList<ShortURL>();
 		String linea="";
@@ -122,6 +159,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		}
 		fileResul.close();
 		br.close();
+		return Response.status(Status.OK).build();
 	}
 	
 	
