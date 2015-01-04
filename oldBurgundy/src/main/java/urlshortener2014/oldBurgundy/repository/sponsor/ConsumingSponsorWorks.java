@@ -29,7 +29,7 @@ public class ConsumingSponsorWorks implements Runnable{
 				if (workBloq.getState() < 3){
 					this.worksRepository.addIncomingWork(workBloq);
 					try {
-						Thread.sleep(10000);
+						Thread.sleep(10000-tiempo);
 					} catch (InterruptedException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -44,7 +44,7 @@ public class ConsumingSponsorWorks implements Runnable{
 				if(ws!=null){
 					try {
 						logger.info("Send to ws " + workBloq.getUrl());
-						ws.sendMessage(new TextMessage("ok::" + workBloq.getUrl()));
+						ws.sendMessage(new TextMessage(workBloq.getUrl()));
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						logger.info("Not valid id ");
