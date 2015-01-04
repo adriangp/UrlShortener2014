@@ -69,8 +69,13 @@ public class BlackListService {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
+	/**
+	 * ATENCIÓN: El método es public static solamente para que pueda ser accedido desde los tests junit.
+	 * @param host
+	 * @return
+	 */
 	@Cacheable(value="BlacklistCache", key="#host")
-	private boolean isBlackListed(String host){
+	public static Boolean isBlackListed(String host){
 		boolean blacklisted = false;
 		final String[] antispamSites = {"zen.spamhaus.org",
 										"multi.surbl.org",
