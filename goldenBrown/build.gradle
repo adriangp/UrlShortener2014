@@ -11,4 +11,13 @@ dependencies {
    compile("org.webjars:jquery:2.0.3-1")
    compile 'org.apache.httpcomponents:httpclient:4.3.6'
    compile 'nl.bitwalker:UserAgentUtils:1.2.4'
+   compile("org.springframework.boot:spring-boot-starter-web:1.2.0.RELEASE")
+   compile 'org.springframework:spring-test:4.0.6.RELEASE'
+   testCompile 'junit:junit:4.10'
+   
+}
+
+tasks.withType(Test) {
+    scanForTestClasses = false
+    include "**/*Test.class" // whatever Ant pattern matches your test class files
 }
