@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,7 +72,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	 * Shortens a given URL if this URL is reachable via HTTP.
 	 */
 	@RequestMapping(value = "/linkreachable", method = RequestMethod.POST)
-	public ResponseEntity<ShortURL> shortenerIfReachable(@RequestParam("url") String url,
+	public ShortURL shortenerIfReachable(@RequestParam("url") String url,
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand,
 			HttpServletRequest request) {
@@ -84,15 +82,10 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		if (isReachableUrl){
 			su = createAndSaveIfValid(url, sponsor, brand, UUID
 					.randomUUID().toString(), extractIP(request));
+			System.out.println("URL REACHABLE!");
 		}
 		
-		if (su != null) {
-			HttpHeaders h = new HttpHeaders();
-			h.setLocation(su.getUri());
-			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
+		return su;
 	}
 }
 
