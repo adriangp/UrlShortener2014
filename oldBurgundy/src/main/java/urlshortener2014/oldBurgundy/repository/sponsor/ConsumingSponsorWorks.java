@@ -25,37 +25,29 @@ public class ConsumingSponsorWorks implements Runnable{
 			long tiempo = System.currentTimeMillis() - workBloq.getStamp();
 			if (tiempo < 10000){
 				logger.info("Not current time ");
-				workBloq.setState(workBloq.getState() + 1);
-				if (workBloq.getState() < 3){
-					this.worksRepository.addIncomingWork(workBloq);
-					try {
-						Thread.sleep(10000-tiempo);
-					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+				try {
+					Thread.sleep(10000 - tiempo);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
 				}
-				else
-					logger.info("Client not conected, erase work ");
 					
 			}
-			else{
-				WebSocketSession ws = this.worksRepository.takePendingWork(workBloq.getShortUrl());
-				if(ws!=null){
-					try {
-						logger.info("Send to ws " + workBloq.getUrl());
-						ws.sendMessage(new TextMessage(workBloq.getUrl()));
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						logger.info("Not valid id ");
-					}
+			
+			WebSocketSession ws = this.worksRepository.takePendingWork(workBloq.getShortUrl());
+			if(ws!=null){
+				try {
+					logger.info("Send to ws " + workBloq.getUrl());
+					ws.sendMessage(new TextMessage(workBloq.getUrl()));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					logger.info("Not valid id ");
 				}
-				else
-				{
-					workBloq.setState(workBloq.getState() + 1);
-					workBloq.setStamp(System.currentTimeMillis());
-					this.worksRepository.addIncomingWork(workBloq);
-				}
+			}
+			else if(workBloq.getState() < 3)
+			{
+				workBloq.setState(workBloq.getState() + 1);
+				workBloq.setStamp(System.currentTimeMillis());
+				this.worksRepository.addIncomingWork(workBloq);
 			}
 
 			//se redireccionara en breves

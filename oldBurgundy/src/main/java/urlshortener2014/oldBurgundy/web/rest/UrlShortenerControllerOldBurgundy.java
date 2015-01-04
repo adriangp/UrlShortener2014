@@ -1,7 +1,11 @@
 package urlshortener2014.oldBurgundy.web.rest;
 
+import java.io.StringWriter;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +35,13 @@ public class UrlShortenerControllerOldBurgundy extends UrlShortenerController {
 			HttpServletRequest request) {
 		logger.info("Request redirection firts with hash " + id);
 		
+		Velocity.init();
+		
 		ShortURL shortURL = shortURLRepository.findByKey(id);
 		
 		if (shortURL == null){
 			logger.info("Not found");
-			return new ResponseEntity<>("<html><body>Not found: Poner bonito</body></html>", HttpStatus.NOT_FOUND); 
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
 		}
 		
 		//ResponseEntity<?> response = super.redirectTo(id, request);
@@ -46,11 +52,20 @@ public class UrlShortenerControllerOldBurgundy extends UrlShortenerController {
 		SponsorWork work = new SponsorWork(uri, id);
 		worksRepositorySponsor.addIncomingWork(work);
 
+		VelocityContext context = new VelocityContext();
+		StringWriter writer = new StringWriter();
+		
 		if (shortURL.getSponsor() == null || shortURL.getSponsor().isEmpty()){
-			return new ResponseEntity<String>("<html><body><iframe src=\"<html><body>none</body></html>\"></iframe></body></html>", HttpStatus.OK);
+			context.put("sponsor", "");
+			context.put("shortURL", shortURL.getHash());
+			Velocity.mergeTemplate("./src/webapp/index.html", "ISO-8859-1", context, writer);
+			return new ResponseEntity<String>(writer.toString(), HttpStatus.OK);
 		}
-			
-		return new ResponseEntity<String>("<html><body><iframe src=" + shortURL.getSponsor() + "></iframe></body></html>", HttpStatus.OK);
+
+		context.put("sponsor", shortURL.getSponsor());
+		context.put("shortURL", shortURL.getHash());
+		Velocity.mergeTemplate("./src/webapp/index.html", "ISO-8859-1", context, writer);
+		return new ResponseEntity<String>(writer.toString(), HttpStatus.OK);
 	}
 
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
