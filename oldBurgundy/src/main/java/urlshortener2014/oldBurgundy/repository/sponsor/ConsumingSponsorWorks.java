@@ -50,6 +50,12 @@ public class ConsumingSponsorWorks implements Runnable{
 						logger.info("Not valid id ");
 					}
 				}
+				else
+				{
+					workBloq.setState(workBloq.getState() + 1);
+					workBloq.setStamp(System.currentTimeMillis());
+					this.worksRepository.addIncomingWork(workBloq);
+				}
 			}
 
 			//se redireccionara en breves
