@@ -1,13 +1,21 @@
+/******************************************************************************
+ *                    A P P   V a r i a b l e s
+ *****************************************************************************/
 var SERVICE_URI = "http://localhost:8080/";
 
 /* Alert Messages */
 var ALERT_SHORTEN_URL = "Unable to shorten that link. It is not a valid or reachable url.";
 var ALERT_ALREADY_SHORTEN = "That is already a shortened link!";
 
-/* Vars */
-var shortenedUriList = [];
-var menuSelected = "shortener";
+/* Other vars */
+var shortenedUriList = []; // list of shortened urls objects
+var menuSelected = "shortener"; // last menu selected option
 
+
+
+/******************************************************************************
+ *                  A P P   F u n c t i o n a l i t y
+ *****************************************************************************/
 /* Document Ready Functionality (jQuery stuff) */
 $( document ).ready(function() { 
   setUrlSubmition();
@@ -231,9 +239,13 @@ function isShortenUri(url) {
   return subUri == SERVICE_URI;
 }
 
-/* API CALLS */
+
+
+/******************************************************************************
+ *                           A P I   C a l l s
+ *****************************************************************************/
 /*
- * Shortens an URL.
+ * ( POST method ): Shortens the given URL.
  */
 function shortenURL(url) {
   $.ajax({
