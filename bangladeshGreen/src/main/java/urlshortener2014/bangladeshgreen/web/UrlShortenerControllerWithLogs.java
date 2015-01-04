@@ -61,7 +61,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		// click con el navegador y SO, actualizar BD y return
 		ResponseEntity<?> response=super.redirectTo(id,request);
 		List<Click> listaClicks=clickRepository.findByHash(id);
-		logger.info("Tamaño: "+listaClicks.size()+"ip: "+ip);
+		logger.info("TamaÃ±o: "+listaClicks.size()+"ip: "+ip);
 		for(int i=listaClicks.size()-1;i>=0;i--){
 			Click click=listaClicks.get(i);
 			logger.info("Click con ip: "+click.getIp());
@@ -75,7 +75,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				break;
 			}
 		}
-		
+	
 		return response;
 	}
 
@@ -121,6 +121,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			fileResul.write(url.getUri().toString()+",\n");
 		}
 		fileResul.close();
+		br.close();
 	}
 	
 	
