@@ -3,21 +3,35 @@ package urlshortener2014.goldenPoppy.massiveLoad;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import urlshortener2014.goldenPoppy.web.UrlShortenerControllerWithLogs;
+
 public class Load implements Runnable{
 
-	List<String> longUrls;
+	private List<Content> longUrls;
+	private List<String> shortUrls;
+	private UrlShortenerControllerWithLogs controller;
+	private HttpServletRequest request;
 	
-	public Load(List<String> list){
-		this.longUrls = new ArrayList<String>();
-		for (String s : list)
-			longUrls.add(s);
+	public Load(ArrayList<Content> longs, ArrayList<String> shorts, 
+			UrlShortenerControllerWithLogs u, HttpServletRequest request){
+		this.longUrls = longs;
+		this.shortUrls = shorts;
+		this.controller = u;
+		this.request = request;
 	}
+	
 	@Override
 	public void run() {
-		System.out.println("Holaaa");
-		for (String s : longUrls){
-			System.out.println(s);
-			System.out.println(Thread.currentThread().getName());
+		ResponseEntity<?> resp = null;
+		for (Content c : longUrls){
+			resp = controller.shortener(c.getURL(), c.getSponsor(), null, request);
+			if (resp.getStatusCode() == HttpStatus.CREATED)
+				shortUrls.add(c.getId(), resp.getHeaders().getLocation().toString());
 		}
 	}	
 }

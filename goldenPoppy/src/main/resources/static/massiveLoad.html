@@ -29,11 +29,24 @@
         }
     	
     	function sendFile() {
+    		var formData = new FormData();
     		var name = document.getElementById('file').value;
     		var files = document.getElementById('file').files;
-    		presp.innerHTML = files[0];
-    		
-    		stompClient.send("/app/massiveload", {}, JSON.stringify({ 'content': files[0], 'filename': name }));
+    		formData.append("file",files[0]);
+    		$.ajax({
+    			type : "POST",
+    			url : "/massiveload",
+    			enctype : "multipart/form-data",
+    			data : formData,
+    			processData: false,
+    			contentType: false,
+    			success : function() {
+    				alert("works");
+    			},
+    			error : function() {
+    				alert("failure");
+    			}
+    		});
     	}
     	
     	function showResponse(message){

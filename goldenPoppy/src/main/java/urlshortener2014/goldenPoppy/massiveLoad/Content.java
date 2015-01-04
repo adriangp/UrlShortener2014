@@ -2,14 +2,24 @@ package urlshortener2014.goldenPoppy.massiveLoad;
 
 public class Content {
 
-	private String content;
-	private String filename;
+	private int id;
+	private String url;
+	private String sponsor;
 	
-	public String getContent(){
-		return this.content;
+	public Content (int id, String url, String sponsor){
+		this.url = url;
+		this.sponsor = sponsor;
 	}
 	
-	public String getFilename(){
-		return this.filename;
+	public int getId(){
+		return this.id;
+	}
+	
+	public String getURL(){
+		return this.url;
+	}
+	
+	public String getSponsor(){
+		return this.sponsor;
 	}
 }
