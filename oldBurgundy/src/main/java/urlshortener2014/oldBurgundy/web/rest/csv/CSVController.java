@@ -25,10 +25,10 @@ public class CSVController {
 		try {
 			try{
 				int status = Integer.parseInt(msg);
-				work.getSession().sendMessage(new TextMessage("error::" + HttpStatus.valueOf(status).toString()));
+				work.getSession().sendMessage(new TextMessage("error::" + work.getLine() + "::" + HttpStatus.valueOf(status).toString()));
 			}
 			catch(NumberFormatException e){
-				work.getSession().sendMessage(new TextMessage("shortUrl::" + msg));
+				work.getSession().sendMessage(new TextMessage("shortUrl::" + work.getLine() + "::" + msg));
 			}
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (Exception e) {
