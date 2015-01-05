@@ -226,7 +226,7 @@ function insertLatestShortenedUriInDOM(shortenedUri) {
                     '<div class="shortened-url">' + shortenedUri.uri + '</div>' +
                     '<div class="target-url"><a target="_blank" href="' + shortenedUri.target + '">' + shortenedUri.target + '</a></div>' +
                   '</div>' +
-                '</div><br>');
+                '</div>');
   
   $( '.shorten-url-block' ).html( uri );
   // animation when shown! :-)

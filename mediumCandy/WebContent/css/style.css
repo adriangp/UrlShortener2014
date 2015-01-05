@@ -28,7 +28,7 @@ body {
   margin: 0 auto;
   padding: 20px;
   padding-left: 40px;
-  width: 600px;
+  width: 500px;
 }
 
 .container h1 {
@@ -48,6 +48,9 @@ body {
   padding-bottom: 0px;
 }
 
+#fileUploader{
+  width: 19px;
+}
 /* Link Menu */
 .menu-links {
   padding: 10px;
@@ -67,6 +70,46 @@ body {
 
 #link-shortener {
   color: #E2062C;
+}
+
+.stats-url-block {
+  margin: 0 auto;
+  width: 100%;
+  padding: 5px;
+  margin-top: 20px;
+  clear: both;
+}
+
+.stats-url-block .img-block {
+  margin: 0 auto;
+  padding: 10px;
+  margin-right: 20px;
+  float: left;
+  width: 20%;
+}
+
+.stats-url-block .details-block .shortened-url{
+  padding-top: 15px;
+}
+
+.stats-url-block .details-block .target-url{
+  font-size: 1em;
+}
+
+.stats-url-block .details-block {
+  padding-left: 5px;
+  float: clear;
+  width: 100%;
+}
+
+.clicks-url{
+  font-size: 0.75em;
+  width: 70px;
+  text-align: center;
+}
+
+.clicks-url span{
+  font-weight: bold;
 }
 
 /* last shortened uri */
@@ -166,6 +209,24 @@ body {
   width: 100%;
 }
 
+/* URL Stats */
+#urlStatsForm {
+  margin: 0 auto;
+  width: 100%;
+}
+
+#statsTable {
+  width: 100%;
+}
+
+#statsTable th {
+  width: 20%
+}
+
+#statsTable td {
+  width: 80%
+}
+
 /* Styles for expanding search element */
 input[type="search"].dream-search {
   letter-spacing: 0.25px;
@@ -190,11 +251,29 @@ input[type="search"].dream-search:focus {
   .container {
     width: 450px;
   }
+
+  .menu-links ul li {
+    padding-top: 20px;
+  }
+
+  .menu-links ul li a {
+    padding: 0px;
+    font-size: 0.8em;
+  }  
+  
 }
 
 @media screen and (max-width: 470px) {
   .container {
     width: 325px;
+  }
+  
+  .menu-links ul li {
+    padding-top: 30px;
+  }
+
+  .menu-links ul li a {
+    font-size: 0.7em;
   }
   
   input[type="search"].dream-search {

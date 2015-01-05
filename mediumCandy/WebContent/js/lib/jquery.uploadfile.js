@@ -79,8 +79,6 @@
             downloadStr: "Download",
             customErrorKeyStr: "jquery-upload-file-error",
             showQueueDiv: false,
-            statusBarWidth: 500,
-            dragdropWidth: 500,
             showPreview: false,
             previewHeight: "auto",
             previewWidth: "100%",
@@ -116,7 +114,7 @@
             if($.fn.ajaxForm) {
 
                 if(s.dragDrop) {
-                    var dragDrop = $('<div class="' + s.dragDropContainerClass + '" style="vertical-align:top;"></div>').width(s.dragdropWidth);
+                    var dragDrop = $('<div class="' + s.dragDropContainerClass + '" style="vertical-align:top;"></div>');
                     $(obj).before(dragDrop);
                     $(dragDrop).append(uploadLabel);
                     $(dragDrop).append($(s.dragDropStr));
@@ -527,7 +525,7 @@
 
 
         function createProgressDiv(obj, s) {
-            this.statusbar = $("<div class='ajax-file-upload-statusbar'></div>").width(s.statusBarWidth);
+            this.statusbar = $("<div class='ajax-file-upload-statusbar'></div>");
             this.preview = $("<img class='ajax-file-upload-preview' />").width(s.previewWidth).height(s.previewHeight).appendTo(this.statusbar).hide();
             this.filename = $("<div class='ajax-file-upload-filename'></div>").appendTo(this.statusbar);
             this.progressDiv = $("<div class='ajax-file-upload-progress'>").appendTo(this.statusbar).hide();
