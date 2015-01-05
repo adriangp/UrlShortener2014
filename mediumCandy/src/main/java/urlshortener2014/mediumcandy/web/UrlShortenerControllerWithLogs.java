@@ -3,12 +3,15 @@ package urlshortener2014.mediumcandy.web;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.web.UrlShortenerController;
+import urlshortener2014.mediumcandy.domain.ClickStats;
 
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
@@ -86,6 +90,26 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		}
 		
 		return su;
+	}
+	
+	@RequestMapping(value = "/linkstats", method = RequestMethod.GET)
+	public ResponseEntity<List<ClickStats>> shortenerIfReachable(@RequestParam("url") String url){
+		
+		List<ShortURL> listShortURL;
+		Long infoClicks; 
+		List<ClickStats> listResult = new ArrayList<ClickStats>();
+		listShortURL = shortURLRepository.findByTarget(url);
+		if(listShortURL.size()==0){
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			
+		}else{
+			for(ShortURL su: listShortURL){
+				infoClicks = clickRepository.clicksByHash(su.getHash());
+				ClickStats cs = new ClickStats(url, infoClicks, su.getOwner(), su.getUri());
+				listResult.add(cs); 
+			}
+			return new ResponseEntity<>(listResult,HttpStatus.OK);
+		}
 	}
 }
 
