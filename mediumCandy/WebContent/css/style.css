@@ -212,8 +212,8 @@ body {
   font-size: 0.75em;
 }
 
-/* alert box */
-#alert-box {
+/* alert and success box */
+#alert-box,  #success-box{
   display: none;
   position: absolute;
   width: 100%;
@@ -297,7 +297,11 @@ input[type="search"].dream-search:focus {
     width: 350px;
   }
   
-  #alert-box {
+  #alert-box, #success-box {
+    font-size: 0.7em;
+  }
+  
+  #success-box {
     font-size: 0.7em;
   }
   

@@ -618,7 +618,10 @@
 
                 },
                 success: function (data, message, xhr) {
-                  $('.ajax-file-upload-statusbar').empty();
+                  $('.ajax-file-upload-statusbar').remove();
+                  showSuccess("The file was successfully uploaded! Your download started...");
+                  var fileName = data;
+                  downloadFile(fileName);
                   // en data es donde va el String que devuelve el SERVER
                   console.log("EXITO - response :   " + data);
                   
@@ -685,7 +688,7 @@
                     obj.sCounter += fileArray.length;
                 },
                 error: function (xhr, status, errMsg) {
-                  $('.ajax-file-upload-statusbar').empty();
+                  $('.ajax-file-upload-statusbar').remove();
                   console.log(xhr);
                   
                     pd.abort.hide();

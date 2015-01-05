@@ -22,18 +22,7 @@ $( document ).ready(function() {
   setStatsSubmition();
   setUploadSubmition();
   setMenuCallbacks();
-  
-  //testing
-  download();
 });
-
-function download() {
-  $( '#download' ).on('click', function (e) {
-    downloadFile( 'name.csv' );
-
-    e.preventDefault();
-  });
-}
 
 /*
  * This function is called everytime the user submits the form.
@@ -183,6 +172,13 @@ function showAlert(alertMessage) {
   }
 }
 
+function showSuccess(successMessage) {
+  if ( elementIsVisible( '#success-box' ) ) {
+    $( '#success-box' ).html(successMessage);
+    $( '#success-box' ).slideDown().delay(5000).slideUp();
+  }
+}
+
 /*
  * Returns TRUE if the element 'element' is visible in the DOM, and
  * FALSE if it is hidden.
@@ -291,18 +287,7 @@ function isShortenUri(url) {
  *                           A P I   C a l l s
  *****************************************************************************/
 function downloadFile(fileName) {
-  $.ajax({
-    url : SERVICE_URI + "files/" + fileName,
-	contentType : 'application/json',
-	type : 'GET',
-	success : function (data)
-	{
-      alert("done!");
-	},
-	error: function (error) {
-      console.log(error);
-	}
-  });
+  window.location.href = SERVICE_URI + "files/" + fileName;
 }
 
 /*
