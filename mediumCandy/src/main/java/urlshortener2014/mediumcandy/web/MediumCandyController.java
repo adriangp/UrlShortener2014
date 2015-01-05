@@ -1,8 +1,5 @@
 package urlshortener2014.mediumcandy.web;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpHeaders;
@@ -13,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import urlshortener2014.common.domain.ShortURL;
 
@@ -32,13 +32,12 @@ public class MediumCandyController {
 		/*------------------------------------------------------------
 		 * CONSUMING REST Service
 		 ------------------------------------------------------------*/
-		//String restURI = linkTo(methodOn(UrlShortenerControllerWithLogs.class).shortenerIfReachable(null, null, null, null)).toString();
-		
-		Map<String, String> vars = new HashMap<String, String>();
-	    vars.put("url", url);
-	    
-	    RestTemplate restTemplate = new RestTemplate();
-		//su = restTemplate.postForObject(restURI, null, ShortURL.class, vars);
+		String restURI = linkTo(methodOn(UrlShortenerControllerWithLogs.class).
+                shortenerIfReachable(url, null, null, null)).toString();
+
+		RestTemplate restTemplate = new RestTemplate();
+
+		su = restTemplate.postForObject(restURI, null, ShortURL.class);
 		/*-----------------------------------------------------------*/
 		
 		if (su != null) {
