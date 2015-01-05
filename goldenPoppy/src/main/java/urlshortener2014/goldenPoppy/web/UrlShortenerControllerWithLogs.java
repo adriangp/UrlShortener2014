@@ -76,14 +76,19 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	
 	@MessageMapping("/isalive")
     @SendToUser("/topic/isalive")
-    public Response isalive(URL url) throws Exception {
-
+    public Response isalive(URL url) {
+		
+		if (!url.isValid()){
+			logger.info("isAlive: Url is not valid "+url.getUrl());
+			return new Response(-1);
+		}
+		
+		logger.info("isAlive: Url is valid "+url.getUrl());
 		ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<Integer> future = executor.submit(new CompruebaUrl(url));
         
         int timeout = url.getTimeout();
                 
-        logger.info("isAlive: timeout requested "+timeout);
         try {
         	int s = future.get(timeout, TimeUnit.SECONDS);
         	executor.shutdownNow();

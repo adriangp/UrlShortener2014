@@ -16,6 +16,7 @@ public class CompruebaUrl implements Callable<Integer>{
 	
 	@Override
     public Integer call() throws Exception {
+
 		HttpClient client = HttpClientBuilder.create().build();
     	//HttpHead request = new HttpHead(url.getUrl());
     	HttpGet request = new HttpGet(url.getUrl());
@@ -31,5 +32,7 @@ public class CompruebaUrl implements Callable<Integer>{
     	}
         
     }
+	
+	
 
 }
