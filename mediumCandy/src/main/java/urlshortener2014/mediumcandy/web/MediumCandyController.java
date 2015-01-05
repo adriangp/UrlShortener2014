@@ -32,13 +32,13 @@ public class MediumCandyController {
 		/*------------------------------------------------------------
 		 * CONSUMING REST Service
 		 ------------------------------------------------------------*/
-		String restURI = linkTo(methodOn(UrlShortenerControllerWithLogs.class).shortenerIfReachable(null, null, null, null)).toString();
+		//String restURI = linkTo(methodOn(UrlShortenerControllerWithLogs.class).shortenerIfReachable(null, null, null, null)).toString();
 		
 		Map<String, String> vars = new HashMap<String, String>();
 	    vars.put("url", url);
 	    
 	    RestTemplate restTemplate = new RestTemplate();
-		su = restTemplate.postForObject(restURI, null, ShortURL.class, vars);
+		//su = restTemplate.postForObject(restURI, null, ShortURL.class, vars);
 		/*-----------------------------------------------------------*/
 		
 		if (su != null) {
