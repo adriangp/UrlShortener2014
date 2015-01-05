@@ -106,7 +106,7 @@
         }
 
         var obj = this;
-        var uploadLabel = $('<div>' + $(this).html() + '</div>');
+        var uploadLabel = $('<div>' + "Upload file..." + '</div>');
         $(uploadLabel).addClass(s.uploadButtonClass);
 
         // wait form ajax Form plugin and initialize

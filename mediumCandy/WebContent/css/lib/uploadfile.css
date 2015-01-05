@@ -86,9 +86,10 @@ margin-right:5px;
     color: #FFF;
     text-align:left;
     vertical-align:middle;
-    padding: 20px;
+    padding: 40px;
     font-size: .9em;
     font-weight: normal;
+    margin-top: 40px;
 }
 
 .ajax-upload-dragdrop.state-hover
