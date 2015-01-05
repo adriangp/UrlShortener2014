@@ -93,7 +93,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	}
 	
 	@RequestMapping(value = "/linkstats", method = RequestMethod.GET)
-	public ResponseEntity<List<ClickStats>> shortenerIfReachable(@RequestParam("url") String url){
+	public ResponseEntity<List<ClickStats>> getLinkStats(@RequestParam("url") String url){
 		
 		List<ShortURL> listShortURL;
 		Long infoClicks; 
