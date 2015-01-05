@@ -35,7 +35,8 @@ public class FileUploadController {
 			InputStream is = fis;
 			// copy it to response's OutputStream
 			ByteStreams.copy(is, response.getOutputStream());
-			response.setContentType("text/csv");
+			response.setContentType("application/x-download");
+			response.setHeader("Content-disposition", "attachment; filename=" + fileName + ".csv");
 			response.flushBuffer();
 		} catch (IOException ex) {
 			throw new RuntimeException("IOError writing file to output stream");

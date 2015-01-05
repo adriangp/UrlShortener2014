@@ -291,18 +291,7 @@ function isShortenUri(url) {
  *                           A P I   C a l l s
  *****************************************************************************/
 function downloadFile(fileName) {
-  $.ajax({
-    url : SERVICE_URI + "files/" + fileName,
-	contentType : 'application/json',
-	type : 'GET',
-	success : function (data)
-	{
-      alert("done!");
-	},
-	error: function (error) {
-      console.log(error);
-	}
-  });
+  window.location.href = SERVICE_URI + "files/" + fileName;
 }
 
 /*
