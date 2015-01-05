@@ -5,9 +5,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,9 +20,10 @@ public class FileUploadController {
     }
 
     @RequestMapping(value="/upload", method=RequestMethod.POST)
-    public @ResponseBody String handleFileUpload(@RequestParam("name") String name,
-            @RequestParam("file") MultipartFile file){
-        if (!file.isEmpty()) {
+    public @ResponseBody String handleFileUpload(@RequestBody MultipartFile file){
+    	String name = "file.csv";
+    	System.out.println("\nEJECUTANDOOOOOOOOOOOO!\n");
+    	if (!file.isEmpty()) {
             try {
                 byte[] bytes = file.getBytes();
                 BufferedOutputStream stream =
@@ -34,7 +35,8 @@ public class FileUploadController {
                 return "You failed to upload " + name + " => " + e.getMessage();
             }
         } else {
-            return "You failed to upload " + name + " because the file was empty.";
+        	System.out.println("\nEMPTY FILE!\n");
+            return "You failed to upload " + name + " because the file was empty.";                    
         }
     }
 
