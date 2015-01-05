@@ -12,7 +12,7 @@ $(document).ready(function() {
 	
 	connect();
 	
-	//setInterval(suspension_points, 200);
+	setInterval(suspension_points, 200);
 });
 
 var iteration = 3;
