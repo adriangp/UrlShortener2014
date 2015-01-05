@@ -108,7 +108,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				ClickStats cs = new ClickStats(url, infoClicks, su.getOwner(), su.getUri());
 				listResult.add(cs); 
 			}
-			return new ResponseEntity<>(listResult,HttpStatus.OK);
+			return new ResponseEntity<>(listResult, HttpStatus.OK);
 		}
 	}
 }
