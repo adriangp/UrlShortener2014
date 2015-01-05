@@ -141,7 +141,7 @@ function generateText() {
 		text.push('\n');
 	}
     return new Blob(text, {
-        type: 'text/plain'
+        type: 'text/csv'
     });
 };
 	/*

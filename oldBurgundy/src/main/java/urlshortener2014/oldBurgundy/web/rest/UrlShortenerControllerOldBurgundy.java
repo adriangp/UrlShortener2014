@@ -37,8 +37,6 @@ public class UrlShortenerControllerOldBurgundy extends UrlShortenerController {
 			HttpServletRequest request) {
 		logger.info("Request redirection firts with hash " + id);
 		
-		Velocity.init();
-		
 		ShortURL shortURL = shortURLRepository.findByKey(id);
 		
 		if (shortURL == null){
@@ -63,7 +61,7 @@ public class UrlShortenerControllerOldBurgundy extends UrlShortenerController {
 		}
 		
 		context.put("shortURL", shortURL.getHash());
-		Velocity.mergeTemplate("./src/main/resources/sponsor.vm", "ISO-8859-1", context, writer);
+		Velocity.mergeTemplate("sponsor.vm", "ISO-8859-1", context, writer);
 		
 		HttpHeaders h = new HttpHeaders();
 		h.setContentType(MediaType.TEXT_HTML);
