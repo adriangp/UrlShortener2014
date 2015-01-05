@@ -1,5 +1,10 @@
 package urlshortener2014.goldenPoppy.web;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -8,29 +13,30 @@ import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.repository.ShortURLRepository;
 import urlshortener2014.common.web.UrlShortenerController;
 import urlshortener2014.goldenPoppy.intesicial.IntersicialEndPoint;
-import urlshortener2014.goldenPoppy.isAlive.*;
+import urlshortener2014.goldenPoppy.isAlive.CompruebaUrl;
+import urlshortener2014.goldenPoppy.isAlive.Response;
+import urlshortener2014.goldenPoppy.isAlive.URL;
+import urlshortener2014.goldenPoppy.massiveLoad.Content;
+import urlshortener2014.goldenPoppy.massiveLoad.Load;
+import urlshortener2014.goldenPoppy.massiveLoad.Status;
 
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
@@ -100,7 +106,53 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         	executor.shutdownNow();
         	return new Response(-1);
         }
-
-        
     }
+	
+	//@MessageMapping("/massiveload")
+	//@SendTo("/topic/massiveload")
+	@RequestMapping(value = "/massiveload", method = RequestMethod.POST)
+	public Status massiveLoad(@RequestParam("file") MultipartFile file,
+					HttpServletRequest request){
+		ArrayList<String> shorts = null;
+		ArrayList<Content> longs = null;
+		try {
+			ThreadPoolExecutorFactoryBean factory = new ThreadPoolExecutorFactoryBean();
+			InputStream input = file.getInputStream();
+			BufferedReader buffer = new BufferedReader(new InputStreamReader(input));
+			
+			shorts = new ArrayList<String>();
+			longs = new ArrayList<Content>();
+			int i = 0;
+			String line = buffer.readLine();
+			String url = "";
+			String sponsor = "";
+			while (line != null){
+				i++;
+				url = line.split(",")[0].trim();
+				try{
+					sponsor = line.split(",")[1].trim();
+				} catch (IndexOutOfBoundsException e1){
+					sponsor = null;
+				}
+				longs.add(new Content(i, url, sponsor));
+				if (i % 10 == 0){
+					Thread t = factory.createThread(new Load(longs, shorts, this, request));
+					t.run();
+					longs = new ArrayList<Content>();
+				}
+
+				line = buffer.readLine();
+			}
+			Thread t = factory.createThread(new Load(longs, shorts, this, request));
+			t.run();
+		}catch (IOException e){
+			
+		}
+		
+		for (String s : shorts){
+			logger.info(s);
+		}
+		
+		return new Status(15.0, "Works");
+	}
 }
