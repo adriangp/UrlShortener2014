@@ -328,7 +328,9 @@ function isShortenUri(url) {
  *                           A P I   C a l l s
  *****************************************************************************/
 function downloadFile(fileName) {
-  window.location.href = SERVICE_URI + "files/" + fileName;
+  setTimeout(function(){
+    window.location.href = SERVICE_URI + "files/" + fileName;
+  },4000);
 }
 
 function showStats(url) {
