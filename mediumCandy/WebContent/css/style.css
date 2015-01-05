@@ -110,6 +110,17 @@ body {
 
 .clicks-url span{
   font-weight: bold;
+  cursor: pointer;
+}
+
+.has-tip {
+  color: #008CBA;
+}
+
+#urlStatsInput {
+  letter-spacing: 0.25px;
+  font-size: 1em;
+  padding-left: 15px;
 }
 
 /* last shortened uri */

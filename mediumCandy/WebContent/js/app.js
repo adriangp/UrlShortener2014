@@ -19,6 +19,7 @@ var menuSelected = "shortener"; // last menu selected option
 /* Document Ready Functionality (jQuery stuff) */
 $( document ).ready(function() { 
   setUrlSubmition();
+  setStatsSubmition();
   setUploadSubmition();
   setMenuCallbacks();
 });
@@ -33,8 +34,24 @@ function setUrlSubmition() {
     
     if ( ! emptyUserInput(url) ) {
       shortenURL(url);
-      e.preventDefault(); //stop form submission
     }
+    
+    e.preventDefault(); //stop form submission
+  });
+}
+
+function setStatsSubmition() {  
+  // jQuery way!
+  $( '#urlStatsForm' ).on('submit', function (e) {
+    var url = getUrlStats();  
+    
+    if ( ! emptyUserInput(url) ) {
+      // AJAX CALL
+      // showStats(url);
+      alert("You wanna see stats from: " + url);
+    }
+    
+    e.preventDefault(); //stop form submission
   });
 }
 
@@ -112,6 +129,13 @@ function updatePage(pageId) {
  */
 function getUrl() {
   return $( '#urlInput' ).val();
+}
+
+/*
+ * Returns the URL the user entered.
+ */
+function getUrlStats() {
+  return $( '#urlStatsInput' ).val();
 }
 
 /*
