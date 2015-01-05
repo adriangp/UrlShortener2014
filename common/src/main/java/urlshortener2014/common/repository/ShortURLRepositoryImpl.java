@@ -2,6 +2,7 @@ package urlshortener2014.common.repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -128,6 +129,17 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 			log.debug("When select for limit " + limit + " and offset "
 					+ offset, e);
 			return null;
+		}
+	}
+
+	@Override
+	public List<ShortURL> findByTarget(String target) {
+		try {
+			return jdbc.query("SELECT * FROM shorturl WHERE target = ?",
+					new Object[] { target }, rowMapper);
+		} catch (Exception e) {
+			log.debug("When select for target " + target , e);
+			return Collections.emptyList();
 		}
 	}
 }
