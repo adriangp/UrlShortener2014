@@ -1,4 +1,5 @@
 .ajax-file-upload-statusbar {
+width: 100%;
 margin: 0;
 padding: 20px;
 }
@@ -6,7 +7,7 @@ padding: 20px;
 width: 100%;
 height: auto;
 margin: 0;
-color: #807579
+color: #807579;
 }
 .ajax-file-upload-progress {
 margin: 0 10px 5px 10px;
@@ -74,11 +75,10 @@ margin-right:5px;
 	font-size: .9em;
    font-weight: bold;
 	cursor:pointer;
-	margin:10px 10px 10px 10px;
   display: inline-block;
   background: #fff;
   text-decoration: none;
-  margin-right: 30px; 
+  margin-right: 20px; 
   padding: 10px 30px 10px 30px; 
   color: #fff;
   background: #008CBA;
@@ -89,11 +89,12 @@ margin-right:5px;
 
 .ajax-upload-dragdrop
 {
+    width: 100%;
     border:1px solid #008CBA;
     color: #FFF;
     text-align:left;
     vertical-align:middle;
-    padding:10px 10px 5px 10px;
+    padding: 20px;
     font-size: .9em;
     font-weight: normal;
 }
