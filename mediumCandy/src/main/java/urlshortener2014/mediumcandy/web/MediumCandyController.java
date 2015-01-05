@@ -29,16 +29,11 @@ public class MediumCandyController {
 			HttpServletRequest request) {
 		ShortURL su = null;
 		
-		/*------------------------------------------------------------
-		 * CONSUMING REST Service
-		 ------------------------------------------------------------*/
+		// Consuming REST Api
 		String restURI = linkTo(methodOn(UrlShortenerControllerWithLogs.class).
                 shortenerIfReachable(url, null, null, null)).toString();
-
 		RestTemplate restTemplate = new RestTemplate();
-
 		su = restTemplate.postForObject(restURI, null, ShortURL.class);
-		/*-----------------------------------------------------------*/
 		
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
