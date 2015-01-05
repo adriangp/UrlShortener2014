@@ -619,7 +619,7 @@
                 },
                 success: function (data, message, xhr) {
                   $('.ajax-file-upload-statusbar').remove();
-                  showSuccess("The file was successfully uploaded! Your download started...");
+                  showSuccess("The file was successfully uploaded! Your download will start now...");
                   var fileName = data;
                   downloadFile(fileName);
                   // en data es donde va el String que devuelve el SERVER
