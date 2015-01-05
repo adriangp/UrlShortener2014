@@ -6,4 +6,5 @@ eclipse {
 
 dependencies {
    compile project(":common")
+	 compile 'org.springframework.hateoas:spring-hateoas:0.16.0.RELEASE'
 }
