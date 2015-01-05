@@ -619,7 +619,9 @@
                 },
                 success: function (data, message, xhr) {
                   $('.ajax-file-upload-statusbar').empty();
-
+                  // en data es donde va el String que devuelve el SERVER
+                  console.log("EXITO - response :   " + data);
+                  
                     //For custom errors.
                     if(s.returnType == "json" && $.type(data) == "object" && data.hasOwnProperty(s.customErrorKeyStr)) {
                         pd.abort.hide();
@@ -684,6 +686,7 @@
                 },
                 error: function (xhr, status, errMsg) {
                   $('.ajax-file-upload-statusbar').empty();
+                  console.log(xhr);
                   
                     pd.abort.hide();
                     if(xhr.statusText == "abort") //we aborted it

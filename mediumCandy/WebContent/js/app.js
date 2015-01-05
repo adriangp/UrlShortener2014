@@ -22,7 +22,18 @@ $( document ).ready(function() {
   setStatsSubmition();
   setUploadSubmition();
   setMenuCallbacks();
+  
+  //testing
+  download();
 });
+
+function download() {
+  $( '#download' ).on('click', function (e) {
+    downloadFile( 'name.csv' );
+
+    e.preventDefault();
+  });
+}
 
 /*
  * This function is called everytime the user submits the form.
@@ -279,6 +290,21 @@ function isShortenUri(url) {
 /******************************************************************************
  *                           A P I   C a l l s
  *****************************************************************************/
+function downloadFile(fileName) {
+  $.ajax({
+    url : SERVICE_URI + "files/" + fileName,
+	contentType : 'application/json',
+	type : 'GET',
+	success : function (data)
+	{
+      alert("done!");
+	},
+	error: function (error) {
+      console.log(error);
+	}
+  });
+}
+
 /*
  * ( POST method ): Shortens the given URL.
  */
