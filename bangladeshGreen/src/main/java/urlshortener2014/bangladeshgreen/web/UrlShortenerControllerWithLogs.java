@@ -2,10 +2,8 @@ package urlshortener2014.bangladeshgreen.web;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.sql.Date;
@@ -14,16 +12,10 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
@@ -35,8 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.google.gson.Gson;
 
 import urlshortener2014.common.domain.Click;
 import urlshortener2014.common.domain.ShortURL;
@@ -63,6 +53,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     	PrintWriter f = new PrintWriter(fichero);
     	String linea="";
     	while((linea = reader.readLine()) != null){
+    		System.out.println(linea);
     		if(linea.startsWith("www") || linea.startsWith("http")){
     			String []listaURL=linea.split(",");
 				for(String url: listaURL){
@@ -73,6 +64,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     		}
 		}
     	f.close();
+    	analizarCSV(fichero,request);
 		return "File Uploaded!";
 	}
 	
@@ -121,7 +113,9 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			HttpServletRequest request) {
 		
 		logger.info("Requested new short for uri "+"url");
-		ResponseEntity<ShortURL>su=super.shortener(url, brand, brand, request);
+		
+		ResponseEntity<ShortURL>su=super.shortener(url, sponsor, brand, request);
+		
 		//comprobar si es segura
 		Client c = ClientBuilder.newClient();
 		url=parse(url);
@@ -136,26 +130,23 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return su;
 	}
 
-	@RequestMapping(value = "/analizar", method = RequestMethod.POST)
-	public Response analizarCSV(@RequestParam("csv") File csv,
+	public Response analizarCSV(File csv,
 			HttpServletRequest request) throws IOException{
 		
-		System.out.println("Llega a analizar");
 		BufferedReader br=new BufferedReader(new FileReader(csv));
-		List<ShortURL> listaUrlAcortadas=new ArrayList<ShortURL>();
+		File csvAcortado=new File("fich_temporal.csv");
+		PrintWriter fileResul=new PrintWriter(csvAcortado);
 		String linea="";
 		while((linea = br.readLine()) != null){
-			String []listaURL=linea.split(",");
-			for(String url: listaURL){
-				ResponseEntity<ShortURL> urlAcortada=shortener(url,"","",request);
-				listaUrlAcortadas.add(urlAcortada.getBody());
-			}
-		}
-		File csvAcortado=new File("temporal.csv");
-		PrintWriter fileResul=new PrintWriter(csvAcortado);
-		for(ShortURL url: listaUrlAcortadas){
-			//Obtener la URI y copiarla recortada
-			fileResul.write(url.getUri().toString()+",\n");
+				String []listaURL=linea.split(",");
+				for(String url: listaURL){
+					System.out.println("Url "+url);
+					if(!url.equals(null) || !url.equals("")){
+						ResponseEntity<ShortURL> urlAcortada=shortener(url,null,null,request);
+						fileResul.write(urlAcortada.getBody().getUri().toString()+",");
+					}
+				}
+				fileResul.write("\n");
 		}
 		fileResul.close();
 		br.close();
