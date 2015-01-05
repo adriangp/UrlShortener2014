@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE HTML>
+<html>	
 	<head>
 		<title>URL Shortener - OldBurgundy</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,20 +13,14 @@
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 		-->
 		<link rel="stylesheet" href="./css/style.css">
-		<script type="text/javascript" src="./js/oldBurgundy.js"></script>
+		<script src="./js/wsClient.js"></script>
 	</head>
 	<body>
-		<div id="banner"></div>
-		<div class="jumbotron">
-			<form role="form" id="shortener">
-				<div class="form-group" style="">
-					<label for="uri">Long URL - CSV</label>
-					<input type="file" class="form-control" id="csvFile" /><!--onchange="readFile(this.files)"-->
-				</div>
-				<button type="submit" class="btn btn-primary" id="btn_submit">Make short!</button>
-			</form>
-			<p/>
-			<div id="result"></div>
+		<div id="header">
+			<div id="banner"></div>
+			<div id="wait_text"><h4><span id="text">Wait to be redirected <span id="dots">. . .</span></span></h4></div>
 		</div>
+		<input id="link" type="Hidden" value="$shortURL"/>
+		<embed id="sponsor" src="$sponsor"></embed>
 	</body>
 </html>
