@@ -22,18 +22,7 @@ $( document ).ready(function() {
   setStatsSubmition();
   setUploadSubmition();
   setMenuCallbacks();
-  
-  //testing
-  download();
 });
-
-function download() {
-  $( '#download' ).on('click', function (e) {
-    downloadFile( 'name.csv' );
-
-    e.preventDefault();
-  });
-}
 
 /*
  * This function is called everytime the user submits the form.
@@ -180,6 +169,13 @@ function showAlert(alertMessage) {
   if ( elementIsVisible( '#alert-box' ) ) {
     $( '#alert-box' ).html(alertMessage);
     $( '#alert-box' ).slideDown().delay(5000).slideUp();
+  }
+}
+
+function showSuccess(successMessage) {
+  if ( elementIsVisible( '#success-box' ) ) {
+    $( '#success-box' ).html(successMessage);
+    $( '#success-box' ).slideDown().delay(5000).slideUp();
   }
 }
 

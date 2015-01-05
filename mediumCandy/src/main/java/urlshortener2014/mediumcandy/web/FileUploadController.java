@@ -63,7 +63,6 @@ public class FileUploadController {
             if ( !multipartFile.isEmpty() ) {
             	try {
             		String fileNameServer = "medcandy-" + generateString(fileName);
-            		System.out.println("fileNameServer >>    " + fileNameServer);
             		
     				byte[] file = multipartFile.getBytes();
     				BufferedOutputStream stream =
