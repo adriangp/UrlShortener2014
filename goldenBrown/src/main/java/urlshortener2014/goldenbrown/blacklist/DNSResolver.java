@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DNSResolver {
-	private static final Logger logger = LoggerFactory.getLogger(BlackListService.class);
+	private static final Logger logger = LoggerFactory.getLogger(BlackListController.class);
 	
 	private String host; 
 	private String antispamSites[]; 

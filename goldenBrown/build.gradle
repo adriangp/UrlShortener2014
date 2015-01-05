@@ -11,6 +11,7 @@ dependencies {
    compile("org.webjars:jquery:2.0.3-1")
    compile 'org.apache.httpcomponents:httpclient:4.3.6'
    compile 'nl.bitwalker:UserAgentUtils:1.2.4'
+   compile 'org.springframework:spring-context'
+   compile 'org.springframework:spring-context-support'
    compile 'net.sf.ehcache:ehcache:2.7.4'
-   compile 'org.springframework:spring-context-support:4.1.4.RELEASE'
 }
