@@ -43,7 +43,7 @@
             showError: true,
             showStatusAfterSuccess: true,
             showStatusAfterError: true,
-            showFileCounter: true,
+            showFileCounter: false,
             fileCounterStyle: "). ",
             showProgress: false,
             nestedForms: true,
@@ -618,6 +618,7 @@
 
                 },
                 success: function (data, message, xhr) {
+                  $('.ajax-file-upload-statusbar').empty();
 
                     //For custom errors.
                     if(s.returnType == "json" && $.type(data) == "object" && data.hasOwnProperty(s.customErrorKeyStr)) {
@@ -682,6 +683,7 @@
                     obj.sCounter += fileArray.length;
                 },
                 error: function (xhr, status, errMsg) {
+                  $('.ajax-file-upload-statusbar').empty();
                   
                     pd.abort.hide();
                     if(xhr.statusText == "abort") //we aborted it
@@ -693,7 +695,11 @@
                         s.onError.call(this, fileArray, status, errMsg, pd);
                         if(s.showStatusAfterError) {
                             pd.progressDiv.hide();
-                            showAlert( "Failed to upload file. Server says: <strong>" + errMsg +"<strong>.");
+                            if ( errMsg.length == 0 ){
+                              showAlert( "Failed to upload file. Server not responding.");
+                            } else {
+                              showAlert( "Failed to upload file. Server says: <strong>" + errMsg +"<strong>.");
+                            }
                         } else {
                             pd.statusbar.hide();
                             pd.statusbar.remove();
