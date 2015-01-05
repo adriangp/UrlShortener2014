@@ -19,6 +19,7 @@ var menuSelected = "shortener"; // last menu selected option
 /* Document Ready Functionality (jQuery stuff) */
 $( document ).ready(function() { 
   setUrlSubmition();
+  setUploadSubmition();
   setMenuCallbacks();
 });
 
@@ -27,13 +28,23 @@ $( document ).ready(function() {
  */
 function setUrlSubmition() {
   // jQuery way!
-  $("form").on('submit', function (e) {
+  $( '#urlShortenerForm' ).on('submit', function (e) {
     var url = getUrl();  
     
     if ( ! emptyUserInput(url) ) {
       shortenURL(url);
       e.preventDefault(); //stop form submission
     }
+  });
+}
+
+function setUploadSubmition() {
+  // here comes the code
+  $( '#fileUploader' ).uploadFile({
+    url: SERVICE_URI + "upload",
+    allowedTypes:"csv",
+    multiple:false,
+    fileName:"myfile"
   });
 }
 
@@ -45,7 +56,7 @@ function setMenuCallbacks() {
     updateMenu('#link-shortener');
     updatePage('#shortener');
     menuSelected = "shortener";
-    // show
+
     e.preventDefault();
   });
   
@@ -53,7 +64,7 @@ function setMenuCallbacks() {
     updateMenu('#link-csv');
     updatePage('#csv');
     menuSelected = "csv";
-    // show
+
     e.preventDefault();
   });
   
@@ -61,7 +72,7 @@ function setMenuCallbacks() {
     updateMenu('#link-branded');
     updatePage('#branded');
     menuSelected = "branded";
-    // show
+
     e.preventDefault();
   });
   
@@ -69,7 +80,7 @@ function setMenuCallbacks() {
     updateMenu('#link-stats');
     updatePage('#stats');
     menuSelected = "stats";
-    // show
+
     e.preventDefault();
   });
 }
