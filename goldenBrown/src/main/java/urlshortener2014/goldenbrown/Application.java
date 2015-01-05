@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
- * Esta clase inicializa el servicio llamando a SpringApplication. Contiene el main de la aplicacion
- * Tambien se puede modificar su comportamiento con la clase SpringApplicationBuilder.
+ * Class that initializes a SpringApplication service.  Contains the main method of the application.
+ * Also, the behaviour can be modified with the SpringApplicationBuilder class.
  * @author: Jorge,Javi,Gabi
  * @version: 08/01/2015
  */
@@ -19,8 +19,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 @ComponentScan
 public class Application extends SpringBootServletInitializer {
 	/**
-	 * Metodo Main, invoca a SpringApplication para correr el servicio
-	 * @param args 
+	 * Main method, starts the SpringApplication service
+	 * @param args command line arguments
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
@@ -28,8 +28,8 @@ public class Application extends SpringBootServletInitializer {
 	}
 	
 	/**
-	 * Metodo para configurar la SpringApplication
-	 * @param application hay que pasarle un SpringApplicationBuilder ya configurado.
+	 * Method that allows to configure the SprintApplication
+	 * @param application a configured SpringApplicationBuilder
 	 */
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {

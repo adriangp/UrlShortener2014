@@ -10,28 +10,29 @@ import urlshortener2014.common.repository.ClickRepositoryImpl;
 import urlshortener2014.common.repository.ShortURLRepository;
 import urlshortener2014.common.repository.ShortURLRepositoryImpl;
 /**
- * Clase que controla la persistencia de la base de datos del common
+ * Class that controls the persistency of the database of common
  * @author: Jorge,Javi,Gabi
  * @version: 08/01/2015
  */
 @Configuration
 public class PersistenceContext {
 
-	//Objeto jdbc que se conecta con la BD
+	//Jdbcd Object that connects with the database
 	@Autowired
     protected JdbcTemplate jdbc;
 
 	/**
-	 * Crea el objeto jdbc de la clase ShortURLRepositoryImpl en el common del proyecto para poder
-	 * utilizar la BD con este jdbc y guardar informacion de las URL.
+	 * Creates a jdbc object of the ShortURLRepositoryImpls class in project's common.
+	 * This allows to use the database with this jdbc and save URL information.
 	 */
 	@Bean
 	ShortURLRepository shortURLRepository() {
 		return new ShortURLRepositoryImpl(jdbc);
 	}
+	
  	/**
- 	 * Crea el objeto jdbc de la clase ClickRepositoryImpl en el common del proyecto para poder
- 	 * utilizar la BD cone ste jdbc y guardar informacion de los click.
+ 	 * Creates a jdbc object of the ClickRepositoryImpl class in project's common.
+ 	 * This allows to use the database with this jdbc and save click information.
  	 */
 	@Bean
 	ClickRepository clickRepository() {
