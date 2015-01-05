@@ -6,6 +6,7 @@ var SERVICE_URI = "http://localhost:8080/";
 /* Alert Messages */
 var ALERT_SHORTEN_URL = "Unable to shorten that link. It is not a valid or reachable url.";
 var ALERT_ALREADY_SHORTEN = "That is already a shortened link!";
+var ALERT_STATS = "Could not show the stats of that link. Try with a different one.";
 
 /* Other vars */
 var shortenedUriList = []; // list of shortened urls objects
@@ -47,8 +48,7 @@ function setStatsSubmition() {
     
     if ( ! emptyUserInput(url) ) {
       // AJAX CALL
-      // showStats(url);
-      alert("You wanna see stats from: " + url);
+      showStats(url);
     }
     
     e.preventDefault(); //stop form submission
@@ -152,6 +152,13 @@ function setUrlInput(objectUri) {
  */
 function clearUrlInput() {
   $( '#urlInput' ).val('');
+}
+
+/*
+ * Clears all text in #urlStatsInput.
+ */
+function clearStatsInput() {
+  $( '#urlStatsInput' ).val('');
 }
 
 /*
@@ -266,10 +273,44 @@ function insertLatestShortenedUriInDOM(shortenedUri) {
 }
 
 /*
+ * Inserts the HTML of the given shortenedUri object, inside
+ * the latest shortened URL block.
+ */
+function insertStatsInDOM(statsObj) {
+  var stats = $(  '<div class="shorten-url-elem">' +
+            '<div class="img-block">' +
+              '<img src="/img/stats.png">' +
+              '<div class="clicks-url">' +
+                '<span>' + statsObj.numClicks + '</span> clicks</div>' +
+            '</div>' +
+            '<div class="details-block">' +
+              '<div class="owner-url"><span>owner:</span> ' + statsObj.owner + '</div>' +
+              '<div class="group">' +
+                '<div class="target-url">' +
+                  '<a target="_blank" href="' + statsObj.target + '">' + statsObj.target + '</a>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>' );
+  
+  $( '.stats-url-block' ).html( stats );
+  // animation when shown! :-)
+  $( '.stats-url-block' ).hide();
+  $( '.stats-url-block' ).slideDown();
+}
+
+/*
  * Selects the content of the #urlInput input.
  */
 function selectUserInput() {
   $( '#urlInput' ).select();
+}
+
+/*
+ * Selects the content of the #urlStatsInput input.
+ */
+function selectStatsInput() {
+  $( '#urlStatsInput' ).select();
 }
 
 /*
@@ -288,6 +329,24 @@ function isShortenUri(url) {
  *****************************************************************************/
 function downloadFile(fileName) {
   window.location.href = SERVICE_URI + "files/" + fileName;
+}
+
+function showStats(url) {
+  $.ajax({
+    url : SERVICE_URI + "linkstats?url=" + url,
+	contentType : 'application/json',
+	type : 'GET',
+	success : function (response)
+	{
+      var statsObj = response[0];
+      insertStatsInDOM(statsObj);
+      clearStatsInput();
+	},
+	error: function (error) {
+      showAlert(ALERT_STATS);
+      selectStatsInput();
+	}
+  });
 }
 
 /*
