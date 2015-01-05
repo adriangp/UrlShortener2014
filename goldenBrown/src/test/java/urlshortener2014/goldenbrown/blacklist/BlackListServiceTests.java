@@ -3,6 +3,7 @@ package urlshortener2014.goldenbrown.blacklist;
 import org.apache.http.util.Asserts;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -24,6 +25,9 @@ import static org.junit.Assert.assertSame;
 @IntegrationTest("server.port=0")
 @DirtiesContext
 public class BlackListServiceTests {
+	
+	@Autowired
+	BlackListService blackListService;
 	
 	/*
 	 * Nomenclature of junit methods described in (with examples):
@@ -60,9 +64,10 @@ public class BlackListServiceTests {
 //	 * 		nslookup <blacklisted_site>.zen.spamhaus.org.
 //	 * @throws Exception
 //	 */
-//	@Test
-//	public void testDNSBlackListed() throws Exception {
-//		Boolean a = BlackListController.isBlackListed("edgecast.com");
-//		assertEquals("DNS is not working", true, a);
-//	}
+	@Test
+	public void testIPBlackListed() throws Exception {
+		String blacklistedip = "142.4.218.66";
+		Boolean res = blackListService.isBlackListed(blacklistedip);
+		assertEquals("DNS is not working", true, res);
+	}
 }

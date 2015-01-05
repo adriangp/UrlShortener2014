@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,10 +28,8 @@ public class DNSResolver {
 		this.result = res;
 	}
 	public boolean doQuery(){
-		String domain="";
 		for (int i=0; i<antispamSites.length; i++){
-			domain = host+"."+antispamSites[i]+".";
-			taskExecutor.execute(new DNSResolverThread(i, domain, this));
+			taskExecutor.execute(new DNSResolverThread(i, host, antispamSites[i], this));
 		}
 		taskExecutor.shutdown();
 		try {
@@ -45,26 +44,52 @@ public class DNSResolver {
 	
 	private class DNSResolverThread implements Runnable {	
 		private int id;
-		private String domain;
+		private String host;
+		private String antispamsite;
 		private DNSResolver dnsResolver;
 		
-		public DNSResolverThread(int id, String domain, DNSResolver dnsResolver) {
+		public DNSResolverThread(int id, String host, String antispamsite, DNSResolver dnsResolver) {
 			this.id = id;
-			this.domain = domain;
+			this.host = host;
+			this.antispamsite = antispamsite;
 			this.dnsResolver = dnsResolver;
 		}
 
 		@Override
 		public void run() {
-			String addr;
+			String ip = "", parsedIp = "", domain = "", blacklist_res = "";
+			ip = resolveDNS(host); // Get the ip
+			if (ip != null){
+				parsedIp = parseIp(ip);
+				domain = parsedIp+"."+antispamsite;
+				blacklist_res = resolveDNS(domain); // Query to the antispamsite
+				if (blacklist_res != null){
+					this.dnsResolver.setResult(true);
+					logger.info("Thread "+id+": It is in a blacklist -> "+domain);
+				}
+			}
+			else{
+				this.dnsResolver.setResult(false);
+			}
+		}
+		
+		private String parseIp(String ip) {
+			String[] parts = ip.split("\\.");
+			return parts[3]+"."+parts[2]+"."+parts[1]+"."+parts[0];
+		}
+
+		private String resolveDNS(String addr){
+			String res_addr;
 			try {
-				addr = InetAddress.getByName(domain).getHostAddress();
-				if (addr != null){
-					dnsResolver.setResult(true);
-					logger.info("Thread "+id+": It's in blacklist");
+				res_addr = InetAddress.getByName(addr).getHostAddress();
+				if (res_addr != null){
+					return res_addr;
+				}
+				else{
+					return null;
 				}
 			} catch (UnknownHostException e) {
-				logger.info("Thread "+id+": "+e.getMessage());
+				return null;
 			}
 		}
 		

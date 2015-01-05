@@ -10,7 +10,6 @@ public class BlackListService {
 	 */
 	@Cacheable("blcache")
 	public  Boolean isBlackListed(String host){
-		boolean blacklisted = false;
 		final String[] antispamSites = {"zen.spamhaus.org",
 										"multi.surbl.org",
 										"black.uribl.com"};

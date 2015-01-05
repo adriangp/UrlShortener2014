@@ -72,6 +72,28 @@
 			type : "POST",
 			url : "/link",
 			data : link,
+			complete: function(jqXHR, textStatus) {
+				var result = false;
+				switch(jqXHR.status){
+				case 201:
+					var uri = jqXHR.responseJSON.uri;
+					$("#result").html("<a target='_blank' href='"+uri+"' class='btn btn-default btn-lg' role='button'>"+uri+"</a>")
+					break;
+				case 423:
+					showFeedback("The provided URL has been blocked!");
+					break;
+				case 404:
+					break;
+				}
+			}
+		});
+	}
+	
+/* 	function queryLink(link){
+		$.ajax({
+			type : "POST",
+			url : "/link",
+			data : link,
 			success : function(msg) {
 				$("#result").html("<a target='_blank' href='"+msg.uri+"' class='btn btn-default btn-lg' role='button'>"+msg.uri+"</a>")
 			},
@@ -79,7 +101,7 @@
 				showFeedback("An error occurred!");
 			}
 		});
-	}
+	} */
 	
 	function showFeedback(errorMsg){
 		$("#result").html("<label>"+errorMsg+"</label>")

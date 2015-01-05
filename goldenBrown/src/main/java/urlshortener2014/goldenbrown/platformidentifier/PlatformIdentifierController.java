@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-public class PlatformIdentifierService {
+public class PlatformIdentifierController {
 		
 	@RequestMapping(value = "/platformidentifier", method = RequestMethod.GET)
 	public ResponseEntity<PlatformIdentity> getPlatform(

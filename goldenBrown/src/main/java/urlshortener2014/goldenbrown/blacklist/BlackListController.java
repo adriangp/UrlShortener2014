@@ -2,9 +2,11 @@ package urlshortener2014.goldenbrown.blacklist;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +33,36 @@ public class BlackListController {
 	 */
 	@RequestMapping(value = "/onshortener", method = RequestMethod.GET)
 	public ResponseEntity<?> onShortener(@RequestParam("url") String urlString){
+		return askBlackListService(urlString);
+	}
+
+	
+	
+	/**
+	 * 
+	 * @param urlString: url pointed by some of our links
+	 * @return
+	 */
+	@RequestMapping(value = "/onredirectto", method = RequestMethod.GET)
+	public ResponseEntity<?> onRedirectTo(@RequestParam("url") String urlString,
+			@DateTimeFormat(pattern="yyyy-MM-dd") Date date, @RequestParam("safe") boolean safe) {
+		
+		if(oldLink(date)){
+			// Then ask again to the blacklist service
+			return askBlackListService(urlString);
+		}
+		else{ // No need to ask to the blacklist service
+			if(safe){
+				return new ResponseEntity<>(HttpStatus.OK);
+			}
+			else{
+				return new ResponseEntity<>(HttpStatus.LOCKED);
+			}
+		}
+		
+	}
+	
+	private ResponseEntity<?> askBlackListService(String urlString) {
 		URL url = null;
 		String host= "";
 		boolean blacklisted = false;
@@ -58,19 +90,18 @@ public class BlackListController {
 		} catch (MalformedURLException e) {
 			System.err.println(e.getMessage());
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		} finally{
-			
 		}
 	}
 	
-	/**
-	 * 
-	 * @param urlString: url pointed by some of our links
-	 * @return
-	 */
-	@RequestMapping(value = "/onredirectto", method = RequestMethod.GET)
-	public ResponseEntity<?> onRedirectTo(@RequestParam("url") String urlString){
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	private boolean oldLink(Date date) {
+		final int ALLOWED_HOURS = 2; 
+		final int MILLI_TO_HOUR = 1000 * 60 * 60;
+		Date now = new Date(System.currentTimeMillis());
+		
+	    int spent_hours = (int) (date.getTime() - now.getTime()) / MILLI_TO_HOUR;
+	    // Return true if the link was checked earlier than
+	    // two hours ago
+	    return spent_hours > ALLOWED_HOURS;
 	}
 	
 
