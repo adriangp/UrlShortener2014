@@ -100,7 +100,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		List<ClickStats> listResult = new ArrayList<ClickStats>();
 		listShortURL = shortURLRepository.findByTarget(url);
 		if(listShortURL.size()==0){
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			
 		}else{
 			for(ShortURL su: listShortURL){
@@ -110,41 +110,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			}
 			return new ResponseEntity<>(listResult,HttpStatus.OK);
 		}
-			
-				
-		
-		
-		 
-		/*
-		List<ShortURL> listInfoURL = new ArrayList<ShortURL>();
-		List<ShortURL> listTemp;
-		List<ClickStats> listResult = new ArrayList<ClickStats>(); 
-		Long infoClicks = (long) 0; 
-		long limit = 1; long offset = 0;
-		
-		logger.info("Request URL's statics..."); 
-		
-		listTemp = shortURLRepository.list(limit,offset);
-		while(listTemp.size()>0){
-			for(int i = 0; i< listTemp.size();i++){
-				listInfoURL.add(listTemp.get(i));
-				listTemp.remove(i);
-			}
-			offset = offset + limit; 
-			limit = limit + limit; 
-			listTemp = shortURLRepository.list(limit,offset);
-		}
-		
-		logger.info("...URL information retrieved...");
-		
-		for(int i = 0; i< listInfoURL.size();i++){
-			infoClicks = clickRepository.clicksByHash(listInfoURL.get(i).getHash());
-			ClickStats cs = new ClickStats(listInfoURL.get(i).getTarget(),infoClicks, listInfoURL.get(i).getOwner(), listInfoURL.get(i).getUri());
-			listResult.add(cs);
-		}
-		
-		logger.info("...Clicks information retrieved");
-		return new ResponseEntity<>(listResult,HttpStatus.CREATED);*/
 	}
 }
 
