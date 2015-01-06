@@ -1,10 +1,16 @@
 package urlshortener2014.goldenPoppy.web;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -13,13 +19,17 @@ import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -103,25 +113,35 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         }
     }
 	
-	//@MessageMapping("/massiveload")
-	//@SendTo("/topic/massiveload")
+	/**
+	 * 
+	 * @param file
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value = "/massiveload", method = RequestMethod.POST)
-	public Status massiveLoad(@RequestParam("file") MultipartFile file,
+	public ResponseEntity<List<Content>> massiveLoad(@RequestParam("file") MultipartFile file,
 					HttpServletRequest request){
-		ArrayList<String> shorts = null;
-		ArrayList<Content> longs = null;
+		List<Content> shorts = null;
+		List<Content> longs = null;
+		List<Future<List<Content>>> futures = new ArrayList<Future<List<Content>>>();
 		try {
-			ThreadPoolExecutorFactoryBean factory = new ThreadPoolExecutorFactoryBean();
+			ExecutorService executor = Executors.newFixedThreadPool(100);
+			
 			InputStream input = file.getInputStream();
 			BufferedReader buffer = new BufferedReader(new InputStreamReader(input));
 			
-			shorts = new ArrayList<String>();
+			long totalSize = file.getSize();
+			long nBytes = 0;
+			shorts = new ArrayList<Content>();
 			longs = new ArrayList<Content>();
 			int i = 0;
 			String line = buffer.readLine();
 			String url = "";
 			String sponsor = "";
+			
 			while (line != null){
+				nBytes += line.getBytes().length;
 				i++;
 				url = line.split(",")[0].trim();
 				try{
@@ -131,23 +151,98 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				}
 				longs.add(new Content(i, url, sponsor));
 				if (i % 10 == 0){
-					Thread t = factory.createThread(new Load(longs, shorts, this, request));
-					t.run();
+					Future<List<Content>> future = executor.submit(new Load(longs, this, request));
+					futures.add(future);
+					massiveloadws(100*nBytes/totalSize, "In process", null);
 					longs = new ArrayList<Content>();
 				}
 
 				line = buffer.readLine();
 			}
-			Thread t = factory.createThread(new Load(longs, shorts, this, request));
-			t.run();
-		}catch (IOException e){
 			
-		}
+			Future<List<Content>> future = executor.submit(new Load(longs, this, request));
+			futures.add(future);
+			for (Future<List<Content>> f : futures){
+				List<Content> l = f.get();
+				for (Content c : l)
+					shorts.add(c.getId(),c);
+			}
+			
+			writeInFile(shorts, request.hashCode() + ".csv");
+			massiveloadws(100*nBytes/totalSize, "Finished", request.hashCode() + ".csv");
+		}catch (IOException e){
+			logger.info("IO Error reading the file " + file.getOriginalFilename());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} 
 		
-		for (String s : shorts){
-			logger.info(s);
-		}
-		
-		return new Status(15.0, "Works");
+		return new ResponseEntity<>(shorts, HttpStatus.OK);
 	}
+	
+	/**
+	 * 
+	 * @param progress
+	 * @param status
+	 * @param url
+	 * @return
+	 */
+	@MessageMapping("/massiveloadws")
+	@SendToUser("/topic/massiveloadws")
+	public Status massiveloadws(double progress, String status, String url){
+		return new Status(progress, status, url);
+	}
+	
+	/**
+	 * Method that returns a file with the URLs shortened.
+	 * 
+	 * @param id Name of the file.
+	 * @param request Http request.
+	 * @return File with thr URLs shortened.
+	 */
+	@RequestMapping(value = "/files/{id}", method = RequestMethod.GET)
+	public ResponseEntity<byte[]> getFile(@PathVariable String id,
+			HttpServletRequest request) {
+		HttpHeaders h = new HttpHeaders();
+		h.setContentType(MediaType.MULTIPART_FORM_DATA);
+		
+		File file = new File("tmp/files/"+id+".csv");
+		byte[] result = null;
+		try{
+	    	 result = IOUtils.toByteArray(new FileInputStream(file));
+	    	 FileUtils.writeByteArrayToFile(file, result);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return new ResponseEntity<>(result,h,HttpStatus.OK);
+	}
+	
+	/**
+	 * Private method that write in a file the result of the massive load.
+	 * 
+	 * @param shorts List with the URLs shortened.
+	 * @param hash Name of the file that will contains the URL shortened.
+	 */
+	private void writeInFile(List<Content> shorts, String hash){
+		FileWriter fileWriter = null;
+		try{
+			fileWriter = new FileWriter("tmp/files/"+hash);
+			for (Content c : shorts){
+				fileWriter.write(c.getURL() + ", " + c.getSponsor());
+			}			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (null != fileWriter)
+					fileWriter.close();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+	}
+
 }

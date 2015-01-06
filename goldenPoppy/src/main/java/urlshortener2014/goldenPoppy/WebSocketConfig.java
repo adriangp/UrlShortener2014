@@ -18,8 +18,8 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/massiveload").withSockJS();
 		registry.addEndpoint("/isalive").withSockJS();
+		registry.addEndpoint("/massiveloadws").withSockJS();
 	}
 
 }
