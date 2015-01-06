@@ -129,7 +129,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				part.getInputStream()));
 
-		File fichero = new File("src\\main\\resources\\public\\csv\\fich_original.csv");
+		File fichero = new File("build\\resources\\main\\public\\csv\\fich_original.csv");
 		fichero.createNewFile();
 		PrintWriter f = new PrintWriter(fichero);
 		String linea = "";
@@ -149,7 +149,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			throws IOException {
 
 		BufferedReader br = new BufferedReader(new FileReader(csv));
-		File csvAcortado = new File("src\\main\\resources\\public\\csv\\fich_temporal.csv");
+		File csvAcortado = new File("build\\resources\\main\\public\\csv\\fich_temporal.csv");
 		csvAcortado.createNewFile();
 		PrintWriter fileResul = new PrintWriter(csvAcortado);
 		String linea = "";

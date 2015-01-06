@@ -51,7 +51,6 @@
 		fd.append("fileToUpload",
 				document.getElementById('fileToUpload').files[0]);
 		var xhr = new XMLHttpRequest();
-		xhr.upload.addEventListener("progress", uploadProgress, false);
 		xhr.addEventListener("load", uploadComplete, false);
 		xhr.addEventListener("error", uploadFailed, false);
 		xhr.addEventListener("abort", uploadCanceled, false);
@@ -59,16 +58,6 @@
 		xhr.send(fd);
 	}
 
-	function uploadProgress(evt) {
-		if (evt.lengthComputable) {
-			var percentComplete = Math.round(evt.loaded * 100 / evt.total);
-			document.getElementById('progressNumber').innerHTML = percentComplete
-					.toString()
-					+ '%';
-		} else {
-			document.getElementById('progressNumber').innerHTML = 'unable to compute';
-		}
-	}
 
 	function uploadComplete(evt) {
 		/* This event is raised when the server send back a response */
@@ -84,7 +73,7 @@
 		}
 
 		document.getElementById('download').innerHTML = '<a href=\"csv\\fich_temporal.csv\" download=\"'
-			+name_tmp+'_acortado.csv\">Descargar fichero</a>'
+			+name_tmp+'_acortado.csv\"><input type=\"button\" value=\"Descargar fichero acortado\" class=\"desc-button\"/></a>'
 	}
 
 	function uploadFailed(evt) {
@@ -177,8 +166,8 @@
 												<br />
 												<div class="row1">
 													<input type="file" name="fileToUpload" id="fileToUpload"
-														onchange="fileSelected();" /> <br>
-													<br> <span class="desc">Arrastra ficheros o haz click para abrir el explorador</span>
+														onchange="fileSelected();" />
+													<br><br> <span class="desc">Arrastra ficheros o haz click para abrir el explorador</span>
 												</div>
 												<div class="info">
 													<div id="fileName"></div>
@@ -187,8 +176,8 @@
 												</div>
 												<div id="row2" class="row2">
 												</div>
-												<div id="progressNumber"></div>
 											</form>
+											
 											<div id="download"></div>
 										</div>
 									</div>
