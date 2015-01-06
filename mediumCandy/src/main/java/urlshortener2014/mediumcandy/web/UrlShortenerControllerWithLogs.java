@@ -86,7 +86,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		if (isReachableUrl){
 			su = createAndSaveIfValid(url, sponsor, brand, UUID
 					.randomUUID().toString(), extractIP(request));
-			System.out.println("URL REACHABLE!");
 		}
 		
 		return su;
