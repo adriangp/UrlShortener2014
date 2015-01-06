@@ -1,12 +1,15 @@
 package urlshortener2014.mediumcandy.web;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.servlet.http.HttpServletResponse;
@@ -18,24 +21,52 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.google.common.io.ByteStreams;
+import urlshortener2014.common.domain.ShortURL;
 
 @Controller
 public class FileUploadController {
+	
+	private byte[] fileBytes = null;
 
 	@RequestMapping(value = "/files/{file_name}", method = RequestMethod.GET)
 	public void getFile(@PathVariable("file_name") String fileName,
 						HttpServletResponse response) {
+		ShortURL su = null;
+		
 		try {
-			// get your file as InputStream
-			FileInputStream fis = new FileInputStream( fileName + ".csv" );
-			InputStream is = fis;
-			// copy it to response's OutputStream
-			ByteStreams.copy(is, response.getOutputStream());
-			is.close();
+			OutputStream fileOut = response.getOutputStream();
+			
+			String uri = "", restURI="";
+    		ArrayList<String> listURIs = new ArrayList<String>();
+    		
+    		//Read each line of the uploaded file and save each line as a URI string
+    		for (int i=0; i<fileBytes.length; i++){
+				if (fileBytes[i] == 13){
+					listURIs.add(uri);
+					i++;
+					uri = "";
+				} else {
+					uri += Character.toString ((char) fileBytes[i]);
+				}
+			}
+			
+    		//Short the URIs from the uploaded CSV file
+			for (String s : listURIs){
+				restURI = linkTo(methodOn(UrlShortenerControllerWithLogs.class).
+		                shortenerIfReachable(s, null, null, null)).toString();
+				RestTemplate restTemplate = new RestTemplate();
+				su = restTemplate.postForObject(restURI, null, ShortURL.class);
+				
+				//If the URI is shortened succesfully --> add to the response
+				if (su.getUri() != null){
+					String result = "\"" + s + "\",\"" +su.getUri().toString()+"\"\r\n"; 
+					fileOut.write(result.getBytes());
+				}
+			}
 			// Deleting File
 			File file = new File( fileName + ".csv" );
 			file.delete();
@@ -68,8 +99,9 @@ public class FileUploadController {
             if ( !multipartFile.isEmpty() ) {
             	try {
             		String fileNameServer = "medcandy-" + generateString(fileName);
-            		
     				byte[] file = multipartFile.getBytes();
+    				fileBytes = file;
+    				
     				BufferedOutputStream stream =
                             new BufferedOutputStream(new FileOutputStream(new File( fileNameServer + ".csv" )));
                     stream.write(file);
