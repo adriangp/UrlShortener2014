@@ -59,8 +59,7 @@ public class MediumCandyController {
 		String restURI = linkTo(methodOn(UrlShortenerControllerWithLogs.class).
 				getLinkStats(url)).toString();
 		RestTemplate restTemplate = new RestTemplate();
-		listResult = restTemplate.getForObject(restURI, null, List.class);
-		
+		listResult = restTemplate.getForObject(restURI,List.class);
 		if(listResult.size()!=0){
 			return new ResponseEntity<>(listResult, HttpStatus.OK);
 			
