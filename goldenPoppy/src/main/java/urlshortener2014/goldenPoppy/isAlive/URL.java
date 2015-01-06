@@ -24,6 +24,23 @@ public class URL {
 	 * 
 	 * @return La url
 	 */
+	public URL(String u, int t){
+		this.url = u;
+		this.timeout = t;
+	}
+	
+	/**
+	 * Constructor por defecto
+	 */
+	public URL(){
+		
+	}
+	
+	
+	/**
+	 * 
+	 * @return la URL
+	 */
 	public String getUrl(){
 		return url;
 	}

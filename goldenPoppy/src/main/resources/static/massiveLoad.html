@@ -9,16 +9,17 @@
 	<script type="text/javascript" src="webjars/sockjs-client/0.3.4-1/sockjs.js"></script>
     <script type="text/javascript">
     
-    	var stompClient = null;
+    	var client = null;
     	
     	function connect(){
-    		
-    		var socket = new SockJS('/massiveload');
-    		stompClient = Stomp.over(socket);
-    		stompClient.connect({}, function(frame) {
+    		var socket = new SockJS('/massiveloadws');
+    		client = Stomp.over(socket);
+    		client.connect({}, function(frame) {
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/topic/massiveload', function(response){
-                    showResponse(JSON.parse(response.body).content);
+                client.subscribe('/user/topic/massiveloadws', function(status){
+                    showResponse(JSON.parse(status.body).percent,
+                    			JSON.parse(status.body).status,
+                    			JSON.parse(status.body).url);
                 });
             });
     	}
@@ -28,7 +29,7 @@
             console.log("Disconnected");
         }
     	
-    	function sendFile() {
+    	function sendFile(){
     		var formData = new FormData();
     		var name = document.getElementById('file').value;
     		var files = document.getElementById('file').files;
@@ -40,20 +41,23 @@
     			data : formData,
     			processData: false,
     			contentType: false,
-    			success : function() {
-    				alert("works");
+    			success : function(message) {
+    				//showResponse(100,"Finished");
     			},
     			error : function() {
-    				alert("failure");
+    				alert("Failure");
     			}
     		});
     	}
     	
-    	function showResponse(message){
-    		var response = document.getElementById('response');
+    	function showResponse(percent, status, url){
 			var presp = document.getElementById('presp');
-			presp.innerHTML = "Works!!!";
-    	}
+			var pinforeturnfile = document.getElementById('pinforeturnfile');
+			var purlreturnfile = document.getElementById('purlreturnfile');
+			presp.innerHTML = status + ": " + percent + "%"; 
+			pinforeturnfile.innerHTML = "Visit the following link to get a file with the shortened URLS:"
+			purlreturnfile.innerHTML = url;
+		}
     </script>
 </head>
 <body onLoad="connect()" onUnLoad="disconnect()">
@@ -71,17 +75,20 @@
 		</form>
 		<div id="response">
 			<p id="presp"></p>
+			<p id="pinforeturnfile"></p>
+			<p id="purlreturnfile"></p>
 		</div>
 		<button id="back" class="btn btn-lg btn-primary" onclick="location.href='index.html'">Back</button>
 	</div>
 	<script type="text/javascript"
 		src="webjars/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 	<script>
-		$(document).ready(function() {
-			$("#massiveLoad").submit(function(){
-				sendFile();
-			});
+	 $(document).ready(function() {
+		$("#massiveLoad").submit(function(event){
+			event.preventDefault();
+			sendFile();
 		});
+	});
 	</script>
 </body>
 </html>
