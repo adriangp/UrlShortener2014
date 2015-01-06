@@ -129,7 +129,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				part.getInputStream()));
 
-		File fichero = new File("build\\resources\\main\\public\\csv\\fich_original.csv");
+		File fichero = new File("src\\main\\resources\\public\\csv\\fich_original.csv");
 		fichero.createNewFile();
 		PrintWriter f = new PrintWriter(fichero);
 		String linea = "";
@@ -141,15 +141,17 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			f.write("\n");
 		}
 		f.close();
-		analizarCSV(fichero, request);
+		Response respuesta=analizarCSV(fichero, request);
+		if(respuesta.getStatus()==400){ return "Error with the File!";}
 		return "File Uploaded!";
 	}
 
+	@SuppressWarnings("resource")
 	public Response analizarCSV(File csv, HttpServletRequest request)
 			throws IOException {
 
 		BufferedReader br = new BufferedReader(new FileReader(csv));
-		File csvAcortado = new File("build\\resources\\main\\public\\csv\\fich_temporal.csv");
+		File csvAcortado = new File("src\\main\\resources\\public\\csv\\fich_temporal.csv");
 		csvAcortado.createNewFile();
 		PrintWriter fileResul = new PrintWriter(csvAcortado);
 		String linea = "";
@@ -160,8 +162,8 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				if (!url.equals(null) || !url.equals("")) {
 					ResponseEntity<ShortURL> urlAcortada = shortener(url, null,
 							null, request);
-					fileResul.write(urlAcortada.getBody().getUri().toString()
-							+ ",");
+					if(urlAcortada.getBody()==null) return Response.status(Status.BAD_REQUEST).build();
+					else fileResul.write(urlAcortada.getBody().getUri().toString()+ ",");
 				}
 			}
 			fileResul.write("\n");
