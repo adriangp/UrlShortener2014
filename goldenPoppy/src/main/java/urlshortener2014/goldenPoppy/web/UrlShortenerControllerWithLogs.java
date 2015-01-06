@@ -78,18 +78,19 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	}
 	
 	/**
-	 * Crea una nueva URL corta que apunta a la URL sin publicidad
+	 * Crea una nueva URL corta que apunta a la URL con el Sponsor
 	 * @param sUrl
 	 * @param sponsor
 	 * @param request
 	 * @return
 	 */
-	public ResponseEntity<ShortURL> intersicial(@RequestParam("shorturl") String sUrl,
+	@RequestMapping(value = "/inter", method = RequestMethod.POST)
+	public ResponseEntity<ShortURL> intersicial(@RequestParam("url") String sUrl,
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			HttpServletRequest request){
 		return shortener(sUrl,sponsor,null,request);
 	}
-	
+
 	/**
 	 * Método que se encarga de comprobar que la URL "url" recibida desde el cliente está viva
 	 * (devuelve un 200) durante un timeout especificado. Si la URL responde antes de agotarse
