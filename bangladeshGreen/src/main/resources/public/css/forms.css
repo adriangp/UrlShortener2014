@@ -1,0 +1,258 @@
+.acort {
+	position: relative;
+	margin: 0px 15px auto auto;
+	width: 300px;
+	height: 155px;
+	padding: 33px 25px 0px;
+	background: white;
+	border-bottom: 1px solid #c4c4c4;
+	border-radius: 5px;
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+}
+
+.acort-title {
+	margin: -25px -25px 15px;
+	padding: 15px 81px;
+	line-height: 10px;
+	font-size: 18pt;
+	font-weight: 600;
+	color: #989898;
+	text-align: center;
+	background: #f7f7f7;
+}
+
+.acort-title:before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 8px;
+	background: #c4e17f;
+	border-radius: 5px 5px 0 0;
+}
+
+input {
+	font-family: inherit;
+	color: inherit;
+	box-sizing: border-box;
+}
+
+.acort-input {
+	width: 100%;
+	height: 45px;
+	margin-bottom: 15px;
+	padding: 0 15px 2px;
+	font-size: 17px;
+	background: white;
+	border: 2px solid #ebebeb;
+	border-radius: 4px;
+	-webkit-box-shadow: inset 0 -2px #ebebeb;
+	box-shadow: inset 0 -2px #ebebeb;
+}
+
+.acort-input:focus {
+	border-color: #62c2e4;
+	outline: none;
+	-webkit-box-shadow: inset 0 -2px #62c2e4;
+	box-shadow: inset 0 -2px #62c2e4;
+}
+
+.acort-button {
+	position: relative;
+	vertical-align: top;
+	width: 100%;
+	height: 49px;
+	padding: 0;
+	font-size: 22px;
+	color: white;
+	text-align: center;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+	background: #A6E17E;
+	border: 0;
+	border-bottom: 2px solid #B0EF87;
+	border-radius: 5px;
+	cursor: pointer;
+	box-shadow: inset 0 -2px #B0EF87;
+}
+
+.acort-button:active {
+	top: 1px;
+	outline: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.result {
+	position: relative;
+	margin: 5px auto auto -24px;
+	width: 300px;
+	height: 85px;
+	padding: 33px 25px 0px;
+	background: white;
+	border-bottom: 1px solid #c4c4c4;
+	border-radius: 5px;
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+}
+
+.result-title {
+	margin: -25px -25px 10px;
+	padding: 15px 115px;
+	line-height: 10px;
+	font-size: 18pt;
+	font-weight: 600;
+	color: #989898;
+	text-align: center;
+	background: #f7f7f7;
+}
+
+.result-title:before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 8px;
+	background: #c4e17f;
+	border-radius: 5px 5px 0 0;
+}
+
+.result-input {
+	width: 100%;
+	height: 40px;
+	padding: 0 15px 2px;
+	font-size: 17px;
+	background: white;
+	border: 2px solid #ebebeb;
+	border-radius: 4px;
+	box-shadow: inset 0 -2px #ebebeb;
+}
+
+.result-input {
+	width: 100%;
+	height: 45px;
+	margin-bottom: 15px;
+	padding: 0 15px 2px;
+	font-size: 17px;
+	background: white;
+	border: 2px solid #ebebeb;
+	border-radius: 4px;
+	-webkit-box-shadow: inset 0 -2px #ebebeb;
+	box-shadow: inset 0 -2px #ebebeb;
+}
+
+.result-input:focus {
+	border-color: #62c2e4;
+	outline: none;
+	-webkit-box-shadow: inset 0 -2px #62c2e4;
+	box-shadow: inset 0 -2px #62c2e4;
+}
+
+.subir {
+	position: relative;
+	margin: 0px 1px auto auto;
+	width: 400px;
+	height: 250px;
+	padding: 33px 25px 0px;
+	background: white;
+	border-bottom: 1px solid #c4c4c4;
+	border-radius: 5px;
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+}
+
+.subir-title {
+	margin: -25px -25px 15px;
+	padding: 15px 96px;
+	line-height: 10px;
+	font-size: 18pt;
+	font-weight: 600;
+	color: #989898;
+	text-align: center;
+	background: #f7f7f7;
+}
+
+.subir-title:before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 8px;
+	background: #c4e17f;
+	border-radius: 5px 5px 0 0;
+}
+
+.row1 {
+	height: 8em;
+	width: 8em;
+	background-color: #ccc;
+	border-radius: 4em;
+	border-color: black; text-align : center;
+	color: white;
+	position: relative;
+	text-align: center; color : white; position : relative;
+	margin: 5px auto 1em;
+}
+
+.row1 span.desc {
+	display: block;
+	font-size: .7em;
+	padding: 0 .5em;
+	color: #000;
+}
+
+input[type="file"] {
+	height: 10em;
+	opacity: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 3;
+}
+
+/* Estilo del área del input[file] con :hover */
+.row1:hover, input[type="file"]:hover {
+	background-color: #A6E17E;
+	cursor: pointer;
+}
+
+.row1:hover span.desc {
+	color: #fff;
+}
+
+.row2{
+	float: left;
+	width: 30%;
+}
+
+.info{
+	float: left;	
+	width: 70%;
+}
+
+.subir-button {
+	position: relative;
+	vertical-align: top;
+	horizontal-align: left;
+	width: 100%;
+	height: 49px;
+	padding: 0;
+	font-size: 22px;
+	color: white;
+	text-align: center;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+	background: #A6E17E;
+	border: 0;
+	border-bottom: 2px solid #B0EF87;
+	border-radius: 5px;
+	cursor: pointer;
+	box-shadow: inset 0 -2px #B0EF87;
+}
+
+.subir-button:active {
+	top: 1px;
+	outline: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
