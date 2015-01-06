@@ -92,23 +92,20 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	}
 	
 	@RequestMapping(value = "/linkstats", method = RequestMethod.GET)
-	public ResponseEntity<List<ClickStats>> getLinkStats(@RequestParam("url") String url){
+	public List<ClickStats> getLinkStats(@RequestParam("url") String url){
 		
 		List<ShortURL> listShortURL;
 		Long infoClicks; 
 		List<ClickStats> listResult = new ArrayList<ClickStats>();
 		listShortURL = shortURLRepository.findByTarget(url);
-		if(listShortURL.size()==0){
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-			
-		}else{
-			for(ShortURL su: listShortURL){
-				infoClicks = clickRepository.clicksByHash(su.getHash());
-				ClickStats cs = new ClickStats(url, infoClicks, su.getOwner(), su.getUri());
-				listResult.add(cs); 
-			}
-			return new ResponseEntity<>(listResult, HttpStatus.OK);
+		
+		for(ShortURL su: listShortURL){
+			infoClicks = clickRepository.clicksByHash(su.getHash());
+			ClickStats cs = new ClickStats(url, infoClicks, su.getOwner(), su.getUri());
+			listResult.add(cs); 
 		}
+			return listResult;
 	}
 }
+
 
