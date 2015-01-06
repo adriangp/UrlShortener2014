@@ -59,6 +59,15 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	@Autowired
 	private IntersicialEndPoint inter;
 	
+	/**
+	 * Method that redirect to an URL. If the URL has an sponsor associated, 
+	 * user will be rediret to a page with a banner and the sponsor, and past
+	 * 10 seconds user will be redirect to the long URL.
+	 * 
+	 * @param id Short URL.
+	 * @param request Http request.
+	 * @return Response with an URL with the banner.
+	 */
 	public ResponseEntity<?> redirectTo(@PathVariable String id, 
 			HttpServletRequest request) {
 		logger.info("Requested redirection with hash "+id);
@@ -68,7 +77,16 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			return inter.redireccionarPubli(id);
 		}
 	}
-
+	
+	/**
+	 * Method that allow to the user to short an URL.
+	 * 
+	 * @param url Long URL to short.
+	 * @param sponsor Sponsor associated to the URL.
+	 * @param brand Brand associated to the URL.
+	 * @param request Http request.
+	 * @return Response with the short URL.
+	 */
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand,
@@ -86,6 +104,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	 */
 	@RequestMapping(value = "/inter", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> intersicial(@RequestParam("url") String sUrl,
+
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			HttpServletRequest request){
 		return shortener(sUrl,sponsor,null,request);
@@ -129,13 +148,14 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     }
 	
 	/**
+	 * Method that allow to the user to load a file with some URLs. 
 	 * 
-	 * @param file
-	 * @param request
-	 * @return
+	 * @param file File that contains the URLs.
+	 * @param request Http request.
+	 * @return Response
 	 */
 	@RequestMapping(value = "/massiveload", method = RequestMethod.POST)
-	public ResponseEntity<List<Content>> massiveLoad(@RequestParam("file") MultipartFile file,
+	public ResponseEntity<Status> massiveLoad(@RequestParam("file") MultipartFile file,
 					HttpServletRequest request){
 		List<Content> shorts = null;
 		List<Content> longs = null;
@@ -156,6 +176,8 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			String sponsor = "";
 			
 			while (line != null){
+				// Reading the files. nBytes count the bytes processed of the file 
+				// to calculate the progress of the load.
 				nBytes += line.getBytes().length;
 				i++;
 				url = line.split(",")[0].trim();
@@ -165,47 +187,56 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 					sponsor = null;
 				}
 				longs.add(new Content(i, url, sponsor));
+				
 				if (i % 10 == 0){
+					// Per 10 URLs about, execute a thread that load the URLs.
 					Future<List<Content>> future = executor.submit(new Load(longs, this, request));
 					futures.add(future);
 					massiveloadws(100*nBytes/totalSize, "In process", null);
 					longs = new ArrayList<Content>();
 				}
-
 				line = buffer.readLine();
 			}
 			
+			// Process the rest of the file
 			Future<List<Content>> future = executor.submit(new Load(longs, this, request));
 			futures.add(future);
+			
 			for (Future<List<Content>> f : futures){
+				// Wait all the threads and take the result of the load.
 				List<Content> l = f.get();
 				for (Content c : l)
-					shorts.add(c.getId(),c);
+					shorts.add(c);
 			}
 			
+			// Create a file with the result of the load.
 			writeInFile(shorts, request.hashCode() + ".csv");
-			massiveloadws(100*nBytes/totalSize, "Finished", request.hashCode() + ".csv");
 		}catch (IOException e){
 			logger.info("IO Error reading the file " + file.getOriginalFilename());
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.info("Interrupt Error");
 		} catch (ExecutionException e) {
-			e.printStackTrace();
+			logger.info("Execution Error");
 		} 
-		
-		return new ResponseEntity<>(shorts, HttpStatus.OK);
+		return new ResponseEntity<>(new Status(100, "Finished", "http://" + 
+				request.getLocalName() + ":8080/files/" + 
+				request.hashCode() + ".csv"), HttpStatus.OK);
 	}
 	
 	/**
+	 * Method that inform to the user about the progress of the load.
 	 * 
-	 * @param progress
-	 * @param status
-	 * @param url
-	 * @return
+	 * @param progress Percent of the load.
+	 * @param status String that inform about the progress of the load.
+	 * @param url URL that contains the file with the URLs shortened when the 
+	 * progress is finished.
+	 * @return Object that contains the percent, the status and the URL with the file.
 	 */
 	@MessageMapping("/massiveloadws")
 	@SendToUser("/topic/massiveloadws")
 	public Status massiveloadws(double progress, String status, String url){
+		// TODO: Esto deberia informar al usuario del progreso de la carga pero
+		// no funciona bien.
 		return new Status(progress, status, url);
 	}
 	

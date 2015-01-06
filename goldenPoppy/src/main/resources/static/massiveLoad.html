@@ -42,7 +42,10 @@
     			processData: false,
     			contentType: false,
     			success : function(message) {
-    				//showResponse(100,"Finished");
+    				var percent = message.percent;
+    				var status = message.status;
+    				var file = message.url;
+    				showResponse(percent, status, file)
     			},
     			error : function() {
     				alert("Failure");
@@ -53,10 +56,9 @@
     	function showResponse(percent, status, url){
 			var presp = document.getElementById('presp');
 			var pinforeturnfile = document.getElementById('pinforeturnfile');
-			var purlreturnfile = document.getElementById('purlreturnfile');
 			presp.innerHTML = status + ": " + percent + "%"; 
 			pinforeturnfile.innerHTML = "Visit the following link to get a file with the shortened URLS:"
-			purlreturnfile.innerHTML = url;
+			$("#purlreturnfile").html("<a target='_blank' href='"+url+"' class='btn btn-default btn-lg' role='button'>"+url+"</a>")
 		}
     </script>
 </head>
@@ -76,7 +78,7 @@
 		<div id="response">
 			<p id="presp"></p>
 			<p id="pinforeturnfile"></p>
-			<p id="purlreturnfile"></p>
+			<div id="purlreturnfile"></div>
 		</div>
 		<button id="back" class="btn btn-lg btn-primary" onclick="location.href='index.html'">Back</button>
 	</div>
