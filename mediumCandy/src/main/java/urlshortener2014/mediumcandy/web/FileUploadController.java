@@ -35,11 +35,6 @@ public class FileUploadController {
 			InputStream is = fis;
 			// copy it to response's OutputStream
 			ByteStreams.copy(is, response.getOutputStream());
-			is.close();
-			// Deleting File
-			File file = new File( fileName + ".csv" );
-			file.delete();
-			// Setting up headers
 			response.setContentType("application/x-download");
 			response.setHeader("Content-disposition", "attachment; filename=" + fileName + ".csv");
 			response.flushBuffer();
