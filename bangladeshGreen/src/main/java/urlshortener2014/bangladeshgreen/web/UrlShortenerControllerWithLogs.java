@@ -46,7 +46,8 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	private ShortURLRepository SURLR;
 	private static final Logger logger = LoggerFactory
 			.getLogger(UrlShortenerControllerWithLogs.class);
-
+	
+	
 	public ResponseEntity<?> redirectTo(@PathVariable String id,
 			HttpServletRequest request) {
 		logger.info("Requested redirection with hash " + id);
@@ -123,6 +124,13 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return su;
 	}
 
+	
+	/**
+	 * Guarda el CSV que recibe como parametro de un formulario web
+	 * @param request peticion con el fichero
+	 * @return mensaje de confirmacion en caso de carga correcta, de error en caso contrario
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/Upload", method = RequestMethod.POST)
 	public String upload(HttpServletRequest request) throws Exception {
 		Part part = request.getPart("fileToUpload");
@@ -142,10 +150,18 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		}
 		f.close();
 		Response respuesta=analizarCSV(fichero, request);
-		if(respuesta.getStatus()==400){ return "Error con el File!";}
+		if(respuesta.getStatus()==400){ return "Error con el fichero!";}
 		return "File Uploaded!";
 	}
 
+	
+	/**
+	 * Lee el csv que recibe como parametro, acorta todas las URL que contenga
+	 * @param csv CSV que contiene las URL a acortar
+	 * @param request necesario para llamar al acortador
+	 * @return al response le añade un "ok" o un "BAD_REQUEST" segun corresponda
+	 * @throws IOException
+	 */
 	@SuppressWarnings("resource")
 	public Response analizarCSV(File csv, HttpServletRequest request)
 			throws IOException {
@@ -172,7 +188,13 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		br.close();
 		return Response.status(Status.OK).build();
 	}
-
+	
+	/**
+	 * Codifica los caracteres de la URL que recibe como parametro para que esta pueda ser pasada por 
+	 * parametro en un formulario
+	 * @param a  String que contiene la URL
+	 * @return String que contiene la URL con los caracteres especiales codificados
+	 */
 	private static String parse(String a) {
 		String res = "";
 		for (int i = 0; i < a.length(); i++) {
