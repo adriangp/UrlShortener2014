@@ -307,10 +307,10 @@ function insertLatestShortenedUriInDOM(shortenedUri) {
                   '</div>' +
                 '</div>');
   
-  $( '.shorten-url-block' ).html( uri );
+  $( '#shorten-block' ).html( uri );
   // animation when shown! :-)
-  $( '.shorten-url-block' ).hide();
-  $( '.shorten-url-block' ).slideDown();
+  $( '#shorten-block' ).hide();
+  $( '#shorten-block' ).slideDown();
 }
 
 /*

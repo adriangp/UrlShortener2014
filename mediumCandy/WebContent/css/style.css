@@ -132,9 +132,14 @@ body {
   border-color: #008CBA;
 }
 
+/* Branded */
+#branded-block {
+  margin: 0 auto;
+}
+
 /* last shortened uri */
 .shorten-url-block {
-  display: none;
+  /*display: none;*/
   padding: 20px;
   width: 500px;
   clear: both;
@@ -220,6 +225,19 @@ body {
 .shortened-url-block .target-url a {
   color: #FFF;
   font-size: 0.75em;
+}
+
+#branded-block .img-block {
+  width: 12%;
+  margin-right: 10px;
+}
+
+#branded-block .details-block {
+  width: 85%;
+}
+
+#branded-block .shortened-url {
+  font-size: 1.1em;
 }
 
 /* alert and success box */
