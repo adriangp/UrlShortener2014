@@ -141,10 +141,12 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			f.write("\n");
 		}
 		f.close();
-		analizarCSV(fichero, request);
+		Response respuesta=analizarCSV(fichero, request);
+		if(respuesta.getStatus()==400){ return "Error con el File!";}
 		return "File Uploaded!";
 	}
 
+	@SuppressWarnings("resource")
 	public Response analizarCSV(File csv, HttpServletRequest request)
 			throws IOException {
 
@@ -160,8 +162,8 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				if (!url.equals(null) || !url.equals("")) {
 					ResponseEntity<ShortURL> urlAcortada = shortener(url, null,
 							null, request);
-					fileResul.write(urlAcortada.getBody().getUri().toString()
-							+ ",");
+					if(urlAcortada.getBody()==null) return Response.status(Status.BAD_REQUEST).build();
+					else fileResul.write(urlAcortada.getBody().getUri().toString()+ ",");
 				}
 			}
 			fileResul.write("\n");
