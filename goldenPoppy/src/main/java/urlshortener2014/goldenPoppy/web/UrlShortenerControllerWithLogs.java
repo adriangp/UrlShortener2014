@@ -80,6 +80,15 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return shortener(sUrl,sponsor,null,request);
 	}
 	
+	/**
+	 * Método que se encarga de comprobar que la URL "url" recibida desde el cliente está viva
+	 * (devuelve un 200) durante un timeout especificado. Si la URL responde antes de agotarse
+	 * el timeout, devuelve un Response que encapsula 1 ó -1 dependiendo si está viva o no.
+	 * Si el timeout acaba, devuelve un 0 como Response, que indica que se agotó el timeout.
+	 * 
+	 * @param url Con la url y el Timeout
+	 * @return Response con 1, -1 ó 0
+	 */
 	@MessageMapping("/isalive")
     @SendToUser("/topic/isalive")
     public Response isalive(URL url) {

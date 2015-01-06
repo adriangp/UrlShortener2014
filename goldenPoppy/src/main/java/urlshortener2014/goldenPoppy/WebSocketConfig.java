@@ -5,7 +5,12 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-
+/**
+ * Clase que se encarga de configurar el "MesageBroker" y Stomp Endpoint para el intercambio
+ * de mensajes entre los distintos Endpoints Websockets.
+ * @author Javier Tello
+ *
+ */
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
