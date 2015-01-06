@@ -124,12 +124,17 @@ body {
   color: #008CBA;
 }
 
-#urlStatsInput {
+#urlStatsInput, #urlBrandInput, #brandInput {
   letter-spacing: 0.25px;
   font-size: 1em;
   padding-left: 15px;
   margin-top: 10px;
   border-color: #008CBA;
+}
+
+/* Branded */
+#branded-block {
+  margin: 0 auto;
 }
 
 /* last shortened uri */
@@ -222,6 +227,19 @@ body {
   font-size: 0.75em;
 }
 
+#branded-block .img-block {
+  width: 12%;
+  margin-right: 10px;
+}
+
+#branded-block .details-block {
+  width: 85%;
+}
+
+#branded-block .shortened-url {
+  font-size: 1.1em;
+}
+
 /* alert and success box */
 #alert-box,  #success-box{
   display: none;
@@ -230,7 +248,7 @@ body {
 }
 
 /* URL Stats */
-#urlStatsForm {
+#urlStatsForm, #urlBrandedForm {
   margin: 0 auto;
   width: 100%;
 }

@@ -43,7 +43,7 @@
         </div>
       </div>
 
-      <div class="row shorten-url-block">
+      <div id="shorten-block" class="row shorten-url-block">
       </div>
       
       <div class="row shortened-url-block">
@@ -72,6 +72,20 @@
           Tag your shortened links in an very simple way. Pick a brand and start shortening 
           customized URLs in the blink of an eye!
         </p>
+        
+        <form id="urlBrandedForm" name="urlBranded">
+          <div class="row collapse">
+            <div class="small-12 columns">              
+              <input type="search" id="brandInput" placeholder="Paste a link to shorten it">
+              <input type="search" id="urlBrandInput" maxlength="30"
+                     placeholder="Write a brand for your shorten link">
+              <input type="submit" style="display: none" />
+            </div>
+          </div>
+        </form>
+        
+        <div id="branded-block" class="row shorten-url-block">
+        </div>
       </div>
     </div>
     

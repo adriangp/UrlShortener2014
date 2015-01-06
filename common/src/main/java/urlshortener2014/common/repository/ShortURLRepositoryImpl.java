@@ -87,6 +87,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		}
 	}
 
+	@Override
 	public void update(ShortURL su) {
 		try {
 			jdbc.update(
@@ -102,7 +103,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	@Override
 	public void delete(String hash) {
 		try {
-			jdbc.update("delete from click shorturl hash=?", hash);
+			jdbc.update("delete from shorturl where hash=?", hash);
 		} catch (Exception e) {
 			log.debug("When delete for hash " + hash, e);
 		}
