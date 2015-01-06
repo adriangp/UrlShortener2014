@@ -7,6 +7,7 @@ var SERVICE_URI = "http://localhost:8080/";
 var ALERT_SHORTEN_URL = "Unable to shorten that link. It is not a valid or reachable url.";
 var ALERT_ALREADY_SHORTEN = "That is already a shortened link!";
 var ALERT_STATS = "Could not show the stats of that link. Try with a different one.";
+var ALERT_STATS = "Unable to shorten that link. Check out your form or try a different brand";
 
 /* Other vars */
 var shortenedUriList = []; // list of shortened urls objects
@@ -20,6 +21,7 @@ var menuSelected = "shortener"; // last menu selected option
 /* Document Ready Functionality (jQuery stuff) */
 $( document ).ready(function() { 
   setUrlSubmition();
+  setBrandedSubmition();
   setStatsSubmition();
   setUploadSubmition();
   setMenuCallbacks();
@@ -41,6 +43,28 @@ function setUrlSubmition() {
   });
 }
 
+/*
+ * This function is called everytime the user submits the form.
+ */
+function setBrandedSubmition() {
+  // jQuery way!
+  $( '#urlBrandedForm' ).on('submit', function (e) {
+    var url = getBrandedUrl();
+    var brand = getBrand();
+    
+    if ( ! emptyUserInput(url) && !  emptyUserInput(brand) ) {
+      alert("good!");
+    } else {
+      alert("bad!");
+    }
+    
+    e.preventDefault(); //stop form submission
+  });
+}
+
+/*
+ * This function is called everytime the user submits the form.
+ */
 function setStatsSubmition() {  
   // jQuery way!
   $( '#urlStatsForm' ).on('submit', function (e) {
@@ -55,6 +79,9 @@ function setStatsSubmition() {
   });
 }
 
+/*
+ * This function is called everytime the user submits the form.
+ */
 function setUploadSubmition() {
   // here comes the code
   $( '#fileUploader' ).uploadFile({
@@ -129,6 +156,20 @@ function updatePage(pageId) {
  */
 function getUrl() {
   return $( '#urlInput' ).val();
+}
+
+/*
+ * Returns the URL the user entered.
+ */
+function getBrandedUrl() {
+  return $( '#urlBrandInput' ).val();
+}
+
+/*
+ * Returns the brand the user entered.
+ */
+function getBrand() {
+  return $( '#brandInput' ).val();
 }
 
 /*
