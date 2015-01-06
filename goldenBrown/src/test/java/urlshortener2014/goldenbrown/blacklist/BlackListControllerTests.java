@@ -24,6 +24,7 @@ import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.goldenbrown.Application;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
@@ -97,26 +98,27 @@ public class BlackListControllerTests {
 		// Asks for a URL which is actually safe, it was checked recently, and it was considered safe then
 		entity = performTestRequestOnRedirect(urlNotBlackListed, now, true);
 		// It shouldn't be checked again, and it should return OK 
-		assertEquals(entity.getStatusCode(), HttpStatus.OK);
+		assertEquals(HttpStatus.OK,entity.getStatusCode());
 		
 		// Asks for a URL which is actually safe, it was checked recently, and it was considered not-safe then
 		entity = performTestRequestOnRedirect(urlNotBlackListed, now, false);
 		// It shouldn't be checked again, and it should return LOCKED 
-		assertEquals(entity.getStatusCode(), HttpStatus.LOCKED);
+		//FIXME: TEST FAILURE, reason => expected:<423> but was:<200>
+		assertEquals(HttpStatus.LOCKED, entity.getStatusCode());
 		
 		
 		// Asks for a URL which is actually safe and it was checked long time ago 
 		// (so it doesn't matters if it was considered safe or not)
 		entity = performTestRequestOnRedirect(urlNotBlackListed, before, true);
 		// It should be checked again, and it should return CREATED
-		assertEquals(entity.getStatusCode(), HttpStatus.OK);
+		assertEquals(HttpStatus.OK,entity.getStatusCode());
 		
 		
 		// Asks for a URL which is actually not-safe and it was checked long time ago 
 		// (so it doesn't matters if it was considered safe or not)
 		entity = performTestRequestOnRedirect(urlBlackListed, before, true);
 		// It should be checked again, and it should return LOCKED
-		assertEquals(entity.getStatusCode(), HttpStatus.LOCKED);
+		assertEquals(HttpStatus.LOCKED, entity.getStatusCode());
 	}
 	
 
@@ -124,10 +126,14 @@ public class BlackListControllerTests {
 	public void testDomainBlackListedOnShortener() throws Exception {
 		try{
 			ResponseEntity<?> entity = performTestRequestOnShortener(urlBlackListed);
+			//FIXME: Is this the expected behavior? in that case,
+			//	TEST FAILURE, reason => Exception should be catched
+			fail("Exception should be catched");
 		}
 		catch(HttpClientErrorException e){
-			assertEquals(e.getStatusCode(), HttpStatus.LOCKED);		
+			assertEquals(HttpStatus.LOCKED,e.getStatusCode());		
 		}
+		
 	}
 	
 	@Test
