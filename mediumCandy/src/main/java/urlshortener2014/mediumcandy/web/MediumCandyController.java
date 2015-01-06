@@ -49,6 +49,9 @@ public class MediumCandyController {
 		}
 	}
 	
+	/**
+	 * Return stats a given URL.
+	 */
 	@RequestMapping(value = "/mediumcandy/linkstats", method = RequestMethod.GET)
 	public ResponseEntity<List<ClickStats>> getLinkStats(@RequestParam("url") String url){
 		List<ClickStats> listResult = new ArrayList<ClickStats>();

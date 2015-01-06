@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -91,6 +90,9 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return su;
 	}
 	
+	/**
+	 * Return stats a given URL.
+	 */
 	@RequestMapping(value = "/linkstats", method = RequestMethod.GET)
 	public List<ClickStats> getLinkStats(@RequestParam("url") String url){
 		
