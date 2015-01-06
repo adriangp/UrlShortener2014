@@ -47,6 +47,29 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	private static final Logger logger = LoggerFactory
 			.getLogger(UrlShortenerControllerWithLogs.class);
 	
+	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
+			@RequestParam(value = "sponsor", required = false) String sponsor,
+			@RequestParam(value = "brand", required = false) String brand,
+			HttpServletRequest request) {
+
+		logger.info("Requested new short for uri " + url);
+		ResponseEntity<ShortURL> su = super.shortener(url, sponsor, brand,
+				request);
+
+		// comprobar si es segura
+		Client c = ClientBuilder.newClient();
+		url = parse(url);
+		Response response = c
+				.target("https://sb-ssl.google.com/safebrowsing/api/lookup?client=Roberto&key=AIzaSyBbjDCPwK13dOYioVf6Cp9_lrFZ_MOEFbU&appver=1.5.2&pver=3.1&url="
+						+ url).request(MediaType.TEXT_HTML).get();
+
+		if (response.getStatus() == 200){
+				
+			ShortURL suUnSafe = SURLR.mark(su.getBody(), false);// marcar como no segura
+			new DirectFieldAccessor(su.getBody()).setPropertyValue("safe", false);
+		}
+		return su;
+	}
 	
 	public ResponseEntity<?> redirectTo(@PathVariable String id,
 			HttpServletRequest request) {
@@ -63,14 +86,17 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				navegador = "Safari";
 			else
 				navegador = "Explorer";
-		else navegador="Desconocido";
-
-		if (agent.indexOf("Windows") != -1)
-			SO = "Windows";
-		else if (agent.indexOf("Linux") != -1)
-			SO = "Linux";
-		else if (agent.indexOf("Macintosh") != -1)
-			SO = "Macintosh";
+			if (agent.indexOf("Windows") != -1)
+				SO = "Windows";
+			else if (agent.indexOf("Linux") != -1)
+				SO = "Linux";
+			else if (agent.indexOf("Macintosh") != -1)
+				SO = "Macintosh";
+		}
+		else{
+			navegador="Desconocido";
+			SO = "Desconocido";
+		}
 
 		logger.info("Requested redirection with hash " + id);
 		// Guardar en un objeto la llamada al padre, guardarme en una lista la
@@ -80,7 +106,9 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		// click con el navegador y SO, actualizar BD y return
 		ResponseEntity<?> response = super.redirectTo(id, request);
 		List<Click> listaClicks = clickRepository.findByHash(id);
-		logger.info("Tamaño: " + listaClicks.size() + "ip: " + ip);
+		logger.info("Se ha realizado un click con Navegador:" + navegador + ", SO: " + SO
+				+ " e ip:" + ip);
+		logger.info("Tamano: " + listaClicks.size() + "ip: " + ip);
 		for (int i = listaClicks.size() - 1; i >= 0; i--) {
 			Click click = listaClicks.get(i);
 			logger.info("Click con ip: " + click.getIp());
@@ -96,37 +124,9 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				break;
 			}
 		}
-
 		return response;
 	}
 
-	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
-			@RequestParam(value = "sponsor", required = false) String sponsor,
-			@RequestParam(value = "brand", required = false) String brand,
-			HttpServletRequest request) {
-
-		logger.info("Requested new short for uri " + "url");
-
-		ResponseEntity<ShortURL> su = super.shortener(url, sponsor, brand,
-				request);
-
-		// comprobar si es segura
-		Client c = ClientBuilder.newClient();
-		url = parse(url);
-		Response response = c
-				.target("https://sb-ssl.google.com/safebrowsing/api/lookup?client=Roberto&key=AIzaSyBbjDCPwK13dOYioVf6Cp9_lrFZ_MOEFbU&appver=1.5.2&pver=3.1&url="
-						+ url).request(MediaType.TEXT_HTML).get();
-
-		
-		if (response.getStatus() == 200){
-				
-			ShortURL suUnSafe = SURLR.mark(su.getBody(), false);// marcar como no segura
-			new DirectFieldAccessor(su.getBody()).setPropertyValue("safe", false);
-		}
-		return su;
-	}
-
-	
 	/**
 	 * Guarda el CSV que recibe como parametro de un formulario web
 	 * @param request peticion con el fichero
@@ -153,7 +153,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		f.close();
 		Response respuesta=analizarCSV(fichero, request);
 		if(respuesta.getStatus()==400){ return "Error con el fichero!";}
-		return "File Uploaded!";
+		return "Fichero Subido!";
 	}
 
 	

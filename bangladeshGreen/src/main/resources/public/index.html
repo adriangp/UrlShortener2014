@@ -54,7 +54,7 @@
 		xhr.addEventListener("load", uploadComplete, false);
 		xhr.addEventListener("error", uploadFailed, false);
 		xhr.addEventListener("abort", uploadCanceled, false);
-		xhr.open("POST", "http://localhost:8080/Upload");
+		xhr.open("POST", "/Upload");
 		xhr.send(fd);
 	}
 
@@ -108,7 +108,7 @@
 																	+msg.uri+"''></a></div>")
 														},
 														error : function() {
-															alert("failure");
+															alert("Fallo al acortar");
 														}
 													});
 										});
@@ -143,7 +143,7 @@
 												<h1 class="acort-title">Inserta URL</h1>
 												<input type="text" class="acort-input" id="uri"
 													placeholder="Long URL" name="url" />
-												<button type="submit" class="acort-button">Shorten</button>
+												<button type="submit" class="acort-button">Acortar!</button>
 											</form>
 											<p />
 											<div id="result">
