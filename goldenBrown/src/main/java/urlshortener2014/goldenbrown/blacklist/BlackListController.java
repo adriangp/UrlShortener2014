@@ -45,7 +45,7 @@ public class BlackListController {
 	 */
 	@RequestMapping(value = "/onredirectto", method = RequestMethod.GET)
 	public ResponseEntity<?> onRedirectTo(@RequestParam("url") String urlString,
-			@DateTimeFormat(pattern="yyyy-MM-dd") Date date, @RequestParam("safe") boolean safe) {
+			@DateTimeFormat(pattern="dd-MM-yyyy") Date date, @RequestParam("safe") boolean safe) {
 		
 		if(oldLink(date)){
 			// Then ask again to the blacklist service
@@ -98,7 +98,7 @@ public class BlackListController {
 		final int MILLI_TO_HOUR = 1000 * 60 * 60;
 		Date now = new Date(System.currentTimeMillis());
 		
-	    int spent_hours = (int) (date.getTime() - now.getTime()) / MILLI_TO_HOUR;
+	    int spent_hours = (int) (now.getTime() - date.getTime()) / MILLI_TO_HOUR;
 	    // Return true if the link was checked earlier than
 	    // two hours ago
 	    return spent_hours > ALLOWED_HOURS;

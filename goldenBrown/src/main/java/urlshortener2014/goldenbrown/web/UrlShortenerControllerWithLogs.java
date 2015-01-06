@@ -5,6 +5,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -51,12 +52,13 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     		
     		RestTemplate restTemplate = new RestTemplate();
     		ResponseEntity<PlatformIdentity> respPlatform, respBlackList;
+    		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
     		try{
     			respBlackList = restTemplate.getForEntity(
     					BLACKLIST_ONREDIRECTTO_URI,
 						null,
 						l.getTarget(),
-						l.getCreated(),
+						sdf.format(l.getCreated()),
 						l.getSafe());
     			
     			// If link has been classified as not-spam recently

@@ -1,4 +1,4 @@
-package urlshortener2014.demo;
+package urlshortener2014.goldenbrown;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 @WebAppConfiguration
 @IntegrationTest("server.port=0")
 @DirtiesContext
-public class PlatformIdentifierServiceTests {
+public class PlatformIdentifierControllerTests {
 	
 	/*
 	 * Nomenclature of junit methods described in (with examples):
