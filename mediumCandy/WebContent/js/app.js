@@ -1,16 +1,27 @@
+/******************************************************************************
+ *                    A P P   V a r i a b l e s
+ *****************************************************************************/
 var SERVICE_URI = "http://localhost:8080/";
 
 /* Alert Messages */
 var ALERT_SHORTEN_URL = "Unable to shorten that link. It is not a valid or reachable url.";
 var ALERT_ALREADY_SHORTEN = "That is already a shortened link!";
+var ALERT_STATS = "Could not show the stats of that link. Try with a different one.";
 
-/* Vars */
-var shortenedUriList = [];
-var menuSelected = "shortener";
+/* Other vars */
+var shortenedUriList = []; // list of shortened urls objects
+var menuSelected = "shortener"; // last menu selected option
 
+
+
+/******************************************************************************
+ *                  A P P   F u n c t i o n a l i t y
+ *****************************************************************************/
 /* Document Ready Functionality (jQuery stuff) */
 $( document ).ready(function() { 
   setUrlSubmition();
+  setStatsSubmition();
+  setUploadSubmition();
   setMenuCallbacks();
 });
 
@@ -19,13 +30,38 @@ $( document ).ready(function() {
  */
 function setUrlSubmition() {
   // jQuery way!
-  $("form").on('submit', function (e) {
+  $( '#urlShortenerForm' ).on('submit', function (e) {
     var url = getUrl();  
     
     if ( ! emptyUserInput(url) ) {
       shortenURL(url);
-      e.preventDefault(); //stop form submission
     }
+    
+    e.preventDefault(); //stop form submission
+  });
+}
+
+function setStatsSubmition() {  
+  // jQuery way!
+  $( '#urlStatsForm' ).on('submit', function (e) {
+    var url = getUrlStats();  
+    
+    if ( ! emptyUserInput(url) ) {
+      // AJAX CALL
+      showStats(url);
+    }
+    
+    e.preventDefault(); //stop form submission
+  });
+}
+
+function setUploadSubmition() {
+  // here comes the code
+  $( '#fileUploader' ).uploadFile({
+    url: SERVICE_URI + "upload",
+    allowedTypes:"csv",
+    multiple:false,
+    fileName:"myfile"
   });
 }
 
@@ -37,7 +73,7 @@ function setMenuCallbacks() {
     updateMenu('#link-shortener');
     updatePage('#shortener');
     menuSelected = "shortener";
-    // show
+
     e.preventDefault();
   });
   
@@ -45,7 +81,7 @@ function setMenuCallbacks() {
     updateMenu('#link-csv');
     updatePage('#csv');
     menuSelected = "csv";
-    // show
+
     e.preventDefault();
   });
   
@@ -53,7 +89,7 @@ function setMenuCallbacks() {
     updateMenu('#link-branded');
     updatePage('#branded');
     menuSelected = "branded";
-    // show
+
     e.preventDefault();
   });
   
@@ -61,7 +97,7 @@ function setMenuCallbacks() {
     updateMenu('#link-stats');
     updatePage('#stats');
     menuSelected = "stats";
-    // show
+
     e.preventDefault();
   });
 }
@@ -96,6 +132,13 @@ function getUrl() {
 }
 
 /*
+ * Returns the URL the user entered.
+ */
+function getUrlStats() {
+  return $( '#urlStatsInput' ).val();
+}
+
+/*
  * Sets the content of the '#urlInput' input to the shortened
  * uri contained inside the 'objectUri' object.
  */
@@ -109,6 +152,13 @@ function setUrlInput(objectUri) {
  */
 function clearUrlInput() {
   $( '#urlInput' ).val('');
+}
+
+/*
+ * Clears all text in #urlStatsInput.
+ */
+function clearStatsInput() {
+  $( '#urlStatsInput' ).val('');
 }
 
 /*
@@ -126,6 +176,13 @@ function showAlert(alertMessage) {
   if ( elementIsVisible( '#alert-box' ) ) {
     $( '#alert-box' ).html(alertMessage);
     $( '#alert-box' ).slideDown().delay(5000).slideUp();
+  }
+}
+
+function showSuccess(successMessage) {
+  if ( elementIsVisible( '#success-box' ) ) {
+    $( '#success-box' ).html(successMessage);
+    $( '#success-box' ).slideDown().delay(5000).slideUp();
   }
 }
 
@@ -207,7 +264,7 @@ function insertLatestShortenedUriInDOM(shortenedUri) {
                     '<div class="shortened-url">' + shortenedUri.uri + '</div>' +
                     '<div class="target-url"><a target="_blank" href="' + shortenedUri.target + '">' + shortenedUri.target + '</a></div>' +
                   '</div>' +
-                '</div><br>');
+                '</div>');
   
   $( '.shorten-url-block' ).html( uri );
   // animation when shown! :-)
@@ -216,10 +273,44 @@ function insertLatestShortenedUriInDOM(shortenedUri) {
 }
 
 /*
+ * Inserts the HTML of the given shortenedUri object, inside
+ * the latest shortened URL block.
+ */
+function insertStatsInDOM(statsObj) {
+  var stats = $(  '<div class="shorten-url-elem">' +
+            '<div class="img-block">' +
+              '<img src="/img/stats.png">' +
+              '<div class="clicks-url">' +
+                '<span>' + statsObj.numClicks + '</span> clicks</div>' +
+            '</div>' +
+            '<div class="details-block">' +
+              '<div class="owner-url"><span>owner:</span> ' + statsObj.owner + '</div>' +
+              '<div class="group">' +
+                '<div class="target-url">' +
+                  '<a target="_blank" href="' + statsObj.target + '">' + statsObj.target + '</a>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>' );
+  
+  $( '.stats-url-block' ).html( stats );
+  // animation when shown! :-)
+  $( '.stats-url-block' ).hide();
+  $( '.stats-url-block' ).slideDown();
+}
+
+/*
  * Selects the content of the #urlInput input.
  */
 function selectUserInput() {
   $( '#urlInput' ).select();
+}
+
+/*
+ * Selects the content of the #urlStatsInput input.
+ */
+function selectStatsInput() {
+  $( '#urlStatsInput' ).select();
 }
 
 /*
@@ -231,9 +322,37 @@ function isShortenUri(url) {
   return subUri == SERVICE_URI;
 }
 
-/* API CALLS */
+
+
+/******************************************************************************
+ *                           A P I   C a l l s
+ *****************************************************************************/
+function downloadFile(fileName) {
+  setTimeout(function(){
+    window.location.href = SERVICE_URI + "files/" + fileName;
+  },4000);
+}
+
+function showStats(url) {
+  $.ajax({
+    url : SERVICE_URI + "linkstats?url=" + url,
+	contentType : 'application/json',
+	type : 'GET',
+	success : function (response)
+	{
+      var statsObj = response[0];
+      insertStatsInDOM(statsObj);
+      clearStatsInput();
+	},
+	error: function (error) {
+      showAlert(ALERT_STATS);
+      selectStatsInput();
+	}
+  });
+}
+
 /*
- * Shortens an URL.
+ * ( POST method ): Shortens the given URL.
  */
 function shortenURL(url) {
   $.ajax({

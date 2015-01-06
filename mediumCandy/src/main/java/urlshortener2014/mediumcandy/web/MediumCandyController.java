@@ -3,6 +3,9 @@ package urlshortener2014.mediumcandy.web;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpHeaders;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import urlshortener2014.common.domain.ShortURL;
+import urlshortener2014.mediumcandy.domain.ClickStats;
 
 @RestController
 public class MediumCandyController {
@@ -46,26 +50,23 @@ public class MediumCandyController {
 	}
 	
 	/**
-	 * Shortens and customizes a given URL.
+	 * Return stats a given URL.
 	 */
-	@RequestMapping(value = "/mediumcandy/linkcustomized", method = RequestMethod.POST)
-	public ResponseEntity<ShortURL> shortenerCustomized(@RequestParam("url") String url,
-			@RequestParam(value = "brand", required = true) String brand,
-			HttpServletRequest request) {
-		ShortURL su = null;
+	@RequestMapping(value = "/mediumcandy/linkstats", method = RequestMethod.GET)
+	public ResponseEntity<List<ClickStats>> getLinkStats(@RequestParam("url") String url){
+		List<ClickStats> listResult = new ArrayList<ClickStats>();
 		
-		// Consuming REST Api
 		String restURI = linkTo(methodOn(UrlShortenerControllerWithLogs.class).
-                shortenerCustomized(url, brand, null)).toString();
+				getLinkStats(url)).toString();
 		RestTemplate restTemplate = new RestTemplate();
-		su = restTemplate.postForObject(restURI, null, ShortURL.class);
+		listResult = restTemplate.getForObject(restURI, null, List.class);
 		
-		if (su != null) {
-			HttpHeaders h = new HttpHeaders();
-			h.setLocation(su.getUri());
-			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
-		} else {
+		if(listResult.size()!=0){
+			return new ResponseEntity<>(listResult, HttpStatus.OK);
+			
+		}else{
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
 }
+

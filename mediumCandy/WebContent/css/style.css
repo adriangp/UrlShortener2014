@@ -28,7 +28,7 @@ body {
   margin: 0 auto;
   padding: 20px;
   padding-left: 40px;
-  width: 600px;
+  width: 500px;
 }
 
 .container h1 {
@@ -48,6 +48,9 @@ body {
   padding-bottom: 0px;
 }
 
+#fileUploader{
+  width: 19px;
+}
 /* Link Menu */
 .menu-links {
   padding: 10px;
@@ -67,6 +70,66 @@ body {
 
 #link-shortener {
   color: #E2062C;
+}
+
+.stats-url-block {
+  display: none;
+  margin: 0 auto;
+  width: 100%;
+  padding: 5px;
+  margin-top: 20px;
+  clear: both;
+}
+
+.stats-url-block .img-block {
+  margin: 0 auto;
+  padding: 10px;
+  margin-right: 10px;
+  float: left;
+  width: 90px;
+}
+
+.stats-url-block .details-block .owner-url{
+  padding-top: 8px;
+  font-size: 0.8em;
+  color: #E2062C;
+}
+
+.stats-url-block .details-block .target-url{
+  font-size: .85em;
+}
+
+.stats-url-block .details-block {
+  padding-top: 17px;
+  float: clear;
+  width: 100%;
+}
+
+.owner-url span {
+  font-weight: bold;
+  color: #008CBA;
+}
+
+.clicks-url{
+  font-size: 0.75em;
+  width: 66px;
+  text-align: center;
+}
+
+.clicks-url span{
+  font-weight: bold;
+}
+
+.has-tip {
+  color: #008CBA;
+}
+
+#urlStatsInput {
+  letter-spacing: 0.25px;
+  font-size: 1em;
+  padding-left: 15px;
+  margin-top: 10px;
+  border-color: #008CBA;
 }
 
 /* last shortened uri */
@@ -159,11 +222,29 @@ body {
   font-size: 0.75em;
 }
 
-/* alert box */
-#alert-box {
+/* alert and success box */
+#alert-box,  #success-box{
   display: none;
   position: absolute;
   width: 100%;
+}
+
+/* URL Stats */
+#urlStatsForm {
+  margin: 0 auto;
+  width: 100%;
+}
+
+#statsTable {
+  width: 100%;
+}
+
+#statsTable th {
+  width: 20%
+}
+
+#statsTable td {
+  width: 80%
 }
 
 /* Styles for expanding search element */
@@ -190,11 +271,29 @@ input[type="search"].dream-search:focus {
   .container {
     width: 450px;
   }
+
+  .menu-links ul li {
+    padding-top: 20px;
+  }
+
+  .menu-links ul li a {
+    padding: 0px;
+    font-size: 0.8em;
+  }  
+  
 }
 
 @media screen and (max-width: 470px) {
   .container {
     width: 325px;
+  }
+  
+  .menu-links ul li {
+    padding-top: 30px;
+  }
+
+  .menu-links ul li a {
+    font-size: 0.7em;
   }
   
   input[type="search"].dream-search {
@@ -208,7 +307,11 @@ input[type="search"].dream-search:focus {
     width: 350px;
   }
   
-  #alert-box {
+  #alert-box, #success-box {
+    font-size: 0.7em;
+  }
+  
+  #success-box {
     font-size: 0.7em;
   }
   
