@@ -139,7 +139,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 					methodOn(UrlShortenerController.class).redirectTo(
 							brand, null)).toUri(), exists.getSponsor(), exists.getCreated(), 
 							owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
-			shortURLRepository.updateShortURL(toUpdate);
+			shortURLRepository.update(toUpdate);
 			return toUpdate;
 		} else {
 			if (urlValidator.isValid(url)) {

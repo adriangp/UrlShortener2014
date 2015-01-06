@@ -87,11 +87,10 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		}
 	}
 
-	@Override
 	public void update(ShortURL su) {
 		try {
 			jdbc.update(
-					"update click set target=?, sponsor=?, created=?, owner=?, mode=?, safe=?, ip=?, country=? where hash=?",
+					"update shorturl set target=?, sponsor=?, created=?, owner=?, mode=?, safe=?, ip=?, country=? where hash=?",
 					su.getTarget(), su.getSponsor(), su.getCreated(),
 					su.getOwner(), su.getMode(), su.getSafe(), su.getIP(),
 					su.getCountry(), su.getHash());
