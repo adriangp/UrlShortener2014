@@ -12,7 +12,7 @@
 
 .acort-title {
 	margin: -25px -25px 15px;
-	padding: 15px 81px;
+	padding: 15px 107px;
 	line-height: 10px;
 	font-size: 18pt;
 	font-weight: 600;
@@ -97,7 +97,7 @@ input {
 
 .result-title {
 	margin: -25px -25px 10px;
-	padding: 15px 115px;
+	padding: 15px 96px;
 	line-height: 10px;
 	font-size: 18pt;
 	font-weight: 600;
@@ -152,7 +152,7 @@ input {
 	position: relative;
 	margin: 0px 1px auto auto;
 	width: 400px;
-	height: 250px;
+	height: 280px;
 	padding: 33px 25px 0px;
 	background: white;
 	border-bottom: 1px solid #c4c4c4;
@@ -162,7 +162,7 @@ input {
 
 .subir-title {
 	margin: -25px -25px 15px;
-	padding: 15px 96px;
+	padding: 15px 114px;
 	line-height: 10px;
 	font-size: 18pt;
 	font-weight: 600;
@@ -196,8 +196,8 @@ input {
 
 .row1 span.desc {
 	display: block;
-	font-size: .7em;
-	padding: 0 .5em;
+	font-size: .9em;
+	padding: -5px .5em;
 	color: #000;
 }
 
@@ -251,6 +251,32 @@ input[type="file"] {
 }
 
 .subir-button:active {
+	top: 1px;
+	outline: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.desc-button {
+	position: relative;
+	vertical-align: top;
+	horizontal-align: left;
+	width: 100%;
+	height: 49px;
+	padding: 0;
+	font-size: 22px;
+	color: white;
+	text-align: center;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+	background: #A6E17E;
+	border: 0;
+	border-bottom: 2px solid #B0EF87;
+	border-radius: 5px;
+	cursor: pointer;
+	box-shadow: inset 0 -2px #B0EF87;
+}
+
+.desc-button:active {
 	top: 1px;
 	outline: none;
 	-webkit-box-shadow: none;

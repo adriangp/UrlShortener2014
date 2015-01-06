@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title></title>
+<link rel="shortcut icon" href="http://www.unizar.es/sites/default/files/favicon.ico" type="image/vnd.microsoft.icon" />
+<title>BangladeshGreen URLShortener - Universidad de Zaragoza</title>
 <meta charset="utf-8">
 <link rel="stylesheet" href="css/reset.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/layout.css" type="text/css" media="all">
@@ -36,10 +37,10 @@
 						.toString()
 						+ 'KB';
 
-			document.getElementById('fileName').innerHTML = 'Name: '
+			document.getElementById('fileName').innerHTML = 'Nombre: '
 					+ file.name;
-			document.getElementById('fileSize').innerHTML = 'Size: ' + fileSize;
-			document.getElementById('fileType').innerHTML = 'Type: '
+			document.getElementById('fileSize').innerHTML = 'Tamaño: ' + fileSize;
+			document.getElementById('fileType').innerHTML = 'Tipo: '
 					+ file.type;
 			document.getElementById('row2').innerHTML = '<input type=\"button\" onclick=\"uploadFile()\" value=\"Upload\" class=\"subir-button\"/>';
 		}
@@ -50,7 +51,6 @@
 		fd.append("fileToUpload",
 				document.getElementById('fileToUpload').files[0]);
 		var xhr = new XMLHttpRequest();
-		xhr.upload.addEventListener("progress", uploadProgress, false);
 		xhr.addEventListener("load", uploadComplete, false);
 		xhr.addEventListener("error", uploadFailed, false);
 		xhr.addEventListener("abort", uploadCanceled, false);
@@ -58,16 +58,6 @@
 		xhr.send(fd);
 	}
 
-	function uploadProgress(evt) {
-		if (evt.lengthComputable) {
-			var percentComplete = Math.round(evt.loaded * 100 / evt.total);
-			document.getElementById('progressNumber').innerHTML = percentComplete
-					.toString()
-					+ '%';
-		} else {
-			document.getElementById('progressNumber').innerHTML = 'unable to compute';
-		}
-	}
 
 	function uploadComplete(evt) {
 		/* This event is raised when the server send back a response */
@@ -81,17 +71,18 @@
 		for (i = 0; i < (name.length) - 4; i++) {
 			name_tmp += name[i]
 		}
-		var fichero=new File("fich_temporal.csv");
-		
-		document.getElementById('download').innerHTML = '<a href="csv\\fich_temporal.csv"> Download File</a>'
+
+		document.getElementById('download').innerHTML = '<a href=\"csv\\fich_temporal.csv\" download=\"'
+			+name_tmp+'_acortado.csv\"><input type=\"button\" value=\"Descargar fichero acortado\" class=\"desc-button\"/></a>'
 	}
 
 	function uploadFailed(evt) {
-		alert("There was an error attempting to upload the file.");
+		alert("Hubo un error al intentar cargar el fichero.");
 	}
 
+	
 	function uploadCanceled(evt) {
-		alert("The upload has been canceled by the user or the browser dropped the connection.");
+		alert("La carga ha sido cancelada por el usuario o el navegador ha perdido la conexion.");
 	}
 </script>
 
@@ -110,8 +101,8 @@
 														data : $(this)
 																.serialize(),
 														success : function(msg) {
-															$("#result")
-																	.html(
+														if(!msg.safe){alert("¡Cuidado!La direccion acortada redirige a una URL no segura.");};
+															$("#result").html(
 																			"<div class='result'><h1 class='result-title'>Short URL</h1><a target='_blank' href="
 																	+ msg.uri +" class='result-link'><input type='text' class='result-input' readonly value='"
 																	+msg.uri+"''></a></div>")
@@ -149,7 +140,7 @@
 									<div class="cont">
 										<div id="acort" class="acort">
 											<form role="form" id="shortener">
-												<h1 class="acort-title">Insert Long URL</h1>
+												<h1 class="acort-title">Inserta URL</h1>
 												<input type="text" class="acort-input" id="uri"
 													placeholder="Long URL" name="url" />
 												<button type="submit" class="acort-button">Shorten</button>
@@ -157,7 +148,7 @@
 											<p />
 											<div id="result">
 												<div class="result">
-													<h1 class="result-title">Short URL</h1>
+													<h1 class="result-title">URL acortada</h1>
 													<input type=text placeholder="Short URL"
 														class='result-input' readonly>
 												</div>
@@ -171,13 +162,12 @@
 										<div id="subir" class="subir">
 											<form id="form1" enctype="multipart/form-data" method="post"
 												action="/Upload">
-												<h1 class="subir-title">Select a File to Upload</h1>
+												<h1 class="subir-title">Seleccionar fichero</h1>
 												<br />
 												<div class="row1">
 													<input type="file" name="fileToUpload" id="fileToUpload"
-														onchange="fileSelected();" /> <br>
-													<br> <span class="desc">Drag and drop files
-														here or click to open explorer</span>
+														onchange="fileSelected();" />
+													<br><br> <span class="desc">Arrastra ficheros o haz click para abrir el explorador</span>
 												</div>
 												<div class="info">
 													<div id="fileName"></div>
@@ -186,8 +176,8 @@
 												</div>
 												<div id="row2" class="row2">
 												</div>
-												<div id="progressNumber"></div>
 											</form>
+											
 											<div id="download"></div>
 										</div>
 									</div>

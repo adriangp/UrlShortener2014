@@ -19,7 +19,11 @@ import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +42,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
 	@Autowired
 	private ClickRepository clickRepository;
+	@Autowired
 	private ShortURLRepository SURLR;
 	private static final Logger logger = LoggerFactory
 			.getLogger(UrlShortenerControllerWithLogs.class);
@@ -109,9 +114,12 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				.target("https://sb-ssl.google.com/safebrowsing/api/lookup?client=Roberto&key=AIzaSyBbjDCPwK13dOYioVf6Cp9_lrFZ_MOEFbU&appver=1.5.2&pver=3.1&url="
 						+ url).request(MediaType.TEXT_HTML).get();
 
-		if (response.getStatus() == 200)
-			SURLR.mark(su.getBody(), false);// marcar como no segura
-
+		
+		if (response.getStatus() == 200){
+				
+			ShortURL suUnSafe = SURLR.mark(su.getBody(), false);// marcar como no segura
+			new DirectFieldAccessor(su.getBody()).setPropertyValue("safe", false);
+		}
 		return su;
 	}
 
@@ -121,7 +129,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				part.getInputStream()));
 
-		File fichero = new File("src\\main\\resources\\public\\csv\\fich_original.csv");
+		File fichero = new File("build\\resources\\main\\public\\csv\\fich_original.csv");
 		fichero.createNewFile();
 		PrintWriter f = new PrintWriter(fichero);
 		String linea = "";
@@ -133,17 +141,15 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			f.write("\n");
 		}
 		f.close();
-		Response respuesta=analizarCSV(fichero, request);
-		if(respuesta.getStatus()==400){ return "Error with the File!";}
+		analizarCSV(fichero, request);
 		return "File Uploaded!";
 	}
 
-	@SuppressWarnings("resource")
 	public Response analizarCSV(File csv, HttpServletRequest request)
 			throws IOException {
 
 		BufferedReader br = new BufferedReader(new FileReader(csv));
-		File csvAcortado = new File("src\\main\\resources\\public\\csv\\fich_temporal.csv");
+		File csvAcortado = new File("build\\resources\\main\\public\\csv\\fich_temporal.csv");
 		csvAcortado.createNewFile();
 		PrintWriter fileResul = new PrintWriter(csvAcortado);
 		String linea = "";
@@ -154,8 +160,8 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				if (!url.equals(null) || !url.equals("")) {
 					ResponseEntity<ShortURL> urlAcortada = shortener(url, null,
 							null, request);
-					if(urlAcortada.getBody()==null) return Response.status(Status.BAD_REQUEST).build();
-					else fileResul.write(urlAcortada.getBody().getUri().toString()+ ",");
+					fileResul.write(urlAcortada.getBody().getUri().toString()
+							+ ",");
 				}
 			}
 			fileResul.write("\n");
@@ -209,6 +215,4 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		}
 		return res;
 	}
-	
-	
 }
