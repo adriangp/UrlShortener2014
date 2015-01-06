@@ -110,5 +110,3 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return listResult;
 	}
 }
-
-
