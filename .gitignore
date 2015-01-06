@@ -2,4 +2,8 @@
 /.gradle/
 /.project
 /.classpath
-/build/
+/.idea/
+/gradle/
+/gradlew
+/gradlew.bat
+/UrlShortener2014.iml

@@ -10,6 +10,13 @@ This is the shared repository for the project developed in this course.
 ## Teams
 
 * [BangladeshGreen](bangladeshGreen): Alberto (leader), Óscar and Roberto
+* [GoldenBrown](goldenBrown): Javier (leader), Jorge and Gabriel
+* [GoldenPoppy](goldenPoppy): Adrián (leader), Javier and Andrés
+* [MediumCandy](mediumCandy): Carlos (leader), Daniel, Alberto and Guillermo
+* [OldBurgundy](oldBurgundy): Pablo (leader), Jorge and Ismael
+* [RichCarmine](richCarmine): Adrian (leader), Sandra and David
+* [TaupeGray](taupeGray): Rubén (leader), Victor and Marcela
+* [DimGray](dimGray): Carlos (leader) and Paulo
 
 ## Starting procedure
 
