@@ -95,7 +95,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	    						PLATFORMIDENTIFIER_URI,
 	    						PlatformIdentity.class,
 	    						useragentstring);
-	    		if (respBlackList.getStatusCode().equals(HttpStatus.OK)){
+	    		if (respPlatform.getStatusCode().equals(HttpStatus.OK)){
 	    			PlatformIdentity pi = respPlatform.getBody();
 	    			if(pi.getVersion().equals("UNKNOWN")){
 	    				browser = pi.getBrowser();
