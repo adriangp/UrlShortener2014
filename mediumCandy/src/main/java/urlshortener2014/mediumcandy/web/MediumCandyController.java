@@ -74,7 +74,7 @@ public class MediumCandyController {
 	 */
 	@RequestMapping(value = "/mediumcandy/linkcustomized", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortenerCustomized(@RequestParam("url") String url,
-			@RequestParam(value = "brand", required = true) String brand,
+			@RequestParam("brand") String brand,
 			HttpServletRequest request) {
 		ShortURL su = null;
 		
