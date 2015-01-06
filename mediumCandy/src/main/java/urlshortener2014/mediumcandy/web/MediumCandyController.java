@@ -61,7 +61,12 @@ public class MediumCandyController {
 		RestTemplate restTemplate = new RestTemplate();
 		listResult = restTemplate.getForObject(restURI, null, List.class);
 		
-		return new ResponseEntity<>(listResult, HttpStatus.OK);
+		if(listResult.size()!=0){
+			return new ResponseEntity<>(listResult, HttpStatus.OK);
+			
+		}else{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 }
 
