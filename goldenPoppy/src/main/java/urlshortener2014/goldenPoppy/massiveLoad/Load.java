@@ -82,7 +82,7 @@ public class Load implements Callable<List<Content>>{
 	 * 
 	 * @param c Object that contains the URL and the sponsor to be shortened.
 	 */
-	private void isAlive(Content c) {
+	public void isAlive(Content c) {
 		try {
 			switch(controller.isalive(new URL(c.getURL(),2)).getStatus()){
 			case 0:
@@ -93,8 +93,8 @@ public class Load implements Callable<List<Content>>{
 			case -1:
 				// The URL is not alive. Store the URL in the list of short URLs
 				// marked as invalid.
-				shortUrls.add(new Content(c.getId(), c.getURL(), "The URL " + c.getURL()
-						+ " is not alive, so it can't be shortened!"));
+				shortUrls.add(new Content(c.getId(), c.getURL(), "The URL is not alive, "
+						+ "so it can't be shortened!"));
 				if (timeouts.contains(c))
 					timeouts.remove(c);
 				nShortened++;
@@ -104,6 +104,9 @@ public class Load implements Callable<List<Content>>{
 				// The URL is alive. Short and store in the list of short URLs.
 				ResponseEntity<ShortURL> resp = controller.shortener(c.getURL(), 
 						c.getSponsor(), null, request);
+				
+				//TODO: Aqui se pierde el control, el siguiente codigo no se ejecuta
+				
 				if (resp.getStatusCode() == HttpStatus.CREATED){
 					shortUrls.add(new Content(c.getId(), c.getURL(), 
 							resp.getHeaders().getLocation().toString()));
