@@ -142,7 +142,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			ShortURL su = new ShortURL(id, url,
 					linkTo(
 							methodOn(UrlShortenerController.class).redirectTo(
-									brand + "/" +id, null)).toUri(), sponsor, new Date(
+									"b" + brand + "/l" +id, null)).toUri(), sponsor, new Date(
 							System.currentTimeMillis()), owner,
 					HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
 			return shortURLRepository.save(su);
