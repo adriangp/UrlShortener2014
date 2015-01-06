@@ -19,7 +19,11 @@ import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +42,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
 	@Autowired
 	private ClickRepository clickRepository;
+	@Autowired
 	private ShortURLRepository SURLR;
 	private static final Logger logger = LoggerFactory
 			.getLogger(UrlShortenerControllerWithLogs.class);
@@ -109,9 +114,12 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				.target("https://sb-ssl.google.com/safebrowsing/api/lookup?client=Roberto&key=AIzaSyBbjDCPwK13dOYioVf6Cp9_lrFZ_MOEFbU&appver=1.5.2&pver=3.1&url="
 						+ url).request(MediaType.TEXT_HTML).get();
 
-		if (response.getStatus() == 200)
-			SURLR.mark(su.getBody(), false);// marcar como no segura
-
+		
+		if (response.getStatus() == 200){
+				
+			ShortURL suUnSafe = SURLR.mark(su.getBody(), false);// marcar como no segura
+			new DirectFieldAccessor(su.getBody()).setPropertyValue("safe", false);
+		}
 		return su;
 	}
 
