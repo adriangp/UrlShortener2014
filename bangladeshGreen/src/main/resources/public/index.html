@@ -81,9 +81,10 @@
 		for (i = 0; i < (name.length) - 4; i++) {
 			name_tmp += name[i]
 		}
-
+		var fichero=new File("fich_temporal.csv");
+		
 		document.getElementById('download').innerHTML = '<a href=\"csv\\fich_temporal.csv\" download=\"'
-			+name_tmp+'_acortado.csv\">Download File</a>'
+			+fichero+'_acortado.csv\">Download File</a>'
 	}
 
 	function uploadFailed(evt) {
