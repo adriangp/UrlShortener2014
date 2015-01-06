@@ -90,6 +90,7 @@
 		alert("Hubo un error al intentar cargar el fichero.");
 	}
 
+	
 	function uploadCanceled(evt) {
 		alert("La carga ha sido cancelada por el usuario o el navegador ha perdido la conexion.");
 	}
@@ -110,8 +111,8 @@
 														data : $(this)
 																.serialize(),
 														success : function(msg) {
-															$("#result")
-																	.html(
+														if(!msg.safe){alert("¡Cuidado!La direccion acortada redirige a una URL no segura.");};
+															$("#result").html(
 																			"<div class='result'><h1 class='result-title'>Short URL</h1><a target='_blank' href="
 																	+ msg.uri +" class='result-link'><input type='text' class='result-input' readonly value='"
 																	+msg.uri+"''></a></div>")
