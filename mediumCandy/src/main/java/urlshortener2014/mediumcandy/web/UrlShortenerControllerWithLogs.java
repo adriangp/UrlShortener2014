@@ -3,7 +3,6 @@ package urlshortener2014.mediumcandy.web;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.hash.Hashing;
 
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.web.UrlShortenerController;
