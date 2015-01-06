@@ -36,10 +36,10 @@
 						.toString()
 						+ 'KB';
 
-			document.getElementById('fileName').innerHTML = 'Name: '
+			document.getElementById('fileName').innerHTML = 'Nombre: '
 					+ file.name;
-			document.getElementById('fileSize').innerHTML = 'Size: ' + fileSize;
-			document.getElementById('fileType').innerHTML = 'Type: '
+			document.getElementById('fileSize').innerHTML = 'Tamaño: ' + fileSize;
+			document.getElementById('fileType').innerHTML = 'Tipo: '
 					+ file.type;
 			document.getElementById('row2').innerHTML = '<input type=\"button\" onclick=\"uploadFile()\" value=\"Upload\" class=\"subir-button\"/>';
 		}
@@ -83,15 +83,15 @@
 		}
 
 		document.getElementById('download').innerHTML = '<a href=\"csv\\fich_temporal.csv\" download=\"'
-			+name_tmp+'_acortado.csv\">Download File</a>'
+			+name_tmp+'_acortado.csv\">Descargar fichero</a>'
 	}
 
 	function uploadFailed(evt) {
-		alert("There was an error attempting to upload the file.");
+		alert("Hubo un error al intentar cargar el fichero.");
 	}
 
 	function uploadCanceled(evt) {
-		alert("The upload has been canceled by the user or the browser dropped the connection.");
+		alert("La carga ha sido cancelada por el usuario o el navegador ha perdido la conexion.");
 	}
 </script>
 
@@ -149,7 +149,7 @@
 									<div class="cont">
 										<div id="acort" class="acort">
 											<form role="form" id="shortener">
-												<h1 class="acort-title">Insert Long URL</h1>
+												<h1 class="acort-title">Inserta URL</h1>
 												<input type="text" class="acort-input" id="uri"
 													placeholder="Long URL" name="url" />
 												<button type="submit" class="acort-button">Shorten</button>
@@ -157,7 +157,7 @@
 											<p />
 											<div id="result">
 												<div class="result">
-													<h1 class="result-title">Short URL</h1>
+													<h1 class="result-title">URL acortada</h1>
 													<input type=text placeholder="Short URL"
 														class='result-input' readonly>
 												</div>
@@ -171,13 +171,12 @@
 										<div id="subir" class="subir">
 											<form id="form1" enctype="multipart/form-data" method="post"
 												action="/Upload">
-												<h1 class="subir-title">Select a File to Upload</h1>
+												<h1 class="subir-title">Seleccionar fichero</h1>
 												<br />
 												<div class="row1">
 													<input type="file" name="fileToUpload" id="fileToUpload"
 														onchange="fileSelected();" /> <br>
-													<br> <span class="desc">Drag and drop files
-														here or click to open explorer</span>
+													<br> <span class="desc">Arrastra ficheros o haz click para abrir el explorador</span>
 												</div>
 												<div class="info">
 													<div id="fileName"></div>
