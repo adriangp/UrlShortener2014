@@ -1,15 +1,22 @@
 package urlshortener2014.mediumcandy.web;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,8 +25,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.hash.Hashing;
+
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.web.UrlShortenerController;
+import urlshortener2014.mediumcandy.domain.ClickStats;
 
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
@@ -74,7 +84,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	 * Shortens a given URL if this URL is reachable via HTTP.
 	 */
 	@RequestMapping(value = "/linkreachable", method = RequestMethod.POST)
-	public ResponseEntity<ShortURL> shortenerIfReachable(@RequestParam("url") String url,
+	public ShortURL shortenerIfReachable(@RequestParam("url") String url,
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand,
 			HttpServletRequest request) {
@@ -84,14 +94,61 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		if (isReachableUrl){
 			su = createAndSaveIfValid(url, sponsor, brand, UUID
 					.randomUUID().toString(), extractIP(request));
+			System.out.println("URL REACHABLE!");
 		}
 		
-		if (su != null) {
-			HttpHeaders h = new HttpHeaders();
-			h.setLocation(su.getUri());
-			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
-		} else {
+		return su;
+	}
+	
+	@RequestMapping(value = "/linkstats", method = RequestMethod.GET)
+	public ResponseEntity<List<ClickStats>> getLinkStats(@RequestParam("url") String url){
+		
+		List<ShortURL> listShortURL;
+		Long infoClicks; 
+		List<ClickStats> listResult = new ArrayList<ClickStats>();
+		listShortURL = shortURLRepository.findByTarget(url);
+		if(listShortURL.size()==0){
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			
+		}else{
+			for(ShortURL su: listShortURL){
+				infoClicks = clickRepository.clicksByHash(su.getHash());
+				ClickStats cs = new ClickStats(url, infoClicks, su.getOwner(), su.getUri());
+				listResult.add(cs); 
+			}
+			return new ResponseEntity<>(listResult, HttpStatus.OK);
+		}
+	}
+	
+	/**
+	 * Shortens a given URL with a given brand.
+	 */
+	@RequestMapping(value = "/linkcustomized", method = RequestMethod.POST)
+	public ShortURL shortenerCustomized(@RequestParam("url") String url,
+			@RequestParam(value = "brand", required = false) String brand,
+			HttpServletRequest request) {
+		ShortURL su = createAndSaveCustomizedIfValid(url, brand, brand, UUID
+					.randomUUID().toString(), extractIP(request));
+		
+		return su;
+	}
+	
+	private ShortURL createAndSaveCustomizedIfValid(String url, String sponsor,
+			String brand, String owner, String ip) {
+		UrlValidator urlValidator = new UrlValidator(new String[] { "http",
+				"https" });
+		if (urlValidator.isValid(url)) {
+			String  id = Hashing.murmur3_32()
+					.hashString(url, StandardCharsets.UTF_8).toString();
+			ShortURL su = new ShortURL(id, url,
+					linkTo(
+							methodOn(UrlShortenerController.class).redirectTo(
+									brand + "/" +id, null)).toUri(), sponsor, new Date(
+							System.currentTimeMillis()), owner,
+					HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
+			return shortURLRepository.save(su);
+		} else {
+			return null;
 		}
 	}
 }
