@@ -20,6 +20,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
+
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.goldenbrown.Application;
 import static org.junit.Assert.assertEquals;
@@ -70,13 +72,14 @@ public class BlackListControllerTests {
 					url);
 	}
 	
-	private ResponseEntity<?> performTestRequestOnRedirect(String url, Date date, boolean safe){
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+	private ResponseEntity<?> performTestRequestOnRedirect(String url, Date date, boolean safe) throws java.text.ParseException{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String dateString = sdf.format(date);
 		return new TestRestTemplate().getForEntity(
 					"http://localhost:"+this.port+"/blacklist/onredirectto/?url={url}&date={date}&safe={safe}",
 					null,
 					url,
-					sdf.format(date),
+					dateString,
 					safe);
 	}
 	
@@ -90,7 +93,7 @@ public class BlackListControllerTests {
 	@Test
 	public void testDomainOnRedirect() throws Exception {
 		final long hoursInMillis = 60L * 60L * 1000L;
-		Date now = new Date(System.currentTimeMillis());
+		Date now = new Date();
 		Date before = new Date(now.getTime() + 
 		                        (-3L * hoursInMillis));
 		ResponseEntity<?> entity;
@@ -103,19 +106,18 @@ public class BlackListControllerTests {
 		// Asks for a URL which is actually safe, it was checked recently, and it was considered not-safe then
 		entity = performTestRequestOnRedirect(urlNotBlackListed, now, false);
 		// It shouldn't be checked again, and it should return LOCKED 
-		//FIXME: TEST FAILURE, reason => expected:<423> but was:<200>
 		assertEquals(HttpStatus.LOCKED, entity.getStatusCode());
 		
 		
 		// Asks for a URL which is actually safe and it was checked long time ago 
-		// (so it doesn't matters if it was considered safe or not)
+		// (so it doesn't matter if it was considered safe or not)
 		entity = performTestRequestOnRedirect(urlNotBlackListed, before, true);
 		// It should be checked again, and it should return CREATED
 		assertEquals(HttpStatus.OK,entity.getStatusCode());
 		
 		
 		// Asks for a URL which is actually not-safe and it was checked long time ago 
-		// (so it doesn't matters if it was considered safe or not)
+		// (so it doesn't matter if it was considered safe or not)
 		entity = performTestRequestOnRedirect(urlBlackListed, before, true);
 		// It should be checked again, and it should return LOCKED
 		assertEquals(HttpStatus.LOCKED, entity.getStatusCode());
@@ -124,16 +126,8 @@ public class BlackListControllerTests {
 
 	@Test
 	public void testDomainBlackListedOnShortener() throws Exception {
-		try{
-			ResponseEntity<?> entity = performTestRequestOnShortener(urlBlackListed);
-			//FIXME: Is this the expected behavior? in that case,
-			//	TEST FAILURE, reason => Exception should be catched
-			fail("Exception should be catched");
-		}
-		catch(HttpClientErrorException e){
-			assertEquals(HttpStatus.LOCKED,e.getStatusCode());		
-		}
-		
+		ResponseEntity<?> entity = performTestRequestOnShortener(urlBlackListed);
+		assertEquals(HttpStatus.LOCKED,entity.getStatusCode());
 	}
 	
 	@Test
