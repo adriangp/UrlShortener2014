@@ -95,22 +95,45 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return super.shortener(url, sponsor, brand, request);
 	}
 	
-	public ResponseEntity<ShortURL> intersicial(@RequestParam("shorturl") String sUrl,
+	/**
+	 * Crea una nueva URL corta que apunta a la URL con el Sponsor
+	 * @param sUrl
+	 * @param sponsor
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/inter", method = RequestMethod.POST)
+	public ResponseEntity<ShortURL> intersicial(@RequestParam("url") String sUrl,
+
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			HttpServletRequest request){
 		return shortener(sUrl,sponsor,null,request);
 	}
-	
+
+	/**
+	 * Método que se encarga de comprobar que la URL "url" recibida desde el cliente está viva
+	 * (devuelve un 200) durante un timeout especificado. Si la URL responde antes de agotarse
+	 * el timeout, devuelve un Response que encapsula 1 ó -1 dependiendo si está viva o no.
+	 * Si el timeout acaba, devuelve un 0 como Response, que indica que se agotó el timeout.
+	 * 
+	 * @param url Con la url y el Timeout
+	 * @return Response con 1, -1 ó 0
+	 */
 	@MessageMapping("/isalive")
     @SendToUser("/topic/isalive")
-    public Response isalive(URL url) throws Exception {
-
+    public Response isalive(URL url) {
+		
+		if (!url.isValid()){
+			logger.info("isAlive: Url is not valid "+url.getUrl());
+			return new Response(-1);
+		}
+		
+		logger.info("isAlive: Url is valid "+url.getUrl());
 		ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<Integer> future = executor.submit(new CompruebaUrl(url));
         
         int timeout = url.getTimeout();
                 
-        logger.info("isAlive: timeout requested "+timeout);
         try {
         	int s = future.get(timeout, TimeUnit.SECONDS);
         	executor.shutdownNow();

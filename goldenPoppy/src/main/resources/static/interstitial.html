@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>URL Shortener</title>
+<title>Interstitial Ad</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" type="text/css"
 	href="webjars/bootstrap/3.0.3/css/bootstrap.min.css" />
@@ -9,41 +9,30 @@
 <body>
 	<script type="text/javascript" src="webjars/jquery/2.0.3/jquery.min.js"></script>
 	<div class="jumbotron">
-		<h1>URL Shortener</h1>
-		<form role="form" id="shortener">
+		<h1>Interstitial Ad</h1>
+		<form role="form" id="inter">
 			<div class="form-group">
 				<label for="uri">Long URL</label> <input type="text"
 					class="form-control" id="uri" placeholder="Long URL" name="url" />
-				<label for="sponsor">Sponsor</label> <input type="text"
+				<label for="uri">Sponsor</label> <input type="text"
 					class="form-control" id="sponsor" placeholder="Sponsor" name="sponsor" />
 			</div>
-			<button type="submit" class="btn btn-lg btn-primary">Make
-				short!</button>
+			<button type="submit" class="btn btn-lg btn-primary">Add sponsor!</button>
 		</form>
 		<p/>
 		<div id="result"></div>
+		<button id="back" class="btn btn-lg btn-primary" onclick="location.href='index.html'">Back</button>
 		
-		<h2>Other funcionalities</h2>
-		<div>
-			<label for="alive">Check if an URL is alive</label>
-			<input type="button" value="Is Alive an URL?" onClick="location.href='isAlive.html'"/><br/>
-			<label for="massive">Charge many long URL since a file</label>
-			<input type="button" value="Massive load of URLs" onClick="location.href='massiveLoad.html'"/><br/>
-			<label for="qr">Obtain a QR code of an URL</label>
-			<input type="button" value="Get QR codes of URLs" onClick="location.href='qr.html'"/><br/>
-			<label for="interstitial">Add a sponsor to an URL</label>
-			<input type="button" value="Add sponsor" onClick="location.href='interstitial.html'"/><br/>
-		</div>
 	</div>
 	<script type="text/javascript"
 		src="webjars/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 	<script>
 	 $(document).ready(function() {
-		$("#shortener").submit(function(event){
+		$("#inter").submit(function(event){
 			event.preventDefault();
 			$.ajax({
 				type : "POST",
-				url : "/link",
+				url : "/inter",
 				data : $(this).serialize(),
 				success : function(msg) {
 					$("#result").html("<a target='_blank' href='"+msg.uri+"' class='btn btn-default btn-lg' role='button'>"+msg.uri+"</a>")

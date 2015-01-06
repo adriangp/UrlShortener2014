@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>isAlive test</title>
+
+	
+    <script type="text/javascript" src="webjars/stomp-websocket/2.3.1-1/stomp.js"></script>
+	<script type="text/javascript" src="webjars/sockjs-client/0.3.4-1/sockjs.js"></script>
+    <script type="text/javascript">
+        var stompClient = null;
+		var i = 0;
+		var urls = ["http://www.google.es", "http://noexistexks.net", "http./malformada.com", "http://155.210.198.1", "http://timeout.com"];
+		var timeouts = ["2", "4", "2", "2", "500"];
+		var esperado = [1, -1, -1, 0, -1];
+
+        function connect() {
+            var socket = new SockJS('/isalive');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/user/topic/isalive', function(response){
+                    showResponse(JSON.parse(response.body).status);
+                });
+            });
+        }
+
+        function disconnect() {
+            stompClient.disconnect();
+            console.log("Disconnected");
+        }
+
+        function sendUrl(url, timeout) {
+            stompClient.send("/app/isalive", {}, JSON.stringify({ 'url': url , 'timeout' : timeout}));
+        }
+
+        function showResponse(message) {
+
+			var presp = document.getElementById(i+1);
+			if (message == esperado[i]){
+				presp.innerHTML = "PRUEBA OK";
+			}
+			else{
+				presp.innerHTML = "ERROR EN LA PRUEBA";
+			}
+			if (i<urls.length){
+				i++;
+				pruebas();
+			}   
+        }
+
+		function pruebas(){
+			sendUrl(urls[i], timeouts[i]);
+		}
+    </script>
+
+
+</head>
+<body onLoad="connect()" onUnLoad="disconnect()">
+
+<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being enabled. Please enable
+    Javascript and reload this page!</h2></noscript>
+
+<h1>isAlive tests</h1>
+<button onclick="pruebas();this.disabled=true;">Comenzar</button>
+<div>
+
+<p><b>Prueba 1: url = http://www.google.es y timeout = 2 (VIVA)</b></p>
+<ul><li><p id="1"></p></li></ul>
+
+<hr>
+<p><b>Prueba 2: url = http://noexistexks.net y timeout = 4 (MUERTA)</b></p>
+<ul><li><p id="2"></p></li></ul>
+
+<hr>
+<p><b>Prueba 3: url = http./malformada.com y timeout = 2 (MUERTA)</b></p>
+<ul><li><p id="3"></p></li></ul>
+
+<hr>
+<p><b>Prueba 4: url = http://155.210.198.1 y timeout = 2 (TIMEOUT)</b></p>
+<ul><li><p id="4"></p></li></ul>
+
+<hr>
+<p><b>Prueba 5: url = http://timeout.com y timeout = 500 (MUERTA)</b></p>
+<ul><li><p id="5"></p></li></ul>
+<hr>
+
+</div>
+
+
+</body>
+</html>
