@@ -121,7 +121,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	 */
 	@RequestMapping(value = "/linkcustomized", method = RequestMethod.POST)
 	public ShortURL shortenerCustomized(@RequestParam("url") String url,
-			@RequestParam(value = "brand", required = false) String brand,
+			@RequestParam("brand") String brand,
 			HttpServletRequest request) {
 		ShortURL su = createAndSaveCustomizedIfValid(url, brand, UUID
 					.randomUUID().toString(), extractIP(request));
