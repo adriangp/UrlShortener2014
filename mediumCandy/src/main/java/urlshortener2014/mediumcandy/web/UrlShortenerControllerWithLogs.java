@@ -3,20 +3,26 @@ package urlshortener2014.mediumcandy.web;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.google.common.hash.Hashing;
 
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.web.UrlShortenerController;
@@ -108,5 +114,34 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		}
 		
 		return listResult;
+	}
+	
+	/**
+	 * Shortens a given URL with a given brand.
+	 */
+	@RequestMapping(value = "/linkcustomized", method = RequestMethod.POST)
+	public ShortURL shortenerCustomized(@RequestParam("url") String url,
+			@RequestParam(value = "brand", required = false) String brand,
+			HttpServletRequest request) {
+		ShortURL su = createAndSaveCustomizedIfValid(url, brand, UUID
+					.randomUUID().toString(), extractIP(request));
+		
+		return su;
+	}
+	
+	private ShortURL createAndSaveCustomizedIfValid(String url, String brand, String owner, String ip) {
+		UrlValidator urlValidator = new UrlValidator(new String[] { "http",
+				"https" });
+		if (urlValidator.isValid(url)) {
+			ShortURL su = new ShortURL(brand, url,
+					linkTo(
+							methodOn(UrlShortenerController.class).redirectTo(
+									brand, null)).toUri(), brand, new Date(
+							System.currentTimeMillis()), owner,
+					HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
+			return shortURLRepository.save(su);
+		} else {
+			return null;
+		}
 	}
 }
