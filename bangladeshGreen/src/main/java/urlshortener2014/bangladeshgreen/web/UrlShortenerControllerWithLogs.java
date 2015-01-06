@@ -54,14 +54,16 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		String agent = request.getHeader("User-Agent");
 		String ip = request.getRemoteAddr();
 		String navegador = "", SO = "";
-		if (agent.indexOf("Chrome") != -1)
-			navegador = "Chrome";
-		else if (agent.indexOf("Firefox") != -1)
-			navegador = "Firefox";
-		else if (agent.indexOf("Safari") != -1)
-			navegador = "Safari";
-		else
-			navegador = "Explorer";
+		if(agent!=null){
+			if (agent.indexOf("Chrome") != -1)
+				navegador = "Chrome";
+			else if (agent.indexOf("Firefox") != -1)
+				navegador = "Firefox";
+			else if (agent.indexOf("Safari") != -1)
+				navegador = "Safari";
+			else
+				navegador = "Explorer";
+		else navegador="Desconocido";
 
 		if (agent.indexOf("Windows") != -1)
 			SO = "Windows";
@@ -89,7 +91,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				Click clickFinal = new Click(identificador, hash, fecha, null,
 						navegador, SO, ip, null);
 				clickRepository.update(clickFinal);
-				logger.info("Actualizado Click con " + navegador + "SO: " + SO
+				logger.info("Actualizado Click con " + navegador + " y SO: " + SO
 						+ " e ip:" + ip);
 				break;
 			}
@@ -159,7 +161,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	 * Lee el csv que recibe como parametro, acorta todas las URL que contenga
 	 * @param csv CSV que contiene las URL a acortar
 	 * @param request necesario para llamar al acortador
-	 * @return al response le añade un "ok" o un "BAD_REQUEST" segun corresponda
+	 * @return al response le anade un "ok" o un "BAD_REQUEST" segun corresponda
 	 * @throws IOException
 	 */
 	@SuppressWarnings("resource")
