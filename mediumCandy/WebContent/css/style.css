@@ -139,7 +139,7 @@ body {
 
 /* last shortened uri */
 .shorten-url-block {
-  /*display: none;*/
+  display: none;
   padding: 20px;
   width: 500px;
   clear: both;

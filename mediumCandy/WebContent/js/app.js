@@ -52,10 +52,9 @@ function setBrandedSubmition() {
     var url = getBrandedUrl();
     var brand = getBrand();
     
-    if ( ! emptyUserInput(url) && !  emptyUserInput(brand) ) {
-      alert("good!");
-    } else {
-      alert("bad!");
+    if ( ! emptyUserInput(url) && ! emptyUserInput(brand) ) {
+      // AJAX Call
+      insertBrandedUriInDOM(/* brandedObj */); // Call inside 'success' function
     }
     
     e.preventDefault(); //stop form submission
@@ -311,6 +310,30 @@ function insertLatestShortenedUriInDOM(shortenedUri) {
   // animation when shown! :-)
   $( '#shorten-block' ).hide();
   $( '#shorten-block' ).slideDown();
+}
+
+/*
+ * Inserts the HTML of the given brandedUri object, inside
+ * the latest shortened URL block.
+ */
+function insertBrandedUriInDOM() {
+  var branded = $(  '<div class="shorten-url-elem">' +
+                      '<div class="img-block">' +
+                        '<img src="/img/href.png">' +
+                      '</div>' +
+                      '<div class="details-block">' +
+                        '<div class="shortened-url">' +
+                          'http://localhost:8080/briiiiiiiiiiiiibriiiiiiiiiiiii' +
+                        '</div>' +
+                        '<div class="target-url"><a target="_blank" href="">jsdasdsad</a>' +
+                        '</div>' +
+                      '</div>' +
+                    '</div>' );
+  
+  $( '#branded-block' ).html( branded );
+  // animation when shown! :-)
+  $( '#branded-block' ).hide();
+  $( '#branded-block' ).slideDown();
 }
 
 /*
