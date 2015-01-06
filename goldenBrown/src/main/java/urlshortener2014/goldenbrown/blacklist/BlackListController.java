@@ -2,6 +2,7 @@ package urlshortener2014.goldenbrown.blacklist;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
 
 @RestController
 @RequestMapping("/blacklist")
@@ -45,8 +48,16 @@ public class BlackListController {
 	 */
 	@RequestMapping(value = "/onredirectto", method = RequestMethod.GET)
 	public ResponseEntity<?> onRedirectTo(@RequestParam("url") String urlString,
-			@DateTimeFormat(pattern="dd-MM-yyyy") Date date, @RequestParam("safe") boolean safe) {
+			@RequestParam("date") String dateString, @RequestParam("safe") boolean safe) {
 		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date date = null;
+		try{
+			date = sdf.parse(dateString);
+		}
+		catch (java.text.ParseException e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		if(oldLink(date)){
 			// Then ask again to the blacklist service
 			return askBlackListService(urlString);

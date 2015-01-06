@@ -65,13 +65,14 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     		
     		RestTemplate restTemplate = new RestTemplate();
     		ResponseEntity<PlatformIdentity> respPlatform, respBlackList;
-    		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    		String dateString = sdf.format(l.getCreated());
     		try{
     			respBlackList = restTemplate.getForEntity(
     					BLACKLIST_ONREDIRECTTO_URI,
 						null,
 						l.getTarget(),
-						sdf.format(l.getCreated()),
+						dateString,
 						l.getSafe());
     			
     			// If link has been classified as not-spam recently
@@ -88,7 +89,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				}
 				// If BlackList validation fails (link is spam), then either "else" block is
 				// executed or an exception is thrown. Therefore, if blacklist validation
-				// fails, no link is returned
+				// fails, no link is returned. Otherwise, continue with platform identifier
 				
 				respPlatform = restTemplate.getForEntity(
 	    						PLATFORMIDENTIFIER_URI,
