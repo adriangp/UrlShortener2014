@@ -13,6 +13,8 @@ The color medium candy apple red, applied with a metallic sheen, is popular amon
 
 # Funcionalidades implementadas
 
+A continuación, se dará una descripción de cada una de las funcionalidades que se han implementado en este proyecto.
+
 ## Servicio que almacena URLs alcanzables
 
 Se ha implementado un Servicio que se encarga de comprobar que una URL es alcanzable previamente a ser acortada y almacenada en el sistema. Tal y como se acordó, el Servicio implementado se corresponde con el **Tipo 2 de implementación**.
