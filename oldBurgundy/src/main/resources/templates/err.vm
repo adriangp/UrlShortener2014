@@ -2,8 +2,15 @@
 <html>	
 	<head>
 		<title>URL Shortener - OldBurgundy</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+		
+		<link rel="stylesheet" href="http://localhost:8080/css/style.css">
 	</head>
 	<body>
-		<div>There was an unexpected error (type=$error, status=$status).</div>
+		<div id="banner"></div>
+		<div class="jumbotron">
+			<p>There was an unexpected error (type=$error, status=$status).</p>
+		</div>
 	</body>
 </html>

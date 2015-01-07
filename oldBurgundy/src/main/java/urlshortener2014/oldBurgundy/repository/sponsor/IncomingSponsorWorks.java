@@ -20,7 +20,7 @@ public class IncomingSponsorWorks {
 	/**
 	 * Add new sponsor work
 	 * @param work The new work
-	 * @return 	<b>true</b> if the work was added <br/>
+	 * @return 	<b>true</b> if the work was added <br>
 	 * 			<b>false</b> if not
 	 */
 	protected synchronized boolean add(SponsorWork work){

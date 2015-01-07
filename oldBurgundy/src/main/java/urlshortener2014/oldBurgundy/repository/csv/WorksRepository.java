@@ -19,7 +19,7 @@ public class WorksRepository {
 	/**
 	 * Add new incoming work
 	 * @param work The work to add
-	 * @return 	<b>true</b> if the work was added <br/>
+	 * @return 	<b>true</b> if the work was added <br>
 	 * 			<b>false</b> if not
 	 */
 	public boolean addIncomingWork(Work work){

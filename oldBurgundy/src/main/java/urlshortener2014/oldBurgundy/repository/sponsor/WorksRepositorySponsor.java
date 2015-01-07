@@ -21,7 +21,7 @@ public class WorksRepositorySponsor {
 	/**
 	 * Add new url petition
 	 * @param work The work of the petiton
-	 * @return 	<b>true</b> if the work was added <br/>
+	 * @return 	<b>true</b> if the work was added <br>
 	 * 			<b>false</b> if not
 	 */
 	public boolean addIncomingWork(SponsorWork work){
