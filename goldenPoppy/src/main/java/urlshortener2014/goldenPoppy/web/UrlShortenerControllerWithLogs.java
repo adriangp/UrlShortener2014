@@ -46,6 +46,7 @@ import urlshortener2014.goldenPoppy.isAlive.Response;
 import urlshortener2014.goldenPoppy.isAlive.URL;
 import urlshortener2014.goldenPoppy.massiveLoad.Content;
 import urlshortener2014.goldenPoppy.massiveLoad.Load;
+import urlshortener2014.goldenPoppy.massiveLoad.Load;
 import urlshortener2014.goldenPoppy.massiveLoad.Status;
 
 @RestController
@@ -234,10 +235,10 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	 */
 	@MessageMapping("/massiveloadws")
 	@SendToUser("/topic/massiveloadws")
-	public Status massiveloadws(double progress, String status, String url){
+	public ResponseEntity<Status> massiveloadws(double progress, String status, String url){
 		// TODO: Esto deberia informar al usuario del progreso de la carga pero
 		// no funciona bien.
-		return new Status(progress, status, url);
+		return new ResponseEntity<>(new Status(progress, status, url),HttpStatus.OK);
 	}
 	
 	/**
@@ -277,7 +278,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		try{
 			fileWriter = new FileWriter("tmp/files/"+hash);
 			for (Content c : shorts){
-				fileWriter.write(c.getURL() + ", " + c.getSponsor());
+				fileWriter.write(c.getURL() + ", " + c.getSponsor() + "\n");
 			}			
 		} catch (Exception e) {
 			e.printStackTrace();
