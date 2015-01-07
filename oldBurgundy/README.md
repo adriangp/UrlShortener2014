@@ -13,10 +13,10 @@ The color old burgundy is a dark tone of burgundy. The first recorded use of old
 # Features implemented
 
 * Rest Validator Services (100%)
-	This services have two rest endpoints:
+	** This services have two rest endpoints:
 	https://github.com/pablooli/UrlShortener2014/blob/master/oldBurgundy/src/main/java/urlshortener2014/oldBurgundy/web/rest/validator/ValidatorWebService.java .
 	The first its for client calls  "/validator"
-		This endpoint evaluates accessibility of url taken to parameter (Post)
+		- This endpoint evaluates accessibility of url taken to parameter (Post)
 		If skip an error return HttpStatus.{error.name}.value.
 		If skip ok return HttpStatus.OK.
 		Only evaluate http and https urls.
