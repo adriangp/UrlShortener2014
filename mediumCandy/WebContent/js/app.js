@@ -405,16 +405,18 @@ function downloadFile(fileName) {
 
 function showStats(url) {
   $.ajax({
-    url : SERVICE_URI + "linkstats?url=" + url,
+    url : SERVICE_URI + "mediumcandy/linkstats?url=" + url,
 	contentType : 'application/json',
 	type : 'GET',
 	success : function (response)
 	{
+      console.log("exito");
       var statsObj = response[0];
       insertStatsInDOM(statsObj);
       clearStatsInput();
 	},
 	error: function (error) {
+      console.log("Oops! Error: " + error);
       showAlert(ALERT_STATS);
       selectStatsInput();
 	}
@@ -428,7 +430,7 @@ function shortenURL(url) {
   $.ajax({
     type : 'POST',
 	contentType : 'application/json',
-	url : SERVICE_URI + "link?url=" + url,
+	url : SERVICE_URI + "mediumcandy/linkreachable?url=" + url,
 	dataType : "json",
 	success : function(response) {
       // update DOM with response data
@@ -456,7 +458,7 @@ function brandedURL(url, brand) {
   $.ajax({
     type : 'POST',
 	contentType : 'application/json',
-	url : SERVICE_URI + "linkcustomized?url=" + url + "&brand=" + brand,
+	url : SERVICE_URI + "mediumcandy/linkcustomized?url=" + url + "&brand=" + brand,
 	dataType : "json",
 	success : function(response) {
       var brandedObj = response;

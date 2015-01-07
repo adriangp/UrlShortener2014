@@ -53,14 +53,14 @@ public class MediumCandyController {
 	 * Return stats a given URL.
 	 */
 	@RequestMapping(value = "/mediumcandy/linkstats", method = RequestMethod.GET)
-	public ResponseEntity<List<ClickStats>> getLinkStats(@RequestParam("url") String url){
-		List<ClickStats> listResult = new ArrayList<ClickStats>();
-		
+	public ResponseEntity<List<ClickStats>> getLinkStats(@RequestParam("url") String url){		
 		String restURI = linkTo(methodOn(UrlShortenerControllerWithLogs.class).
 				getLinkStats(url)).toString();
 		RestTemplate restTemplate = new RestTemplate();
-		listResult = restTemplate.getForObject(restURI,List.class);
-		if(listResult.size()!=0){
+		@SuppressWarnings("unchecked")
+		List<ClickStats> listResult = restTemplate.getForObject(restURI,List.class);
+		
+		if( !listResult.isEmpty() ){
 			return new ResponseEntity<>(listResult, HttpStatus.OK);
 			
 		}else{
