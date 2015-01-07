@@ -6,41 +6,41 @@ The color medium candy apple red, applied with a metallic sheen, is popular amon
 
 # Team Members
 
-* Carlos Mart√≠nez Castillero (leader)
-* Daniel Garc√≠a Paez
+* Carlos MartÌnez Castillero (leader)
+* Daniel GarcÌa Paez
 * Alberto Berbel Aznar
-* Guillermo Ginestra D√≠az
+* Guillermo Ginestra DÌaz
 
 # Funcionalidades implementadas
 
-A continuaci√≥n, se dar√° una descripci√≥n de cada una de las funcionalidades que se han implementado en este proyecto.
+A continuaciÛn, se dar· una descripciÛn de cada una de las funcionalidades que se han implementado en este proyecto.
 
 ## Servicio que almacena URLs alcanzables
 
-Se ha implementado un Servicio que se encarga de comprobar que una URL es alcanzable previamente a ser acortada y almacenada en el sistema. Tal y como se acord√≥, el Servicio implementado se corresponde con el **Tipo 2 de implementaci√≥n**.
+Se ha implementado un Servicio que se encarga de comprobar que una URL es alcanzable previamente a ser acortada y almacenada en el sistema. Tal y como se acordÛ, el Servicio implementado se corresponde con el **Tipo 2 de implementaciÛn**.
 
-El servicio principal que se encarga de responder a las peticiones se encuentra en el `MediumCandyController` y es accesible a trav√©s de la uri mostrada a continuaci√≥n (siendo el par√°metro `url` la URL que se desea acortar): 
+El servicio principal que se encarga de responder a las peticiones se encuentra en el `MediumCandyController` y es accesible a travÈs de la uri mostrada a continuaciÛn (siendo el par·metro `url` la URL que se desea acortar): 
 
 - `http://URI_DEL_SERVIDOR/mediumcandy/linkreachable?url=URL` 
 
-El servicio responder√° con: 
+El servicio responder· con: 
 
 - `CREATED (201)` en el caso de que la URL proporcionada sea alcanzable (y correctamente formada, por supuesto).
 - `BAD REQUEST (400)` en el caso de que la URL que se desea acortar no sea alcanzable (o en su defecto, no se trate de una URL correctamente formada).
  
-La funcionalidad m√°s importante se encuentra implementada en el `UrlShortenerControllerWithLogs`, Servicio al que accede el `MediumCandyController` para poder dar respuesta a todas las peticiones que le llegan en `/mediumcandy/linkreachable`. Cabe destacar la funci√≥n `private static boolean ping(String urlIn)` que determina si `urlIn` es una URL alcanzable. Aspectos destacables acerca de su implementaci√≥n son:
+La funcionalidad m·s importante se encuentra implementada en el `UrlShortenerControllerWithLogs`, Servicio al que accede el `MediumCandyController` para poder dar respuesta a todas las peticiones que le llegan en `/mediumcandy/linkreachable`. Cabe destacar la funciÛn `private static boolean ping(String urlIn)` que determina si `urlIn` es una URL alcanzable. Aspectos destacables acerca de su implementaciÛn son:
 
-- La utilizaci√≥n de la clase `HttpURLConnection` que permite realizar peticiones *http*.
-- La existencia de un *timeout* de varios segundos, tras el cual si no hemos recibido respuesta tras realizar una petici√≥n cierra la conexi√≥n y determina que la URL dada no es alzanzable.
-- En el caso de obtener respuesta accedemos a sus cabeceras *http* y comprobamos que el c√≥digo recibido es v√°lido y se trata por tanto de de una URL alcanzable.
+- La utilizaciÛn de la clase `HttpURLConnection` que permite realizar peticiones *http*.
+- La existencia de un *timeout* de varios segundos, tras el cual si no hemos recibido respuesta tras realizar una peticiÛn cierra la conexiÛn y determina que la URL dada no es alzanzable.
+- En el caso de obtener respuesta accedemos a sus cabeceras *http* y comprobamos que el cÛdigo recibido es v·lido y se trata por tanto de de una URL alcanzable.
 
 
 
 ## Acortamiento masivo de URLs mediante fichero CSV
 
-## Servicio de personalizaci√≥n de URLs acortadas
+## Servicio de personalizaciÛn de URLs acortadas
 
-## Informaci√≥n y estad√≠sticas de URLs
+## InformaciÛn y estadÌsticas de URLs
 
 Funcionalidad que consiste en mostrar estadÌsticias de las URLs almacenadas en la Base de Datos con su URL corta implementado con **nivel tecnolÛgico Tipo 2** como acordamos. 
 
