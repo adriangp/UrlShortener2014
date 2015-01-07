@@ -1,9 +1,32 @@
 eclipse {
-   project {
-      name = "UrlShortener2014.richCarmine"
-   }
+    project {
+        name = "UrlShortener2014.richCarmine"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
-   compile project(":common")
+    compile project(":common")
+    compile("org.springframework.boot:spring-boot-starter-websocket")
+    compile("org.springframework:spring-messaging")
+    compile("org.springframework:spring-web")
+    // Provides java script libraries for static content
+    compile("org.webjars:angular-ui-bootstrap:0.12.0")
+    compile("org.webjars:jquery:2.0.3-1")
+    compile("org.webjars:angularjs:1.3.6")
+    compile("org.webjars:angular-ui-router:0.2.13")
+    compile("org.webjars:sockjs-client:0.3.4")
+    compile("org.webjars:stomp-websocket:2.3.1-1")
+    compile("org.json:json:20140107")
+
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("com.jayway.jsonpath:json-path")
+    testCompile("org.eclipse.jetty:jetty-websocket:8.1.16.v20140903")
 }

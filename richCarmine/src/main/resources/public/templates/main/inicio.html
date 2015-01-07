@@ -1,0 +1,112 @@
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#collapsing">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#/inicio">PistachoShortener</a>
+		</div>
+		<div class="collapse navbar-collapse" id="collapsing">
+			<ul class="nav navbar-nav navbar-left">
+                <li>
+                    <a href="#/massive">Upload CSV</a>
+                </li>
+                <li>
+                    <a href="#/rest/massive" >Upload CSV [REST]</a>
+                </li>
+				<li>
+					<a href="#/acerca">About</a>
+				</li>
+                <li>
+                    <a href="https://github.com/SAReyes/UrlShortener2014">Code</a>
+                </li>
+				<li>
+					<a href="http://www.pistachosoft.com">Back to PistachoSoft!</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<!-- Content -->
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="page-header">
+                <h1>Welcome to PistachoShortener</h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main functionality -->
+    <div clas="row">
+        <div class="col-md-10 col-md-offset-1">
+            <div class="jumbotron">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <!-- Input -->
+                        <form class="form-group" ng-submit="shortenURL()">
+                            <div class="input-group">
+                                <input type="url" class="form-control" placeholder="Place here your long URL" ng-model="longurl" ng-click="longurl = null" required/>
+                                <span class="input-group-btn" ng-show="qrcheck">
+                                    <a class="btn btn-success" ng-click="qrrize()">Get QR</a>
+                                </span>
+                                <span class="input-group-btn" ng-hide="qrcheck">
+                                    <a class="btn btn-default" ng-click="qrrize()">Get QR</a>
+                                </span>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-primary" type="submit">Shorten!</button>
+                                </span>
+                            </div>
+                        </form>
+
+                        <!-- Result -->
+                        <div class="form-group" ng-hide="noresult">
+                            <div class="input-group">
+                                <span class="input-group-addon">Your short URL is: </span>
+                                <input type="url" class="form-control" style="cursor: auto;" ng-model="shorturl" placeholder="pista.cho/hashcode" readonly="readonly">
+                            </div>
+                            <br>
+                            <div ng-show="qrcheck">
+                                <span>
+                                    <img class="img-responsive center-block" height="300" width="300" ng-src="{{qruri}}">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Two more functionalities -->
+    <div class="row" ng-hide="true">
+        <div class="col-md-10 col-md-offset-1">
+            <div class="row">
+                <!-- CSV functionality -->
+                <div class="col-md-8 col-md-offset-2">
+                    <div class="modal-header">
+                        <h3>Submit longURL CSV to get shortURLs!</h3>
+                    </div>
+                    <div class="jumbotron">
+                        <form class="form-group" ng-submit="CSVtoShortURL()">
+                            <div class="input-group">
+                                <!--Browse your CSV&hellip;-->
+                                <input type="file" class="form-control" ng-model="form_csv" required/>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-primary" type="submit">Shorten!</button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer></footer>

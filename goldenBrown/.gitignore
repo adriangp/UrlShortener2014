@@ -1,6 +1,7 @@
-/build/
 /bin/
-/.settings/
 /.classpath
+/.settings/
+/.gradle/
 /.project
+/build/
 /goldenBrown.iml
