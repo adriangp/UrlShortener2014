@@ -3,16 +3,13 @@ package urlshortener2014.richcarmine.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.hash.Hashing;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.hateoas.EntityLinks;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.socket.TextMessage;
@@ -50,9 +47,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     @Autowired
     private ShortURLRepository shortURLRepository;
 
-    @Autowired
-    EntityLinks entityLinks;
-
     public ResponseEntity<?> redirectTo(@PathVariable String id,
                                         HttpServletRequest request) {
         logger.info("Requested redirection with hash " + id);
@@ -67,6 +61,18 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         return super.shortener(url, sponsor, brand, request);
     }
 
+    // ==========================================================================================
+    //                                  QR code module
+    // ==========================================================================================
+
+    /**
+     * Method that receives post petitions for url shortener with QR code.
+     * @param url url to be shortened
+     * @param sponsor not used
+     * @param brand not used
+     * @param request client request containing his IP
+     * @return a response with the requested ShortURL
+     */
     @RequestMapping(value = "/qr", method = RequestMethod.POST)
     public ResponseEntity<ShortURL> QRrize(@RequestParam("url") String url,
                                            @RequestParam(value = "sponsor", required = false) String sponsor,
@@ -77,6 +83,12 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         return super.shortener(url, sponsor, brand, request);
     }
 
+    /**
+     * Method that gets a QR code for the given ShortURL hash.
+     * @param id hash of the ShortURL to be embedded in a QR code
+     * @param request client request containing his IP
+     * @return a response with the QR code (image) of the ShortURL
+     */
     @RequestMapping(value = "/qr{id}", method = RequestMethod.GET)
     public ResponseEntity<byte[]> redirectQR(@PathVariable String id,
                                              HttpServletRequest request) {
@@ -85,7 +97,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        //TODO improve this thing
         String uri = linkTo(methodOn(UrlShortenerController.class).redirectTo(id, null)).toUri().toString();
         String url = "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=" + uri + "&choe=UTF-8";
         ResponseEntity<?> re = restTemplate.exchange(
@@ -296,6 +307,15 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         }
     }
 
+    // ==========================================================================================
+    //                                  Geolocation Module
+    // ==========================================================================================
+
+    /**
+     * Method that given an IP address returns the country where it belongs.
+     * @param ip address from where to retrieve country
+     * @return country where the IP belongs
+     */
     private String getLocationByIP(String ip) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -317,6 +337,15 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         return country;
     }
 
+    /**
+     * Method that creates a ShortURL if it's valid, storing client's country too.
+     * @param url url to be shortened
+     * @param sponsor not used
+     * @param brand not used
+     * @param owner not used
+     * @param ip client IP
+     * @return a ShortURL object
+     */
     @Override
     protected ShortURL createAndSaveIfValid(String url, String sponsor,
                                             String brand, String owner, String ip) {
@@ -337,6 +366,12 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
             return null;
         }
     }
+
+    /**
+     * Method that creates a Click if it's valid, storing client's country too.
+     * @param hash requested hash of the ShortURL
+     * @param ip client IP
+     */
     @Override
     protected void createAndSaveClick(String hash, String ip) {
         Click cl = new Click(null, hash, new Date(System.currentTimeMillis()),
