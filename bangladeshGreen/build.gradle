@@ -1,3 +1,18 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'eclipse'
+apply plugin: 'eclipse-wtp'
+
+repositories {
+   mavenCentral()                                               
+}
+
 eclipse {
    project {
       name = "UrlShortener2014.bangladeshGreen"
@@ -6,4 +21,9 @@ eclipse {
 
 dependencies {
    compile project(":common")
+   providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
+   compile 'org.glassfish.jersey.core:jersey-client:2.13'
+   testCompile "org.springframework.boot:spring-boot-starter-test"
+   testCompile "com.jayway.jsonpath:json-path"
+   testCompile 'junit:junit:4.12'
 }
