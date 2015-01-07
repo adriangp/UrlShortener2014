@@ -3,7 +3,6 @@ package urlshortener2014.richcarmine.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.hash.Hashing;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +13,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -21,19 +21,16 @@ import urlshortener2014.common.domain.Click;
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.repository.ShortURLRepository;
 import urlshortener2014.common.web.UrlShortenerController;
-import urlshortener2014.richcarmine.massiveShortenerNaiveWS.CSVContent;
-import urlshortener2014.richcarmine.massiveShortenerREST.ResponseData;
-import urlshortener2014.richcarmine.massiveShortenerREST.ShortURLGenerator;
+import urlshortener2014.richcarmine.domain.csv.CSVContent;
+import urlshortener2014.richcarmine.domain.csv.ResponseData;
+import urlshortener2014.richcarmine.domain.csv.ShortURLGenerator;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -99,6 +96,12 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     // ==========================================================================================
     //                         Serve csv files located on  /csv
     // ==========================================================================================
+
+    /**
+     * method in charge of serving every csv located in /csv
+     * @param fileName
+     * @return
+     */
     @RequestMapping(value = "/csv/{fileName}", produces = "text/csv")
     public FileSystemResource serveCSV(@PathVariable String fileName) {
         logger.info("Requested csv: " + fileName);
@@ -117,6 +120,16 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     // ==========================================================================================
     //                                  Massive shortener REST
     // ==========================================================================================
+
+    /**
+     * This method recives a file by a POST request answering back with a ResponseData that contains
+     * all the shortened urls and its csv file's uri
+     * @param file
+     * @param sponsor
+     * @param brand
+     * @param req
+     * @return
+     */
     @RequestMapping(value = "/rest/csv", method = RequestMethod.POST)
     public ResponseEntity<ResponseData> restCSVShortener(@RequestParam("file") MultipartFile file,
                                                          @RequestParam(value = "sponsor", required = false) String sponsor,
@@ -144,7 +157,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
             /* retrieve everything */
             for (int i = 0; i < order; i++) {
-                logger.info("shortening: " + i);
                 list.add(pool.take().get());
             }
 
@@ -173,9 +185,10 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
             ResponseEntity<ResponseData> re = new ResponseEntity<>(data, HttpStatus.OK);
             logger.info(re.toString());
+            threadPool.shutdown();
             return re;
         } catch (IOException | InterruptedException | ExecutionException e) {
-            logger.info("Smth went wrong");
+            logger.info("Smth went wrong " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -185,55 +198,86 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     //                                  WebSocket? naive approach
     // ==========================================================================================
 
+    /***
+     * Websocket handler, it's used to manage the connection
+     */
     public class MyHandler extends TextWebSocketHandler {
 
+        private HashMap<String, List<CSVContent>> mapList = new HashMap<>();
+        private HashMap<String, String> mapFileName = new HashMap<>();
+        private HashMap<String, AtomicLong> mapOrder = new HashMap<>();
+        private HashMap<String, AtomicBoolean> mapFinished = new HashMap<>();
+        private HashMap<String, Long> mapTimer = new HashMap<>();
         private ObjectMapper mapper = new ObjectMapper();
-        private AtomicLong messageOrder = new AtomicLong(0);
-        private ExecutorService threadPool = Executors.newCachedThreadPool();
-        private CompletionService<CSVContent> pool = new ExecutorCompletionService<>(threadPool);
-        private List<CSVContent> csvContentList = new ArrayList<>();
-        private String fileName = "csv/outputCSV" + UUID.randomUUID().toString() + ".csv";
+        private ExecutorService wsThreadPool = Executors.newCachedThreadPool();
+        private CompletionService<CSVContent> wsPool = new ExecutorCompletionService<>(wsThreadPool);
         private String localAddress = "";
-        AtomicBoolean finished = new AtomicBoolean(false);
         long start = 0;
+
 
         @Override
         public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-            localAddress = session.getHandshakeHeaders().getFirst("host");
+            /* get the host address, used to create the link, and clean */
+            if(localAddress.equals("")) localAddress = session.getHandshakeHeaders().getFirst("host");
+            mapList.put(session.getId(),new ArrayList<>());
+            mapFileName.put(session.getId(),"csv/outputCSV" + UUID.randomUUID().toString() + ".csv");
+            mapFinished.put(session.getId(), new AtomicBoolean(true));
+            mapOrder.put(session.getId(), new AtomicLong(0));
         }
 
         @Override
         protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-            finished.set(message.getPayload().trim().equals("<<EOF>>"));
-            if (!finished.get()) {
+            /* if the message is <<EOF>> start generating the csv */
+            if (!setAndGetBoolean(mapFinished.get(session.getId()), message.getPayload().trim().equals("<<EOF>>"))) {
                 String messageURL = message.getPayload().trim();
-                logger.info("[WS] shorten: " + messageURL);
-                long order = messageOrder.getAndIncrement();
-                if (order == 1) start = System.currentTimeMillis();
-                pool.submit(new CreateCallable(order, messageURL, "", "", "", session.getRemoteAddress().getHostName()));
-                CSVContent content = pool.take().get();
-                synchronized (this) {
-                    csvContentList.add(content);
+                if(!messageURL.equals("")){
+                    /* keep the messages in order */
+                    long order = mapOrder.get(session.getId()).getAndIncrement();
+                    if (order == 1) mapTimer.put(session.getId(), System.currentTimeMillis());
+                    /* use its thread pool */
+                    wsPool.submit(new CreateCallable(order, messageURL, "", "", "", session.getRemoteAddress().getHostName()));
+                    CSVContent content = wsPool.take().get();
+                    synchronized (this) {
+                        mapList.get(session.getId()).add(content);
+                    }
+                    /* answer back */
+                    session.sendMessage(new TextMessage(mapper.writeValueAsString(content)));
                 }
-                session.sendMessage(new TextMessage(mapper.writeValueAsString(content)));
             } else {
-            /* Generating new file */
-                File f = new File(fileName);
+                /* Generating new file */
+                File f = new File(mapFileName.get(session.getId()));
                 if (verifyAndCreate(f)) {
                     PrintWriter writer = new PrintWriter(f);
 
-                    csvContentList.forEach(writer::println);
+                    mapList.get(session.getId()).forEach(writer::println);
 
                     writer.close();
                 }
 
                 /* Respond */
                 ResponseData data = new ResponseData();
-                data.setConsumedTime(System.currentTimeMillis() - start);
-                data.setUri(fileName);
-                data.setCsv(csvContentList);
+                data.setConsumedTime(System.currentTimeMillis() - mapTimer.get(session.getId()));
+                data.setUri(mapFileName.get(session.getId()));
+                data.setCsv(mapList.get(session.getId()));
                 session.sendMessage(new TextMessage(mapper.writeValueAsString(data)));
+                session.close();
             }
+        }
+
+
+        @Override
+        public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+            /* remove everything related to this session */
+            mapList.remove(session.getId());
+            mapFileName.remove(session.getId());
+            mapFinished.remove(session.getId());
+            mapOrder.remove(session.getId());
+            mapTimer.remove(session.getId());
+        }
+
+        private synchronized boolean setAndGetBoolean(AtomicBoolean atomic, boolean bool){
+            atomic.set(bool);
+            return bool;
         }
 
         private synchronized boolean verifyAndCreate(File f) throws IOException {
@@ -264,11 +308,20 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
                 CSVContent content = new CSVContent();
                 content.setOrder(order);
                 content.setUrl(url);
-                content.setShortURL(shortURL.getUri().toString());
+                content.setShortURL(shortURL == null ? null : shortURL.getUri().toString());
                 return content;
             }
         }
 
+        /**
+         * Solves the IllegalStateException caused by linkTo as it depends on the current http context
+         * @param url
+         * @param sponsor
+         * @param brand
+         * @param owner
+         * @param ip
+         * @return
+         */
         public ShortURL nonHTTPCreateAndSaveIfValid(String url, String sponsor,
                                                     String brand, String owner, String ip) {
             UrlValidator urlValidator = new UrlValidator(new String[]{"http",
@@ -286,6 +339,11 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
             }
         }
 
+        /**
+         * Generate the link by the localAddress generated at the first connection
+         * @param id
+         * @return
+         */
         private URI createLink(String id) {
             return URI.create("http://" + localAddress + "/l" + id);
         }
@@ -299,14 +357,14 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         headers.setAccept(acceptableMedia);
         HttpEntity<String> entity = new HttpEntity<>(headers);
         String url = "http://www.telize.com/geoip/" + ip;
+        String country;
+        try {
         ResponseEntity<String> re = restTemplate.exchange(url, HttpMethod.GET,
                 entity, String.class);
         JSONObject json = new JSONObject(re.getBody());
-        String country;
-        try {
             logger.info("country: " + json.getString("country"));
             country = json.getString("country");
-        } catch (JSONException e) {
+        } catch (Exception e) {
             country = null;
         }
         return country;

@@ -1,11 +1,9 @@
-package urlshortener2014.richcarmine.massiveShortenerREST;
-
-import urlshortener2014.richcarmine.massiveShortenerNaiveWS.CSVContent;
+package urlshortener2014.richcarmine.domain.csv;
 
 import java.util.List;
 
 /**
- * Created by SAdrian on 06/01/2015.
+ * response used to answer back on any call
  */
 public class ResponseData {
     private String uri;

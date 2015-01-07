@@ -102,51 +102,56 @@ angular.module('shortener', ['ui.router','ui.bootstrap'])
         $scope.csv_uri = "";
 
         var ws_uri = "ws://" + window.location.host + "/ws/naivews";
-
-        var ws = new WebSocket(ws_uri);
-
-        ws.onmessage = function(event) {
-            data = JSON.parse(event.data);
-            if(data.hasOwnProperty("csv")){
-                $scope.$apply(function(){
-                    $scope.csv_uri = "http://" + window.location.host + "/" + data.uri;
-                });
-                console.log(data);
-            }
-            else{
-                $scope.$apply(function(){
-                    $scope.loaded ++;
-                    $scope.loaded_per = $scope.loaded/$scope.max * 100;
-                    $scope.urls.push(data);
-                });
-            }
-        };
         $scope.showContent = function($fileContent){
             $scope.content = $fileContent;
         };
         $scope.uploadContent = function(){
+            var ws = new WebSocket(ws_uri);
+
+            ws.onmessage = function(event) {
+                data = JSON.parse(event.data);
+                if(data.hasOwnProperty("csv")){
+                    $scope.$apply(function(){
+                        $scope.csv_uri = "http://" + window.location.host + "/" + data.uri;
+                    });
+                    console.log(data);
+                }
+                else{
+                    $scope.$apply(function(){
+                        $scope.loaded ++;
+                        $scope.loaded_per = $scope.loaded/$scope.max * 100;
+                        $scope.urls.push(data);
+                    });
+                }
+            };
+
+
+            $scope.max = 0;
+            $scope.loaded = 0;
+            $scope.loaded_per = 0;
+            $scope.urls = [];
             $scope.hideData = false;
             $scope.lines = $scope.content.split("\n");
             $scope.max = $scope.lines.length;
 
-            $scope.lines.forEach(function(e) {
-                if(e !== ""){
-                    ws.send(e);
-                }
-                else{
-                    $scope.max --;
-                    $scope.loaded_per = $scope.loaded/$scope.max * 100;
-                }
-            });
-            ws.send("<<EOF>>");
+            ws.onopen = function() {
+                $scope.lines.forEach(function(e) {
+                    if(e !== ""){
+                        ws.send(e);
+                    }
+                    else{
+                        $scope.max --;
+                        $scope.loaded_per = $scope.loaded/$scope.max * 100;
+                    }
+                });
+                ws.send("<<EOF>>");
+            }
         };
         $scope.downloadCSV = function(){
-//            window.open($scope.csv_uri,"_blank");
             window.location.assign($scope.csv_uri);
         };
     }])
 
-    // http://uncorkedstudios.com/blog/multipartformdata-file-upload-with-angularjs
     .directive('onReadFile', ['$parse', function ($parse) {
         return {
             restrict: 'A',
