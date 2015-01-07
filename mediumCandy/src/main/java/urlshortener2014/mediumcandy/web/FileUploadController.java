@@ -32,6 +32,11 @@ public class FileUploadController {
 	
 	private byte[] fileBytes = null;
 
+	/**
+	 * Upload file 
+	 * @param fileName
+	 * @param response
+	 */
 	@RequestMapping(value = "/files/{file_name}", method = RequestMethod.GET)
 	public void getFile(@PathVariable("file_name") String fileName,
 						HttpServletResponse response) {
