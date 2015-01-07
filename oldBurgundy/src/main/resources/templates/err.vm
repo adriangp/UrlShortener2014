@@ -1,0 +1,9 @@
+<!DOCTYPE HTML>
+<html>	
+	<head>
+		<title>URL Shortener - OldBurgundy</title>
+	</head>
+	<body>
+		<div>There was an unexpected error (type=$error, status=$status).</div>
+	</body>
+</html>

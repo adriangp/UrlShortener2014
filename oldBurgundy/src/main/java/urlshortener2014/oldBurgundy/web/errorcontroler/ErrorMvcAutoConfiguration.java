@@ -15,6 +15,7 @@ package urlshortener2014.oldBurgundy.web.errorcontroler;
  * limitations under the License.
  */
 
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,8 @@ import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -112,17 +115,17 @@ public class ErrorMvcAutoConfiguration implements EmbeddedServletContainerCustom
 	@Conditional(ErrorTemplateMissingCondition.class)
 	protected static class WhitelabelErrorViewConfiguration {
 
-		private final SpelView defaultErrorView = new SpelView(
-				"<html><body><h1>Whitelabel Error Page</h1>"
-						+ "<p>PUTA</p>"
-						+ "<div id='created'>${timestamp}</div>"
-						+ "<div>There was an unexpected error (type=${error}, status=${status}).</div>"
-						+ "<div>${message}</div></body></html>");
-
 		@Bean(name = "error")
 		@ConditionalOnMissingBean(name = "error")
-		public View defaultErrorView() {
-			return this.defaultErrorView;
+		public static View defaultErrorView() {
+			StringWriter writer = new StringWriter();		
+			VelocityContext context = new VelocityContext();
+			context.put("error", "${error}");
+			context.put("status", "${status}");
+			Velocity.init();
+			Velocity.mergeTemplate("err.vm", "ISO-8859-1", context, writer);
+			SpelView defaultErrorView = new SpelView(writer.toString());
+			return (defaultErrorView);
 		}
 
 		// If the user adds @EnableWebMvc then the bean name view resolver from
