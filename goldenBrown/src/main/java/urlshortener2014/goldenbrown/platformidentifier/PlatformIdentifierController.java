@@ -10,10 +10,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
+/**
+* Class that consist of read the headers User-Agent of the request HTTP and about it,
+* clasify navigator and platform of the click. For that, we use the library UserAgentUtils
+* for fill better information of the request.
+* @author: Jorge,Javi,Gabi
+* @version: 08/01/2015
+*/
 @RestController
 public class PlatformIdentifierController {
-		
+	/**
+	* Main method that gets the request of the user and identifier the navigator and platform
+	* of the user. For this, we use the class PlatformIdentity that abstract the process of
+	* get the information from the User-Agent.
+	* @param us contain the User-Agent
+	* @param request of the user
+	* @return
+	*/
 	@RequestMapping(value = "/platformidentifier", method = RequestMethod.GET)
 	public ResponseEntity<PlatformIdentity> getPlatform(
 			@RequestParam(value = "us", required = true) String us,
