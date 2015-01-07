@@ -1,7 +1,5 @@
 package urlshortener2014.oldBurgundy.web.rest.csv;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,24 +36,25 @@ public class CSVController {
 	public ResponseEntity<?> shortUrlResult(@PathVariable int id, @RequestBody String msg)  {
 		
 		Work work = this.worksRepository.takePendingWork(id);
-		try {
-			try{
-				int status = Integer.parseInt(msg);
-				work.getSession().sendMessage(new TextMessage("error::" + work.getLine() + "::" + HttpStatus.valueOf(status).getReasonPhrase()));
-				logger.info("Work finish url: '" + work.getUrl() + "' error: '" + status + "'");
-			}
-			catch(NumberFormatException e){
-				work.getSession().sendMessage(new TextMessage("shortUrl::" + work.getLine() + "::" + msg));
-				logger.info("Work finish url: '" + work.getUrl() + "' hash: '" + msg + "'");
-			}
-			return new ResponseEntity<>(HttpStatus.OK);
-		} catch (Exception e) {
+		int i = 0;
+		do{
+			i++;
 			try {
-				work.getSession().sendMessage(new TextMessage("error::" + work.getLine() + "::" + HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
-				logger.info("Work finish url: '" + work.getUrl() + "' error: '500'");
-			} catch (IOException e1) {
+				try{
+					int status = Integer.parseInt(msg);
+					work.getSession().sendMessage(new TextMessage("error::" + work.getLine() + "::" + HttpStatus.valueOf(status).getReasonPhrase()));
+					logger.info("Work finish url: '" + work.getUrl() + "' error: '" + status + "'");
+				}
+				catch(NumberFormatException e){
+					work.getSession().sendMessage(new TextMessage("shortUrl::" + work.getLine() + "::" + msg));
+					logger.info("Work finish url: '" + work.getUrl() + "' hash: '" + msg + "'");
+				}
+				return new ResponseEntity<>(HttpStatus.OK);
+			} catch (Exception e) {
+				
 			}
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		}while(i < 3);
+		
+		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

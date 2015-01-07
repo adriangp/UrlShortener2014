@@ -13,7 +13,7 @@
 			<center>
 				<h1><b>Error: $error ($status)</b></h1>
 				<br/>
-				<img src="$img" alt="Smiley face" height="300">
+				<img src="$img" height="300">
 			</center>
 		</div>
 	</body>

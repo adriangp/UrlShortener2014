@@ -30,7 +30,6 @@ function suspension_points(){
 	
 function connect(){
 	var socket;
-	var host = "ws://localhost:8080/sponsor/ws";
 
 	try{
 		var socket = new WebSocket(host);

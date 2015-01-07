@@ -1,11 +1,9 @@
 package urlshortener2014.oldBurgundy.config;
 
 import org.apache.velocity.app.Velocity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -16,12 +14,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
         "urlshortener2014.oldBurgundy.web"
 })
 public class WebAppContext extends WebMvcConfigurerAdapter {
-
-	@Autowired
-    Environment env;
 	
 	public WebAppContext(){		
-		Velocity.init("./src/main/resources/properties/velocity.properties");
+		Velocity.init("./src/main/resources/properties/velocity.properties");		
 	}
 	
 }

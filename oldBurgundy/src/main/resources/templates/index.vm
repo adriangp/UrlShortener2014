@@ -8,6 +8,9 @@
 		<script type="text/javascript" src="webjars/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 		
 		<link rel="stylesheet" href="./css/style.css">
+		<script>
+			var host = "ws://" + "$host" + "/csv/ws";
+		</script>
 		<script type="text/javascript" src="./js/oldBurgundy.js"></script>
 	</head>
 	<body>

@@ -38,8 +38,6 @@ function updateRow(message){
 }
 
 function connect(){
-	var host = "ws://localhost:8080/csv/ws";
-
 	try{
 		var socket = new WebSocket(host);
 

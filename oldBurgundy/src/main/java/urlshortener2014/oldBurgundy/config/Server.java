@@ -15,21 +15,21 @@ public class Server {
 
 	@Bean
     public String hostCore() {
-        return env.getProperty("host.core") == null ? "localhost:8080" : env.getProperty("host.core");
+        return env.getProperty("host.core") == null ? "http://localhost:8080" : env.getProperty("host.core");
     }
 
 	@Bean
     public String hostValidator() {
-        return env.getProperty("host.validator") == null ? "localhost:8080" : env.getProperty("host.validator");
+        return env.getProperty("host.validator") == null ? "http://localhost:8080" : env.getProperty("host.validator");
     }
 
 	@Bean
     public String hostCsv() {
-        return env.getProperty("host.csv") == null ? "localhost:8080" : env.getProperty("host.csv");
+        return env.getProperty("host.csv") == null ? "http://localhost:8080" : env.getProperty("host.csv");
     }
 
 	@Bean
     public String hostSponsor() {
-        return env.getProperty("host.sponsor") == null ? "localhost:8080" : env.getProperty("host.sponsor");
+        return env.getProperty("host.sponsor") == null ? "http://localhost:8080" : env.getProperty("host.sponsor");
     }
 }
