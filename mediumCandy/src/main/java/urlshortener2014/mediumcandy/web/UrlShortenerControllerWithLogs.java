@@ -134,25 +134,25 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http",
 				"https" });
 			ShortURL exists = shortURLRepository.findByKey(brand);
-		if (exists != null) {
-			ShortURL toUpdate = new ShortURL(brand, url, linkTo(
-					methodOn(UrlShortenerController.class).redirectTo(
-							brand, null)).toUri(), exists.getSponsor(), exists.getCreated(), 
-							owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
-			shortURLRepository.update(toUpdate);
-			return toUpdate;
-		} else {
 			if (urlValidator.isValid(url)) {
-				ShortURL su = new ShortURL(brand, url,
-						linkTo(
-								methodOn(UrlShortenerController.class).redirectTo(
-									brand, null)).toUri(), brand, new Date(
-									System.currentTimeMillis()), owner,
-									HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
-				return shortURLRepository.save(su);
+				if (exists != null) {
+					ShortURL toUpdate = new ShortURL(brand, url, linkTo(
+							methodOn(UrlShortenerController.class).redirectTo(
+									brand, null)).toUri(), exists.getSponsor(), exists.getCreated(), 
+									owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
+					shortURLRepository.update(toUpdate);
+					return toUpdate;
+				} else {
+					ShortURL su = new ShortURL(brand, url,
+							linkTo(
+									methodOn(UrlShortenerController.class).redirectTo(
+										brand, null)).toUri(), brand, new Date(
+										System.currentTimeMillis()), owner,
+										HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
+					return shortURLRepository.save(su);
+				}
 			} else {
 				return null;
-			}
-		}
+			}		
 	}
 }
