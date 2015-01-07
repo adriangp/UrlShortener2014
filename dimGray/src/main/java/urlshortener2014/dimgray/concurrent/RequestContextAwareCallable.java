@@ -8,7 +8,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 /**
  * Superclase que soluciona el problema del contexto de los ThreadPool en Spring.
- * @author csamuel	http://stackoverflow.com/questions/1528444/accessing-scoped-proxy-beans-within-threads-of
+ * @author csamuel	
+ * @link http://stackoverflow.com/questions/1528444/accessing-scoped-proxy-beans-within-threads-of
  *
  * @param <V> parámetro genérico que devuelve el método call() de la clase.
  */
