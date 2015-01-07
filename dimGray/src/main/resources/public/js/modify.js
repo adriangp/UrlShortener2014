@@ -6,11 +6,12 @@ $(document).ready(function() {
 				url : "/modify",
 				data : $('#modify').serialize(),
 				success : function() {				
-
+					document.forms['modify'].submit();
 				},
 				error : function() {
-					alert("Incorrect url.");
+					alert("Error al modificar o borrar.");
 				}
+				
 			});
 		
 			

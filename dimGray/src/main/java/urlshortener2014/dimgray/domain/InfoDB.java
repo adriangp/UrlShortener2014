@@ -2,9 +2,13 @@ package urlshortener2014.dimgray.domain;
 
 import java.net.URI;
 import java.sql.Date;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+/**
+	 * Clase para la comunicacion entre javascript y java, que contiene informacion o de un click
+	 * o de una ShortURL, pero no de las dos. 
+	 * @author Ivan Pinos y Paulo Pizarro
+	 *
+*/
 public class InfoDB {
 
 	private String hash;  		
@@ -29,7 +33,7 @@ public class InfoDB {
 	private String urlIp;
 	private Boolean isUrl;
 
-	private static final Logger logger = LoggerFactory.getLogger(InfoDB.class);
+	
 	public InfoDB(String hash, String target, URI uri, String sponsor,
 			Date urlCreated, String owner, Integer mode, Boolean safe, String urlIp,
 			String urlCountry, Boolean isUrl, Boolean isClick) {

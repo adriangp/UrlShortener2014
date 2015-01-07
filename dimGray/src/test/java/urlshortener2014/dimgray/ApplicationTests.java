@@ -46,6 +46,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.repository.fixture.ClickFixture;
+import urlshortener2014.dimgray.domain.InfoDBList;
 import urlshortener2014.dimgray.domain.UrlPair;
 import urlshortener2014.dimgray.domain.UrlPairs;
 import urlshortener2014.dimgray.web.fixture.ShortURLFixture;
@@ -124,6 +125,13 @@ public class ApplicationTests {
          assertNotSame(up.getUrlPairs().get(0).getShortenedUrl(),null); //la primera url es correcta.
          assertEquals(up.getUrlPairs().get(1).getShortenedUrl(),null); //la segunda url es incorrecta.
          
+	}
+	
+	@Test
+	public void testDBService() throws Exception {
+		ResponseEntity<InfoDBList> entity = new TestRestTemplate().getForEntity(
+				"http://localhost:" + this.port+"/showInfo", InfoDBList.class);
+		assertEquals(HttpStatus.OK, entity.getStatusCode());
 	}
 
 }
