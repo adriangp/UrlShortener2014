@@ -85,13 +85,19 @@ public class BlackListControllerTests {
 	
 	
 	@Test
-	public void testDomainNotBlackListedOnShortener() throws Exception {
+	public void test_BlackList_DomainNotBlackListed_200Ok() throws Exception {
 		ResponseEntity<?> entity = performTestRequestOnShortener(urlNotBlackListed);
 		assertEquals(HttpStatus.OK, entity.getStatusCode());
 	}
+
+	@Test
+	public void test_BlackList_DomainBlackListed_423Locked() throws Exception {
+		ResponseEntity<?> entity = performTestRequestOnShortener(urlBlackListed);
+		assertEquals(HttpStatus.LOCKED,entity.getStatusCode());
+	}
 	
 	@Test
-	public void testDomainOnRedirect() throws Exception {
+	public void test_BlackList_DomainOnRedirect_200OkAND423Locked() throws Exception {
 		final long hoursInMillis = 60L * 60L * 1000L;
 		Date now = new Date();
 		Date before = new Date(now.getTime() + 
@@ -123,15 +129,8 @@ public class BlackListControllerTests {
 		assertEquals(HttpStatus.LOCKED, entity.getStatusCode());
 	}
 	
-
 	@Test
-	public void testDomainBlackListedOnShortener() throws Exception {
-		ResponseEntity<?> entity = performTestRequestOnShortener(urlBlackListed);
-		assertEquals(HttpStatus.LOCKED,entity.getStatusCode());
-	}
-	
-	@Test
-	public void testCache() throws Exception {
+	public void test_BlackList_CheckCacheAfterPetition_ContainsData() throws Exception {
 		blackListService.isBlackListed(urlNotBlackListed);
 		ValueWrapper check_wrap = cacheManager.getCache("blcache").get(urlNotBlackListed);
 		assertTrue(check_wrap != null);
