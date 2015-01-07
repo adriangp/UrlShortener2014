@@ -51,4 +51,4 @@ Otherwise, if the URL was checked more than two hours ago, then the DNS query is
 Relevant libraries used:
 * java.util.concurrent.ExecutorService;
 
-### Publicity interstice (Not implemented)
+### Interstitial Ad (Not implemented)
