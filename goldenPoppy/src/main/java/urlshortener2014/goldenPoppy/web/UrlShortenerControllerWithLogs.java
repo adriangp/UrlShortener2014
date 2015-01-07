@@ -92,7 +92,12 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand,
 			HttpServletRequest request) {
-		logger.info("Requested new short for uri "+url);
+		if(sponsor == null){
+			logger.info("Requested new short for uri "+url);
+		}else{
+			logger.info("Requested sponsor "+sponsor+" for uri "+url);
+		}
+		
 		return super.shortener(url, sponsor, brand, request);
 	}
 	
