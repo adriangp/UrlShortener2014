@@ -24,7 +24,7 @@ dependencies {
     compile("org.webjars:angular-ui-router:0.2.13")
     compile("org.webjars:sockjs-client:0.3.4")
     compile("org.webjars:stomp-websocket:2.3.1-1")
-    compile("org.json:json:20141113")
+    compile("org.json:json:20140107")
 
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("com.jayway.jsonpath:json-path")

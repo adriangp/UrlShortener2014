@@ -12,6 +12,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.socket.TextMessage;
@@ -303,14 +304,14 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         headers.setAccept(acceptableMedia);
         HttpEntity<String> entity = new HttpEntity<>(headers);
         String url = "http://www.telize.com/geoip/" + ip;
-        ResponseEntity<String> re = restTemplate.exchange(url, HttpMethod.GET,
-                entity, String.class);
-        JSONObject json = new JSONObject(re.getBody());
         String country;
         try {
+            ResponseEntity<String> re = restTemplate.exchange(url, HttpMethod.GET,
+                    entity, String.class);
+            JSONObject json = new JSONObject(re.getBody());
             logger.info("country: " + json.getString("country"));
             country = json.getString("country");
-        } catch (JSONException e) {
+        } catch (Exception e) {
             country = null;
         }
         return country;
