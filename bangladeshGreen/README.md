@@ -4,6 +4,7 @@ Miembros del equipo BangladeshGreen:
 	Roberto Gotor
 
 Funcionalidades:
+
 	1. Servicio que dado las cabeceras HTTP de una redirección es capaz de identificar desde qué navegador se hace la petición (Explorer, Chrome, etc.) y desde qué plataforma (Windows, OSX, Linux). -> Tipo 1 
 	IMPLEMENTADA 
 		-Se hace uso de la cabecera “User-Agent” disponible en las peticiones HTTP al redirigir la URL acortada.
@@ -29,6 +30,7 @@ Enlace al javadoc del proyecto que contiene las especificaciones de la clase Url
 	
 	
 Test de las funcionalidades:
+
 	1.  -Ejecutar el proyecto BangladeshGreen con 'gradle run', una vez este en funcionamiento el servicio, se podrá hacer uso de las direcciones creadas con el mismo, al acceder a una de ellas, se redirige a la URL correspondiente, las cabeceras serán guardadas en la base de datos, para comprobarlo basta con mirar la terminal donde se ha ejecutado el proyecto, dado que se muestra dicha información.
 		-Ejecutar con junit y comprobar en el log que se han cogido las cabeceras correctas
 
