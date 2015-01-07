@@ -70,6 +70,7 @@ public class ApplicationTests {
     /**
      * Set up a MockMVC of this application.
      */
+    @Before
     public void setUp() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.ctx).build();
     }
@@ -82,7 +83,7 @@ public class ApplicationTests {
         writer.println("smth random");
         writer.close();
     }
-
+    
     @Test
     public void testHome() throws Exception {
         ResponseEntity<String> entity = new TestRestTemplate().getForEntity(
