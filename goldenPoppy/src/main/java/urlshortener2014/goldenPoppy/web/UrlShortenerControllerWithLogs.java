@@ -286,15 +286,10 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			for (Content c : shorts){
 				fileWriter.write(c.getURL() + ", " + c.getSponsor() + "\n");
 			}			
-		} catch (Exception e) {
+		} catch (FileNotFoundException e) {
+			logger.info("Massive load: File not exists.");
+		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if (null != fileWriter)
-					fileWriter.close();
-			} catch (Exception e2) {
-				e2.printStackTrace();
-			}
 		}
 	}
 
