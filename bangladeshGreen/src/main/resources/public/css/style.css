@@ -103,7 +103,8 @@ header {
 	display: block;
 	background: url(../images/logo.png) no-repeat;
 	width: 920px;
-	height: 86px; fixed;
+	height: 86px; 
+	fixed;
 	text-indent: -9999px
 }
 

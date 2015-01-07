@@ -149,7 +149,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		PrintWriter f = new PrintWriter(fichero);
 		String linea = "";
 		while ((linea = reader.readLine()) != null) {
-			System.out.println(linea);
 			String[] listaURL = linea.split(",");
 			for (String url : listaURL)
 				f.write(url + ",");
@@ -186,7 +185,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		while ((linea = br.readLine()) != null) {
 			String[] listaURL = linea.split(",");
 			for (String url : listaURL) {
-				System.out.println("Url " + url);
 				if (!url.equals(null) || !url.equals("")) {
 					ResponseEntity<ShortURL> urlAcortada = shortener(url, null,
 							null, request);
