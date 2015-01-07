@@ -28,4 +28,5 @@ dependencies {
 
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("com.jayway.jsonpath:json-path")
+    testCompile("org.eclipse.jetty:jetty-websocket:8.1.16.v20140903")
 }

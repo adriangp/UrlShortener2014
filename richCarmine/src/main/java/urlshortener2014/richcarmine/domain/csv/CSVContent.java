@@ -1,9 +1,7 @@
-package urlshortener2014.richcarmine.massiveShortenerNaiveWS;
-
-import urlshortener2014.common.domain.ShortURL;
+package urlshortener2014.richcarmine.domain.csv;
 
 /**
- * Created by SAdrian on 05/01/2015.
+ * each csv row content
  */
 public class CSVContent implements Comparable<CSVContent>{
 

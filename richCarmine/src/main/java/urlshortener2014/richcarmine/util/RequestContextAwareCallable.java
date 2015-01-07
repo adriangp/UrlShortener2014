@@ -1,4 +1,4 @@
-package urlshortener2014.richcarmine.massiveShortenerREST;
+package urlshortener2014.richcarmine.util;
 
 import java.util.concurrent.Callable;
 

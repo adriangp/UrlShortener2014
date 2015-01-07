@@ -1,16 +1,16 @@
-package urlshortener2014.richcarmine.massiveShortenerREST;
+package urlshortener2014.richcarmine.domain.csv;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import urlshortener2014.common.domain.ShortURL;
-import urlshortener2014.richcarmine.massiveShortenerNaiveWS.CSVContent;
+import urlshortener2014.richcarmine.domain.csv.CSVContent;
+import urlshortener2014.richcarmine.util.RequestContextAwareCallable;
 import urlshortener2014.richcarmine.web.UrlShortenerControllerWithLogs;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.concurrent.Callable;
 
 /**
- * Created by SAdrian on 05/01/2015.
+ * Callable used to generate a CSVContent from its attributes
  */
 public class ShortURLGenerator extends RequestContextAwareCallable<CSVContent> {
 
