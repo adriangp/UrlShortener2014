@@ -7,6 +7,7 @@ import static org.junit.Assert.assertSame;
 import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.HSQL;
 import static urlshortener2014.common.repository.fixture.ShortURLFixture.badUrl;
 import static urlshortener2014.common.repository.fixture.ShortURLFixture.url1;
+import static urlshortener2014.common.repository.fixture.ShortURLFixture.url1modified;
 import static urlshortener2014.common.repository.fixture.ShortURLFixture.url2;
 import static urlshortener2014.common.repository.fixture.ShortURLFixture.url3;
 import static urlshortener2014.common.repository.fixture.ShortURLFixture.urlSponsor;
@@ -110,6 +111,25 @@ public class ShortURLRepositoryTests {
 		assertEquals(sul.size(), 0);
 	}
 	
+	@Test
+	public void thatDeleteDelete() {
+		repository.save(url1());
+		repository.save(url2());
+		repository.delete(url1().getHash());
+		assertEquals(repository.count().intValue(), 1);
+		repository.delete(url2().getHash());
+		assertEquals(repository.count().intValue(), 0);
+	}
+
+	@Test
+	public void thatUpdateUpdate() {
+		repository.save(url1());
+		ShortURL su = repository.findByKey(url1().getHash());
+		assertEquals(su.getTarget(), "http://www.unizar.es/");
+		repository.update(url1modified());
+		su = repository.findByKey(url1().getHash());
+		assertEquals(su.getTarget(), "http://www.unizar.org/");
+	}
 	
 	@After
 	public void shutdown() {

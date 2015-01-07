@@ -91,7 +91,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	public void update(ShortURL su) {
 		try {
 			jdbc.update(
-					"update click set target=?, sponsor=?, created=?, owner=?, mode=?, safe=?, ip=?, country=? where hash=?",
+					"update shorturl set target=?, sponsor=?, created=?, owner=?, mode=?, safe=?, ip=?, country=? where hash=?",
 					su.getTarget(), su.getSponsor(), su.getCreated(),
 					su.getOwner(), su.getMode(), su.getSafe(), su.getIP(),
 					su.getCountry(), su.getHash());
@@ -103,7 +103,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	@Override
 	public void delete(String hash) {
 		try {
-			jdbc.update("delete from click shorturl hash=?", hash);
+			jdbc.update("delete from shorturl where hash=?", hash);
 		} catch (Exception e) {
 			log.debug("When delete for hash " + hash, e);
 		}

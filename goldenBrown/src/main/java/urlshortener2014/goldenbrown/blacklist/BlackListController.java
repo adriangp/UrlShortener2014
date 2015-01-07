@@ -1,6 +1,7 @@
 package urlshortener2014.goldenbrown.blacklist;
 
 import java.net.MalformedURLException;
+
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,6 +20,13 @@ import org.slf4j.LoggerFactory;
 
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
 
+/**
+ * Class that provides a web service  that use third parties BD for prove the IP of the 
+ * URL to shortener. This option is rebuilt from a PHP program. Also, we use a cache for 
+ * avoid bomb the service if the IP's are know.
+ * @author: Jorge,Javi,Gabi
+ * @version: 08/01/2015
+ */
 @RestController
 @RequestMapping("/blacklist")
 public class BlackListController {
@@ -29,10 +37,11 @@ public class BlackListController {
 	private static final Logger logger = LoggerFactory.getLogger(BlackListController.class);
 	
 	/**
-	 * 
+	 * This method receive an URL and call a private method to prove is the URL is in the blacklsit
+	 * or not
 	 * @param urlString: url introduced manually by the user
 	 * 			It represents an accessible URL
-	 * @return
+	 * @return OK if the url isn't in the blacklist and LOCKED if it is
 	 */
 	@RequestMapping(value = "/onshortener", method = RequestMethod.GET)
 	public ResponseEntity<?> onShortener(@RequestParam("url") String urlString){
@@ -42,9 +51,10 @@ public class BlackListController {
 	
 	
 	/**
-	 * 
+	 * This method ask again to the third databases if that url is in the blacklist.
+	 * A url can be safe and become unsafe, so this method proves that that url dont become unsafe.
 	 * @param urlString: url pointed by some of our links
-	 * @return
+	 * @return OK if the url isn't in the blacklist and LOCKED if it is nad BAD REQUEST if there is any error
 	 */
 	@RequestMapping(value = "/onredirectto", method = RequestMethod.GET)
 	public ResponseEntity<?> onRedirectTo(@RequestParam("url") String urlString,
@@ -72,7 +82,11 @@ public class BlackListController {
 		}
 		
 	}
-	
+	/**
+	 * This method invoke the blackListService if the url is in the blacklist
+	 * @param urlString URL that we prove if it is in the blacklist or not
+	 * @return OK if the url isn't in the blacklist and LOCKED if it is
+	 */
 	private ResponseEntity<?> askBlackListService(String urlString) {
 		URL url = null;
 		String host= "";
@@ -89,17 +103,19 @@ public class BlackListController {
 			catch(Exception e){ }
 		    blacklisted = blackListService.isBlackListed(host);
 		    if (!blacklisted){
+		    	logger.info("\""+urlString + "\" is Not Blacklisted.");
 		    	return new ResponseEntity<>(HttpStatus.OK);
 		    }
 		    else{
+		    	logger.info("\""+urlString + "\" is Blacklisted.");
 		    	return new ResponseEntity<>(HttpStatus.LOCKED);
 		    }
 		}
 		catch(IllegalArgumentException e){
-			System.err.println(e.getMessage());
+			logger.error("Bad Request, cannot check if \""+urlString + "\" is blacklisted.");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} catch (MalformedURLException e) {
-			System.err.println(e.getMessage());
+			logger.error("Url is Malformed, cannot check if \""+urlString + "\" is blacklisted.");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}

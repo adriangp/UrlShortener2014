@@ -29,8 +29,8 @@ import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.web.UrlShortenerController;
 import urlshortener2014.goldenbrown.platformidentifier.PlatformIdentity;
 /**
- * Clase principal del proyecto. En esta clase se controla tanto la creacion de la URL acortado por medio
- * del metodo shortener, como la gestion de la redireccion con el click del usuario.
+ * Main class project. This class control the URLshortener creation by the method shorneted
+ * and the redirection management with the user click
  * @author: Jorge,Javi,Gabi
  * @version: 08/01/2015
  */
@@ -48,11 +48,11 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			"http://localhost:8080/blacklist/onshortener/?url={url}";
 
 	/**
-	 * Metodo que sirve para gestionar todo lo referente al click del usuario sobre la URL acortada.
-	 * En este metodo se realiza la identificacion de la plataforma y navegador del usuario por medio
+	 * Method that managent all refer to user click about the short URL
+	 * In this method realize the identification of the platform and navigator using the User-Agent
 	 * del User-Agent
-	 * @param id de la URL acortada
-	 * @param request objeto utilizado para saber la informacion del usuario por medio de su User-Agent
+	 * @param id id of the short URL
+	 * @param request object used for know the user information using his User-Agent
 	 */
 	@Override
 	@RequestMapping(value = "/l{id}", method = RequestMethod.GET)
@@ -138,8 +138,8 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	}
 
 	/**
-	 * Metodo que sirve para acortar una URL pasada por el usuario, llama al metodo shortener del common
-	 * @param url URL que el usuario quiere acortar
+	 * Method that short a user URL, it call the shortener method of the commonn
+	 * @param url URL that user wants shortener
 	 */
 	@Override
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
@@ -179,21 +179,24 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	}
 	
 	/**
-	 * Este metodo crea un objeto Click con la informacion recogida en el redirectTo para enviarla al
-	 * clikRepository del common y guardar la informacion del click con la informacion del navegador
-	 * y plataforma del usuario que ha pulsado en el click, ademas de la ip, la fecha y el id de la
-	 * url.
-	 * @param hash de la URL acortada que ha sido pulsada
-	 * @param ip del usuario
-	 * @param browser del usuario
-	 * @param platform del usuario
+	 * This method create a Click object with the collection information in the method redirectTo
+	 * for send to the common clickRepository and save the click information with the information 
+	 * of the navigator and platform that press in the click, plus the IP, date and id of the URL.
+	 * @param hash of the short URL that was pressed
+	 * @param ip user ip
+	 * @param browser user browser
+	 * @param platform platform user
 	 */
 	protected void createAndSaveClick(String hash, String ip, String browser, String platform) {
 		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()),
 				null, browser, platform, ip, null);
 		clickRepository.save(cl);
 	}
-	
+	/**
+	 * This method  update the date of a given short URL.
+	 * @param oldsu short URL to update
+	 * @param safe parameter for know is safe or not (is in blacklist)
+	 */
 	protected ShortURL updateShortUrl(ShortURL oldsu, boolean safe) {
 		Date now = new Date(System.currentTimeMillis());
 		ShortURL su = new ShortURL(oldsu.getHash(), oldsu.getTarget(), oldsu.getUri(),

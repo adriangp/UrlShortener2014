@@ -2,10 +2,7 @@ package urlshortener2014.goldenbrown.platformidentifier;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import nl.bitwalker.useragentutils.Browser;//TODO REMOVE
-import nl.bitwalker.useragentutils.OperatingSystem;//TODO REMOVE
 import nl.bitwalker.useragentutils.UserAgent;
-import nl.bitwalker.useragentutils.Version;//TODO REMOVE
 /**
  * Web service that consist of read the headers User-Agent of the request HTTP and about it,
  * clasify navigator and platform of the click. For that, we use the library UserAgentUtils 
