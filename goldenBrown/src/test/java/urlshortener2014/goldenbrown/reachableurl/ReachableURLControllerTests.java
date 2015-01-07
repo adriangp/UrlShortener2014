@@ -73,7 +73,7 @@ public class ReachableURLControllerTests {
 	@Test
 	public void test_ReachableUrl_NotReachableBecauseOfRedirection_404NotFound() throws Exception {
 		ResponseEntity<String> entity = performTestRequest("http://wikipedia.org/wiki/URL_redirection/");
-		assertEquals(HttpStatus.NOT_FOUND, entity.getStatusCode());
+		assertEquals(HttpStatus.TEMPORARY_REDIRECT, entity.getStatusCode());
 	}
 	
 	// NOTE: This test assumess that port 54433 is not being used.
