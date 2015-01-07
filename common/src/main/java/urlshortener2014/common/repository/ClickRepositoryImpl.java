@@ -99,7 +99,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 	public void update(Click cl) {
 		try {
 			jdbc.update(
-					"update click set hash=?, date=?, created=?, referrer=?, browser=?, platform=?, ip=?, country=? where id=?",
+					"update click set hash=?, created=?, referrer=?, browser=?, platform=?, ip=?, country=? where id=?",
 					cl.getHash(), cl.getCreated(), cl.getReferrer(),
 					cl.getBrowser(), cl.getPlatform(), cl.getIp(),
 					cl.getCountry(), cl.getId());
