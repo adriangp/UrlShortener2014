@@ -7,12 +7,16 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import urlshortener2014.goldenbrown.web.UrlShortenerControllerWithLogs;
 
 /**
 * Class that provide a web service that consist of prove if an URL can be reachable using
@@ -25,7 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReachableURLController {
 	//Parameter that calculate the time out of the URL
 	static final int TIME_OUT = 5000;
-	static final boolean DEBUG = true;//TODO:ELIMINATE
+	
+	private static final Logger logger = LoggerFactory.getLogger(ReachableURLController.class);
 	
 	/**
 	* Main Method that prove is an URL (urlString) can be reachable within TIME_OUT time.
@@ -49,46 +54,35 @@ public class ReachableURLController {
 		    huc.setConnectTimeout(TIME_OUT);
 		    huc.connect(); 
 		    code = huc.getResponseCode();
-//TODO:ELIMINATE		    if (DEBUG) { System.out.println("timeout: "+huc.getConnectTimeout()); }
 		    if (code == HttpURLConnection.HTTP_OK){
+		    	logger.info(url + " is Reachable.");
 		    	return new ResponseEntity<>(HttpStatus.OK);
 		    }
 		    else{
+		    	logger.info("\""+url + "\" is Not Reachable.");
 		    	return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		    }
 		}
 		catch(IllegalArgumentException e){
-			System.err.println(e.getMessage());
+			logger.error("Bad Request, cannot check if url is reachable.");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} catch (MalformedURLException e) {
-			System.err.println(e.getMessage());
+			logger.error("Url is Malformed, cannot check if url is reachable.");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} catch(SocketTimeoutException e){
-			System.err.println(e.getMessage());
+			logger.error("Connection Timeout, url is Not Reachable");
 			return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
 		} catch (ConnectException e){
-			System.err.println(e.getMessage());
+			logger.error("Connection Timeout, url is Not Reachable");
 			return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
 		} catch(IOException e){
-			System.err.println(e.getMessage());
+			logger.error("Bad Request, cannot check if url is reachable.");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		finally{
 			if(huc != null){
 				huc.disconnect();
 			}
-		}
-	}
-	//TODO: ELIMINATE METHOD
-	private static String parseURL(String url) throws IllegalArgumentException {
-		if (url != null){
-			if (!url.startsWith("http://") && !url.startsWith("https://")){
-				url = "http://"+url;
-			}
-			return url;
-		}
-		else{
-			throw new IllegalArgumentException("URL cannot be null.");
 		}
 	}
 }
