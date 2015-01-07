@@ -40,7 +40,6 @@ La funcionalidad más importante se encuentra implementada en el `UrlShortenerCo
 
 ## Servicio de personalización de URLs acortadas
 
-## Servicio de personalización de URLs acortadas
 Este servicio permite añadir a la url acortada un texto cualquiera al final de la misma. Ha sido implementado siguiendo las características del **Nivel Tecnológico Tipo 2** como se indicó en la propuesta del proyecto.
 
 El cliente debe realizar una llamada de tipo `POST` al servicio, indicando la `url` a acortar y el texto del `brand` deseado, a través de la url:
