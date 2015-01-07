@@ -6,7 +6,7 @@ import java.util.concurrent.BlockingQueue;
 /**
  * Incoming sponsor works storage
  */
-public class IncomingSponsorWorks {
+class IncomingSponsorWorks {
 
 	private BlockingQueue<SponsorWork> incomingWorks;
 

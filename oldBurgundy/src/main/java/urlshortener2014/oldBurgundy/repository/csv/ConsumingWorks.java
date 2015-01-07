@@ -16,13 +16,16 @@ import urlshortener2014.oldBurgundy.web.rest.validator.Url;
  * Thread to process the works
  */
 public class ConsumingWorks implements Runnable{
+	
+	String hostValidator;
 
 	private static final Logger logger = LoggerFactory.getLogger(ConsumingWorks.class);
 	
 	private WorksRepository worksRepository;
 	
-	public ConsumingWorks(WorksRepository worksRepository){
+	public ConsumingWorks(WorksRepository worksRepository, String hostValidator){
 		this.worksRepository = worksRepository;
+		this.hostValidator = hostValidator;
 	}
 
 	@Override
@@ -37,7 +40,7 @@ public class ConsumingWorks implements Runnable{
 			do{
 				i++;
 				try{
-					ResponseEntity<?> response = (new RestTemplate()).postForEntity("http://localhost:8080/validator/" + work.getId(), new Url(work.getUrl(), work.getSponsor()), null);
+					ResponseEntity<?> response = (new RestTemplate()).postForEntity(hostValidator + "/validator/" + work.getId(), new Url(work.getUrl(), work.getSponsor()), null);
 					if(send = response.getStatusCode().value() == 200){
 						this.worksRepository.addPendingWork(work);
 					}

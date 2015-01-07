@@ -7,7 +7,7 @@ import org.springframework.web.socket.WebSocketSession;
 /**
  * Waiting clients storage
  */
-public class WaitingClients {
+class WaitingClients {
 
 	private HashMap<String, WebSocketSession> waitingClients;
 	

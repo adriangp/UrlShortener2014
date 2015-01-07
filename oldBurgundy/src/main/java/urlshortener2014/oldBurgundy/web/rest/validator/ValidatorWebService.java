@@ -13,6 +13,7 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,12 +24,19 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import urlshortener2014.common.domain.ShortURL;
+import urlshortener2014.oldBurgundy.web.errorcontroler.ErrorMvcAutoConfiguration;
 
 /**
  * Rest controller of the validator web service
  */
 @RestController
 public class ValidatorWebService {
+	
+	@Autowired
+	String hostCore;
+	
+	@Autowired
+	String hostCsv;
 
 	private static final Logger logger = LoggerFactory.getLogger(ValidatorWebService.class);
 
@@ -44,7 +52,7 @@ public class ValidatorWebService {
 		
 		int status = httpRequest(urlParam.getUrl());
 		
-		return new ResponseEntity<>(HttpStatus.valueOf(status));
+		return ErrorMvcAutoConfiguration.responseError(HttpStatus.valueOf(status));
 	}
 
 	/**
@@ -57,8 +65,7 @@ public class ValidatorWebService {
 	@RequestMapping(value = "/validator/{id}", method = RequestMethod.POST)
 	public ResponseEntity<?> validateUrlInternal(@PathVariable int id, @RequestBody Url url)  {
 		
-		logger.info("Server solicitation id: " + id + " - url " + url.getUrl() + " - sponsor " + url.getSponsor()
-				);
+		logger.info("Server solicitation id: " + id + " - url " + url.getUrl() + " - sponsor " + url.getSponsor());
 		
 		new Thread(new HttpRequestThread(id, url.getUrl(), url.getSponsor())).start();
 		
@@ -122,18 +129,18 @@ public class ValidatorWebService {
 			switch(status){
 				case 200:
 					if(sponsor == null){
-						(new RestTemplate()).postForEntity("http://localhost:8080/link/" + this.id + "?url=" + this.url, null, ShortURL.class);
+						(new RestTemplate()).postForEntity(hostCore + "/link/" + this.id + "?url=" + this.url, null, ShortURL.class);
 						break;
 					}
 					else{
 						status = ValidatorWebService.this.httpRequest(sponsor);
 						if(status == 200){
-							(new RestTemplate()).postForEntity("http://localhost:8080/link/" + this.id + "?url=" + this.url + "&sponsor=" + this.sponsor, null, ShortURL.class);
+							(new RestTemplate()).postForEntity(hostCore + "/link/" + this.id + "?url=" + this.url + "&sponsor=" + this.sponsor, null, ShortURL.class);
 							break;
 						}
 					}
 				default:
-					(new RestTemplate()).postForEntity("http://localhost:8080/csv/rest/" + this.id, status, null);
+					(new RestTemplate()).postForEntity(hostCsv + "/csv/rest/" + this.id, status, null);
 			}
 		}
 		
