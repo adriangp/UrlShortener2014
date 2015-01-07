@@ -26,7 +26,14 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import urlshortener2014.common.domain.ShortURL;
-
+/**
+ * 
+ * Class in charge of controling the upload of a CSV file with a list of urls, and treat this file
+ *  in order to generate a new CSV file by creating shortened urls fo the original urls.
+ * 
+ * @author MediumCandy
+ *
+ */
 @Controller
 public class FileUploadController {
 	
