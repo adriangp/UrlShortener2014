@@ -1,45 +1,46 @@
 package urlshortener2014.richcarmine.web;
 
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.hash.Hashing;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.http.*;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.repository.ShortURLRepository;
 import urlshortener2014.common.web.UrlShortenerController;
-import urlshortener2014.richcarmine.massiveShortenerNaiveWS.*;
+import urlshortener2014.richcarmine.massiveShortenerNaiveWS.CSVContent;
 import urlshortener2014.richcarmine.massiveShortenerREST.ResponseData;
 import urlshortener2014.richcarmine.massiveShortenerREST.ShortURLGenerator;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.*;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
@@ -100,7 +101,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     //                         Serve csv files located on  /csv
     // ==========================================================================================
     @RequestMapping(value = "/csv/{fileName}", produces = "text/csv")
-    public FileSystemResource serveCSV(@PathVariable String fileName, HttpServletResponse resp) {
+    public FileSystemResource serveCSV(@PathVariable String fileName) {
         logger.info("Requested csv: " + fileName);
         File f = new File("csv/" + fileName + ".csv");
         if (!f.exists()) {
@@ -117,16 +118,16 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     // ==========================================================================================
     //                                  Massive shortener REST
     // ==========================================================================================
-
     @RequestMapping(value = "/rest/csv", method = RequestMethod.POST)
     public ResponseEntity<ResponseData> restCSVShortener(@RequestParam("file") MultipartFile file,
-                                              @RequestParam(value = "sponsor", required = false) String sponsor,
-                                              @RequestParam(value = "brand", required = false) String brand,
-                                              HttpServletRequest req) {
+                                                         @RequestParam(value = "sponsor", required = false) String sponsor,
+                                                         @RequestParam(value = "brand", required = false) String brand,
+                                                         HttpServletRequest req) {
         ExecutorService threadPool = Executors.newCachedThreadPool();
         CompletionService<CSVContent> pool = new ExecutorCompletionService<>(threadPool);
 
-        logger.info("Massive shortener: " + file.getName() +"|"+ sponsor +"|"+ brand);
+        logger.info("Massive shortener: " + file.getName() + "|" + sponsor + "|" + brand);
+        long start = System.currentTimeMillis();
         try {
             BufferedReader bf = new BufferedReader(new InputStreamReader(file.getInputStream()));
 
@@ -137,13 +138,13 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
             /* Submit everything to the pool */
             while (line != null) {
-                order ++;
-                pool.submit(new ShortURLGenerator(order,line.trim(),sponsor,brand,req,this));
+                order++;
+                pool.submit(new ShortURLGenerator(order, line.trim(), sponsor, brand, req, this));
                 line = bf.readLine();
             }
 
             /* retrieve everything */
-            for(int i = 0; i < order; i++){
+            for (int i = 0; i < order; i++) {
                 logger.info("shortening: " + i);
                 list.add(pool.take().get());
             }
@@ -152,7 +153,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
             Collections.sort(list);
 
             /* Generating new file */
-            String fileName = "csv/outputCSV" + System.currentTimeMillis() + ".csv";
+            String fileName = "csv/outputCSV" + UUID.randomUUID().toString() + ".csv";
 
             logger.info(fileName);
 
@@ -167,13 +168,14 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
             /* Respond */
             ResponseData data = new ResponseData();
+            data.setConsumedTime(System.currentTimeMillis() - start);
             data.setUri(fileName);
             data.setCsv(list);
 
             ResponseEntity<ResponseData> re = new ResponseEntity<>(data, HttpStatus.OK);
             logger.info(re.toString());
             return re;
-        } catch (IOException | InterruptedException |ExecutionException e) {
+        } catch (IOException | InterruptedException | ExecutionException e) {
             logger.info("Smth went wrong");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -186,97 +188,106 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
     public class MyHandler extends TextWebSocketHandler {
 
-        AtomicLong messageOrder = new AtomicLong(0);
-        ExecutorService threadPool = Executors.newCachedThreadPool();
-        CompletionService<CSVContent> pool = new ExecutorCompletionService<>(threadPool);
+        private ObjectMapper mapper = new ObjectMapper();
+        private AtomicLong messageOrder = new AtomicLong(0);
+        private ExecutorService threadPool = Executors.newCachedThreadPool();
+        private CompletionService<CSVContent> pool = new ExecutorCompletionService<>(threadPool);
+        private List<CSVContent> csvContentList = new ArrayList<>();
+        private String fileName = "csv/outputCSV" + UUID.randomUUID().toString() + ".csv";
+        private String localAddress = "";
+        AtomicBoolean finished = new AtomicBoolean(false);
+        long start = 0;
 
-        /* controller reference */
-        @Autowired
-        UrlShortenerControllerWithLogs controller;
+        @Override
+        public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+            localAddress = session.getHandshakeHeaders().getFirst("host");
+        }
 
         @Override
         protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-            logger.info("WS: " + message.getPayload());
-            long order = messageOrder.getAndIncrement();
-            pool.submit(new ShortURLWSGenerator(order,message.getPayload(),"","","",session.getRemoteAddress(),controller));
-            CSVContent content = pool.take().get();
-            session.sendMessage(new TextMessage("Echo Test: " + content.getShortURL().getUri()));
+            finished.set(message.getPayload().trim().equals("<<EOF>>"));
+            if (!finished.get()) {
+                String messageURL = message.getPayload().trim();
+                logger.info("[WS] shorten: " + messageURL);
+                long order = messageOrder.getAndIncrement();
+                if(order == 1) start = System.currentTimeMillis();
+                pool.submit(new CreateCallable(order, messageURL, "", "", "", session.getRemoteAddress().getHostName()));
+                CSVContent content = pool.take().get();
+                synchronized (this) {
+                    csvContentList.add(content);
+                }
+                session.sendMessage(new TextMessage(mapper.writeValueAsString(content)));
+            } else {
+            /* Generating new file */
+                File f = new File(fileName);
+                if (verifyAndCreate(f)) {
+                    PrintWriter writer = new PrintWriter(f);
+
+                    csvContentList.forEach(writer::println);
+
+                    writer.close();
+                }
+
+                /* Respond */
+                ResponseData data = new ResponseData();
+                data.setConsumedTime(System.currentTimeMillis() - start);
+                data.setUri(fileName);
+                data.setCsv(csvContentList);
+                session.sendMessage(new TextMessage(mapper.writeValueAsString(data)));
+            }
         }
-    }
 
-    /* wrap the createAndSaveIfValid function */
-    public class CreateCallable implements Callable<ShortURL>{
-        String url;
-        String sponsor;
-        String brand;
-        String owner;
-        String ip;
-
-        public CreateCallable(String url, String sponsor, String brand, String owner, String ip) {
-            this.url = url;
-            this.sponsor = sponsor;
-            this.brand = brand;
-            this.owner = owner;
-            this.ip = ip;
+        private synchronized boolean verifyAndCreate(File f) throws IOException {
+            return f.createNewFile();
         }
 
-        @Override
-        public ShortURL call() throws Exception {
-            /* explodes while creating the new short url */
-            return createAndSaveIfValid(url,sponsor,brand,owner,ip);
-        }
-    }
-    // ==========================================================================================
-    //                          WebSocket? naive approach with brokers
-    // ==========================================================================================
-    AtomicLong id = new AtomicLong(0);
-    AtomicBoolean finished = new AtomicBoolean(false);
-    List<CSVContent> list = new ArrayList<CSVContent>();
+        /* wrap the createAndSaveIfValid function */
+        public class CreateCallable implements Callable<CSVContent> {
+            long order;
+            String url;
+            String sponsor;
+            String brand;
+            String owner;
+            String ip;
 
-    @MessageMapping("/naivews/shorten")
-    @SendTo("/response/naivews")
-    public OutPutContent shorten(URLInput url) throws Exception {
-        if (!finished.get()) {
-            logger.info("WS: shorten " + url.getUrl() + "|");
-            long order = id.getAndIncrement();
-
-            /* doesn't work */
-            ShortURL shortURL = createAndSaveIfValid(url.getUrl(), "smthrandom", "smthrandom", "smthrandom", "smthrandom");
-            /* shortening simulation */
-//            OutPutContent output = new OutPutContent(url.getUrl() + "/" + order);
-
-            synchronized (this) {
-//                this.list.add(new CSVContent(order, null,null));
+            public CreateCallable(long order, String url, String sponsor, String brand, String owner, String ip) {
+                this.order = order;
+                this.url = url;
+                this.sponsor = sponsor;
+                this.brand = brand;
+                this.owner = owner;
+                this.ip = ip;
             }
 
-            return new OutPutContent(shortURL.getUri().toString());
-        } else {
-            return new OutPutContent("cannot add more content");
+            @Override
+            public CSVContent call() throws Exception {
+                ShortURL shortURL = nonHTTPCreateAndSaveIfValid(url, sponsor, brand, owner, ip);
+                CSVContent content = new CSVContent();
+                content.setOrder(order);
+                content.setUrl(url);
+                content.setShortURL(shortURL.getUri().toString());
+                return content;
+            }
         }
-    }
 
-    @MessageMapping("/naivews/eof")
-    @SendTo("/response/naivews")
-    public synchronized OutPutContent eofFound(EOFInput url) throws Exception {
-        if (!finished.get()) {
-            finished.set(true);
-            String fileName = "csv/outputFile" + System.currentTimeMillis() + ".csv";
+        public ShortURL nonHTTPCreateAndSaveIfValid(String url, String sponsor,
+                                                    String brand, String owner, String ip) {
+            UrlValidator urlValidator = new UrlValidator(new String[]{"http",
+                    "https"});
+            if (urlValidator.isValid(url)) {
+                String id = Hashing.murmur3_32()
+                        .hashString(url, StandardCharsets.UTF_8).toString();
+                ShortURL su = new ShortURL(id, url, createLink(id), sponsor, new java.sql.Date(
+                        System.currentTimeMillis()), owner,
+                        HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
+                return shortURLRepository.save(su);
+            } else {
+                return null;
+            }
+        }
 
-            File f = new File(fileName);
-            f.createNewFile();
-
-            PrintWriter writer = new PrintWriter(f);
-
-            Collections.sort(list);
-
-            final PrintWriter finalWriter = writer;
-            list.forEach(e -> finalWriter.println(e.getShortURL()));
-
-            writer.close();
-
-            return new OutPutContent("received eof order " + fileName);
-        } else {
-            return new OutPutContent("already finished");
+        private URI createLink(String id) {
+            return URI.create("http://" + localAddress + "/l" + id);
         }
     }
 }

@@ -38,7 +38,7 @@ public class ShortURLGenerator extends RequestContextAwareCallable<CSVContent> {
         content.setUrl(url);
 
         if(response.getStatusCode() == HttpStatus.BAD_REQUEST) content.setShortURL(null);
-        else content.setShortURL(response.getBody());
+        else content.setShortURL(response.getBody().getUri().toString());
 
         return content;
     }

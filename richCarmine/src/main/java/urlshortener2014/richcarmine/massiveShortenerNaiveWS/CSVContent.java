@@ -10,7 +10,7 @@ public class CSVContent implements Comparable<CSVContent>{
     private long order;
 
     private String url;
-    private ShortURL shortURL;
+    private String shortURL;
 
     public CSVContent() {
     }
@@ -20,7 +20,7 @@ public class CSVContent implements Comparable<CSVContent>{
         return (int) (order - o.order);
     }
 
-    public ShortURL getShortURL() {
+    public String getShortURL() {
         return shortURL;
     }
 
@@ -40,12 +40,12 @@ public class CSVContent implements Comparable<CSVContent>{
         this.url = url;
     }
 
-    public void setShortURL(ShortURL shortURL) {
+    public void setShortURL(String shortURL) {
         this.shortURL = shortURL;
     }
 
     @Override
     public String toString() {
-        return url + "," + shortURL.getUri();
+        return url + "," + shortURL;
     }
 }

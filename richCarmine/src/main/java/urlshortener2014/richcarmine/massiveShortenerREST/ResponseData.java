@@ -9,9 +9,18 @@ import java.util.List;
  */
 public class ResponseData {
     private String uri;
+    private long consumedTime;
     private List<CSVContent> csv;
 
     public ResponseData() {
+    }
+
+    public long getConsumedTime() {
+        return consumedTime;
+    }
+
+    public void setConsumedTime(long consumedTime) {
+        this.consumedTime = consumedTime;
     }
 
     public String getUri() {
