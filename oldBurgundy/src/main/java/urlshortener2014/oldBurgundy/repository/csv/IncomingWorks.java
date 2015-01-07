@@ -22,7 +22,7 @@ public class IncomingWorks {
 	/**
 	 * Add new work
 	 * @param work The new work
-	 * @return 	<b>true</b> if the work was added <br/>
+	 * @return 	<b>true</b> if the work was added <br>
 	 * 			<b>false</b> if not
 	 */
 	protected synchronized boolean add(Work work){
