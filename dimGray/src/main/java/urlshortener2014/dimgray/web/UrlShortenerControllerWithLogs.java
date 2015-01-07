@@ -16,6 +16,7 @@ import java.util.concurrent.Future;
 import java.util.Properties;
 import java.net.InetAddress;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Date;
 import java.util.Calendar;
 import java.text.ParseException;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
@@ -130,7 +132,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	 * @return Un array de bytes en base64 con la imagen.
 	 */
 	@RequestMapping(value = "/qr", method = RequestMethod.GET)
-	public ResponseEntity<byte[]> qrImage(@RequestParam("type") String url, 
+	public ResponseEntity<byte[]> qrImage(@RequestParam("url") String url, 
 			HttpServletRequest request) {
 		byte[] png = null;
 		
@@ -144,8 +146,12 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return new ResponseEntity<>(png,headers,HttpStatus.CREATED);
 	}
 	
+		
 	/**
 	 * Servicio que devuelve los datos de clicks, usuarios y url de la base de datos
+	 * 
+	 * @param request
+	 * @return Un array que contiene los datos de las dos tablas de la base de datos.
 	 */
 	@RequestMapping(value = "/showInfo", method = RequestMethod.POST)
 	public ResponseEntity<List<InfoDB>> showData(HttpServletRequest request) {
@@ -155,6 +161,8 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		logger.info("Datos de clicks: "+clickRepository.list(limit,offset).size());
 		List<ShortURL> sul = shortURLRepository.list(limit,offset);
 		List<InfoDB> result  = new ArrayList();
+		// Los datos se añaden a una lista de InfoDB. InfoDB es la clase que contiene o un click
+		// o una ShortURL
 		for (int i = 0; i < sul.size(); i++){
 			result.add(new InfoDB(sul.get(i).getHash(),sul.get(i).getTarget(),
 					sul.get(i).getUri(),sul.get(i).getSponsor(),
@@ -174,7 +182,19 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return new ResponseEntity<>(result ,HttpStatus.OK);		
 		
 	}
-	
+	/**
+	 * Metodo que realiza consultas de moficacion o borrado a la base de datos.
+	 * Se le pasa por parametro el tipo de consulta y las variables de donde se obtiene la 
+	 * informacion 
+	 * 
+	 * @param modo Operacion contra la base de datos (DELETE o UPDATE)
+	 * @param key1 Contiene los datos para modificar
+	 * @param key2 Contiene los datos para borrar
+	 * @param clave Campo a modificar en la base de datos
+	 * @param valor Valor a introducir en la base de datos
+	 * @param request
+	 * @return HttpStatus
+	 */
 	@RequestMapping(value = "/modify", method = RequestMethod.GET)
 	public ResponseEntity modify(@RequestParam("modOrDel") String modo,
 			@RequestParam(value = "radMod", required = false) String key1,
@@ -222,9 +242,45 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			}
 		}
 		else {
-			//modificar
+			//modificar - Click tiene bug
 			if (!click){
+				String  url = s.next(), ur = s.next(), sponsor = s.next(),
+						created = s.next(), owner = s.next(), 
+						m = s.next(), sa = s.next(), ip = s.next(), country = s.next();
+				int mode = Integer.parseInt(m);
+				URI uri = null;
+				try {
+					uri = new URI(ur);
+				}
+				catch(URISyntaxException e) {
+					return new ResponseEntity(HttpStatus.BAD_REQUEST);
+				}
+					
+				boolean safe = Boolean.parseBoolean(sa);
+				// Se convierte la fecha
+				logger.info("Borrando click con id: "+id);
 				
+				Date date = shortURLRepository.findByKey(hash).getCreated();	
+
+				if (clave.toUpperCase().equals("SPONSOR")){
+					ShortURL su = new ShortURL(hash, url, uri, valor,
+							date, owner, mode,safe, ip, country);					
+					shortURLRepository.update(su);
+				}else if (clave.toUpperCase().equals("OWNER")){
+					ShortURL su = new ShortURL(hash, url, uri, sponsor,
+							date, valor, mode,safe, ip, country);	
+					shortURLRepository.update(su);
+				}else if (clave.toUpperCase().equals("IP")){
+					ShortURL su = new ShortURL(hash, url, uri, sponsor,
+							date, owner, mode,safe, valor, country);	
+					shortURLRepository.update(su);
+				}else if (clave.toUpperCase().equals("COUNTRY")){
+					ShortURL su = new ShortURL(hash, url, uri, sponsor,
+							date, owner, mode,safe, ip, valor);	
+					shortURLRepository.update(su);
+				}else {
+					return new ResponseEntity(HttpStatus.BAD_REQUEST);	
+				}		
 			}else{
 				hash = s.next();
 				String  created = s.next(), referrer = s.next(),
@@ -236,16 +292,10 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 						Integer.parseInt(created.substring(6,7)),
 						Integer.parseInt(created.substring(9,10)));	
 				// Comprobamos si el campo es adecuado
-					
-				if (clave.toUpperCase().equals("CREATED")){
-					
-				}else if (clave.toUpperCase().equals("REFERRER")){
+				// La fecha no tiene sentido modificarla, pero es campo correcto	
+				if (clave.toUpperCase().equals("REFERRER")){
 					Click cl = new Click(id, hash, date, valor,
-							browser, platform, ip, country);
-					
-					logger.info("id:"+cl.getId()+". hash: "+cl.getHash()+". created: "
-					+cl.getCreated().toString()+"referrer"+cl.getReferrer());
-					
+							browser, platform, ip, country);					
 					clickRepository.update(cl);
 				}else if (clave.toUpperCase().equals("BROWSER")){
 					Click cl = new Click(id, hash, date, referrer,
@@ -264,6 +314,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 							browser, platform, ip, valor);
 					clickRepository.update(cl);
 				}else {
+					// si el campo era incorrecto se informa
 					return new ResponseEntity(HttpStatus.BAD_REQUEST);	
 				}				
 			}

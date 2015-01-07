@@ -1,11 +1,15 @@
 -- ShortURL
 
 CREATE TABLE SHORTURL(
-	HASH		VARCHAR(10) PRIMARY KEY,	-- Key
+	HASH		VARCHAR(30) PRIMARY KEY,	-- Key
 	TARGET		VARCHAR(1024),				-- Original URL
+	SPONSOR		VARCHAR(1024),				-- Sponsor URL
 	CREATED 	TIMESTAMP,					-- Creation date
 	OWNER		VARCHAR(255),				-- User id
-	MODE		INTEGER						-- Redirect mode
+	MODE		INTEGER,					-- Redirect mode
+	SAFE		BOOLEAN,						-- Safe target
+	IP			VARCHAR(20),				-- IP
+	COUNTRY		VARCHAR(50)					-- Country
 );
 
 -- Click
