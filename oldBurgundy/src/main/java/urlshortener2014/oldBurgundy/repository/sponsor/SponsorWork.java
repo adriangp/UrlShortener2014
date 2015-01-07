@@ -1,26 +1,24 @@
 package urlshortener2014.oldBurgundy.repository.sponsor;
 
-import org.springframework.web.socket.WebSocketSession;
-
+/**
+ * URL petition
+ */
 public class SponsorWork {
 	
 	private long stamp;
 	private String url, shortUrl;
-	private int state;
-		
+	private int attempt;
+	
+	/**
+	 * New url petition
+	 * @param url
+	 * @param shortUrl
+	 */
 	public SponsorWork(String url, String shortUrl) {
 		this.url = url;
 		this.shortUrl = shortUrl;
 		this.stamp = System.currentTimeMillis();
-		this.state = 0;
-	}
-	
-	public SponsorWork(String Url, WebSocketSession shortUrl) {
-		this.setUrl(Url);
-	}
-	
-	public SponsorWork(String shortUrl) {
-		this.shortUrl = shortUrl;
+		this.attempt = 0;
 	}
 
 	public String getShortUrl() {
@@ -30,7 +28,6 @@ public class SponsorWork {
 	public void setShortUrl(String shortUrl) {
 		this.shortUrl = shortUrl;
 	}
-
 
 	public String getUrl() {
 		return url;
@@ -48,12 +45,12 @@ public class SponsorWork {
 		this.stamp = stamp;
 	}
 
-	public int getState() {
-		return state;
+	public int getAttempt() {
+		return attempt;
 	}
 
-	public void setState(int state) {
-		this.state = state;
+	public void setAttempt(int attempt) {
+		this.attempt = attempt;
 	}
 
 

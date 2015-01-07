@@ -1,5 +1,8 @@
 package urlshortener2014.oldBurgundy.web.rest.validator;
 
+/**
+ * Object to storage the url and sponsor
+ */
 public class Url {
 	
 	private String url;

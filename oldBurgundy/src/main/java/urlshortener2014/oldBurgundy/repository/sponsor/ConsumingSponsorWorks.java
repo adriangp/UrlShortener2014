@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+/**
+ * Thread to process the short url petitions
+ */
 public class ConsumingSponsorWorks implements Runnable{
 
 	private static final Logger logger = LoggerFactory.getLogger(ConsumingSponsorWorks.class);
@@ -17,50 +20,37 @@ public class ConsumingSponsorWorks implements Runnable{
 
 	@Override
 	public void run() {
+		
 		while(true){
-
-			SponsorWork workBloq = this.worksRepository.takeIncomingWork();
-			logger.info("Requested new short for uri " + workBloq.getUrl() + " shorUrl " + workBloq.getShortUrl());
+			SponsorWork work = this.worksRepository.takeIncomingWork();
 			
-			long tiempo = System.currentTimeMillis() - workBloq.getStamp();
-			if (tiempo < 10000){
-				logger.info("Not current time ");
+			logger.info("Short url petition taked shorUrl: '" + work.getShortUrl() + "' url: '" + work.getUrl() + "'");
+			
+			long time = System.currentTimeMillis() - work.getStamp();
+			if (time < 10000){
+				long waitTime = 10000 - time;
+				logger.info("Waiting " + waitTime + " ms");
 				try {
-					Thread.sleep(10000 - tiempo);
+					Thread.sleep(waitTime);
 				} catch (InterruptedException e1) {
-					e1.printStackTrace();
 				}
 					
 			}
 			
-			WebSocketSession ws = this.worksRepository.takePendingWork(workBloq.getShortUrl());
-			if(ws!=null){
+			WebSocketSession ws = this.worksRepository.takeWaitingClient(work.getShortUrl());
+			if(ws != null){
 				try {
-					logger.info("Send to ws " + workBloq.getUrl());
-					ws.sendMessage(new TextMessage(workBloq.getUrl()));
+					logger.info("Send to client hash: '" + work.getShortUrl() + "' url: '" + work.getUrl() + "'");
+					ws.sendMessage(new TextMessage(work.getUrl()));
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					logger.info("Not valid id ");
 				}
 			}
-			else if(workBloq.getState() < 3)
+			else if(work.getAttempt() < 3)
 			{
-				workBloq.setState(workBloq.getState() + 1);
-				workBloq.setStamp(System.currentTimeMillis());
-				this.worksRepository.addIncomingWork(workBloq);
-			}
-
-			//se redireccionara en breves
-			//take 
-			//syste curent actual resta...tiempo bloquin queue
-			//10 seg - ese tiempo...tiempo bloquin queue
-			//theat.sleep
-			//pasan 10 seg
-			//.get (id) consulta hashmap busca idurlcorta...contador veces metido
-			//null estampillamos tiemp de nuevo contador ++ 
-			//valiable session url larga
-			
+				work.setAttempt(work.getAttempt() + 1);
+				work.setStamp(System.currentTimeMillis());
+				this.worksRepository.addIncomingWork(work);
+			}			
 		}
 	}
-
 }

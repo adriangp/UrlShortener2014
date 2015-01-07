@@ -1,4 +1,4 @@
-package test.java.urlshortener2014.web.rest;
+package urlshortener2014.web.rest;
 
 
 import static org.hamcrest.Matchers.is;
