@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Url is Alive?</title>
+
+	<link rel="stylesheet" type="text/css"
+	href="webjars/bootstrap/3.0.3/css/bootstrap.min.css" />
+
+    <script type="text/javascript" src="webjars/stomp-websocket/2.3.1-1/stomp.js"></script>
+	<script type="text/javascript" src="webjars/sockjs-client/0.3.4-1/sockjs.js"></script>
+    <script type="text/javascript">
+        var stompClient = null;
+
+        function connect() {
+
+            var socket = new SockJS('/isalive');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/user/topic/isalive', function(response){
+                    showResponse(JSON.parse(response.body).status);
+                });
+            });
+        }
+
+        function disconnect() {
+            stompClient.disconnect();
+            console.log("Disconnected");
+        }
+
+        function sendUrl(timeout) {
+		// Borramos resultado anterior
+		var presp = document.getElementById('presp');
+		presp.innerHTML = "";
+            var url = document.getElementById('url').value;
+            stompClient.send("/app/isalive", {}, JSON.stringify({ 'url': url , 'timeout' : timeout}));
+        }
+
+        function showResponse(message) {
+
+            var response = document.getElementById('response');
+			var presp = document.getElementById('presp');
+			if (message == 1){
+				presp.innerHTML = "La url está viva";
+			}
+			else if ( message == -1){
+				presp.innerHTML = "La url NO está viva";
+			}
+			else{ // Es 0 (TIMEOUT)
+				if (confirm("Le está costando responder... ¿Quieres intentarlo con más tiempo?")){
+					var t = prompt("Pon un timeout (segundos)", "10");
+					if (t != null){
+						var num = parseInt(t);
+						if (!isNaN(num)){
+							if (num < 2 || num > 30){
+								alert("Error. 2 < timeout < 30");
+							}
+							else{ // Todo OK
+								var url = document.getElementById('url').value;
+								// volver a enviar la peticion con otro timeout
+								sendUrl(num);
+							}			
+						}
+						else{
+							alert("Error. Debes introducir un número");
+						}		
+					}
+					else{
+						alert("Error. No puedes dejarlo vacío");
+					}
+				}
+			}   
+        }
+    </script>
+</head>
+<body onLoad="connect()" onUnLoad="disconnect()">
+<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being enabled. Please enable
+    Javascript and reload this page!</h2></noscript>
+<div class="jumbotron">
+	<h1>URL is Alive?</h1>
+    <div role="form" id="conversationDiv">
+        <label for="uri">Enter a URL</label><input class="form-control" type="text" id="url" placeholder="Ej. http://www.unizar.es" name="url"/>
+        <button id="sendUrl" class="btn btn-lg btn-primary" onclick="sendUrl(2);">Send</button>
+        <div id="response">
+			<p id="presp"></p>
+		</div>
+		<button id="back" class="btn btn-lg btn-primary" onclick="location.href='index.html'">Back</button>
+    </div>
+</div>
+</body>
+</html>
