@@ -1,9 +1,10 @@
 package urlshortener2014.richcarmine.web;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.hash.Hashing;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +14,10 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import urlshortener2014.common.domain.Click;
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.repository.ShortURLRepository;
 import urlshortener2014.common.web.UrlShortenerController;
@@ -27,10 +26,10 @@ import urlshortener2014.richcarmine.massiveShortenerREST.ResponseData;
 import urlshortener2014.richcarmine.massiveShortenerREST.ShortURLGenerator;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -210,7 +209,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
                 String messageURL = message.getPayload().trim();
                 logger.info("[WS] shorten: " + messageURL);
                 long order = messageOrder.getAndIncrement();
-                if(order == 1) start = System.currentTimeMillis();
+                if (order == 1) start = System.currentTimeMillis();
                 pool.submit(new CreateCallable(order, messageURL, "", "", "", session.getRemoteAddress().getHostName()));
                 CSVContent content = pool.take().get();
                 synchronized (this) {
@@ -279,7 +278,8 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
                         .hashString(url, StandardCharsets.UTF_8).toString();
                 ShortURL su = new ShortURL(id, url, createLink(id), sponsor, new java.sql.Date(
                         System.currentTimeMillis()), owner,
-                        HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
+                        HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
+                        getLocationByIP(ip));
                 return shortURLRepository.save(su);
             } else {
                 return null;
@@ -290,5 +290,52 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
             return URI.create("http://" + localAddress + "/l" + id);
         }
     }
-}
 
+    private String getLocationByIP(String ip) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        ArrayList<MediaType> acceptableMedia = new ArrayList<>();
+        acceptableMedia.add(MediaType.APPLICATION_JSON);
+        headers.setAccept(acceptableMedia);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        String url = "http://www.telize.com/geoip/" + ip;
+        ResponseEntity<String> re = restTemplate.exchange(url, HttpMethod.GET,
+                entity, String.class);
+        JSONObject json = new JSONObject(re.getBody());
+        String country;
+        try {
+            logger.info("country: " + json.getString("country"));
+            country = json.getString("country");
+        } catch (JSONException e) {
+            country = null;
+        }
+        return country;
+    }
+
+    @Override
+    protected ShortURL createAndSaveIfValid(String url, String sponsor,
+                                            String brand, String owner, String ip) {
+        UrlValidator urlValidator = new UrlValidator(new String[]{"http",
+                "https"});
+        if (urlValidator.isValid(url)) {
+            String id = Hashing.murmur3_32()
+                    .hashString(url, StandardCharsets.UTF_8).toString();
+            ShortURL su = new ShortURL(id, url,
+                    linkTo(
+                            methodOn(UrlShortenerController.class).redirectTo(
+                                    id, null)).toUri(), sponsor, new Date(
+                    System.currentTimeMillis()), owner,
+                    HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
+                    getLocationByIP(ip));
+            return shortURLRepository.save(su);
+        } else {
+            return null;
+        }
+    }
+    @Override
+    protected void createAndSaveClick(String hash, String ip) {
+        Click cl = new Click(null, hash, new Date(System.currentTimeMillis()),
+                null, null, null, ip, getLocationByIP(ip));
+        clickRepository.save(cl);
+    }
+}

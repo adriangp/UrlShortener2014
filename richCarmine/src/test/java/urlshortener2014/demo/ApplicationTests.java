@@ -1,6 +1,8 @@
 package urlshortener2014.demo;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.IntegrationTest;
@@ -12,6 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+
+import urlshortener2014.richcarmine.Application;
+
+import java.io.File;
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,6 +32,15 @@ public class ApplicationTests {
 
 	@Value("${local.server.port}")
 	private int port = 0;
+
+    public TemporaryFolder folder = new TemporaryFolder();
+
+    private File testFile;
+
+    @Before
+    public void loadTestFile() throws IOException {
+        testFile = folder.newFile("someCSVFile.csv");
+    }
 
 	@Test
 	public void testHome() throws Exception {
