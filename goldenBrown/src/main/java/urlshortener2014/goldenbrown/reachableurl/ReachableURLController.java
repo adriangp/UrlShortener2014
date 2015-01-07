@@ -55,7 +55,7 @@ public class ReachableURLController {
 		    huc.connect(); 
 		    code = huc.getResponseCode();
 		    if (code == HttpURLConnection.HTTP_OK){
-		    	logger.info(url + " is Reachable.");
+		    	logger.info("\""+url + "\" is Reachable.");
 		    	return new ResponseEntity<>(HttpStatus.OK);
 		    }
 		    else{
