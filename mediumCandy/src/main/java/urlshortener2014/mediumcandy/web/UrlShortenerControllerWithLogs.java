@@ -29,6 +29,17 @@ import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.web.UrlShortenerController;
 import urlshortener2014.mediumcandy.domain.ClickStats;
 
+/**
+ * Class that extends the given UrlShortenerController in order to acomplish some of the basic 
+ * tasks of our service:
+ *   
+ *   - Short a given URL
+ *   - Short and customize a given URL
+ *   - Get the stats of a given URL
+ * 
+ * @author MediumCandy
+ *
+ */
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 

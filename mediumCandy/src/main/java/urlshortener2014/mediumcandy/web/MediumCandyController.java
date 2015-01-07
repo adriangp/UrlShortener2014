@@ -19,6 +19,12 @@ import org.springframework.web.client.RestTemplate;
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.mediumcandy.domain.ClickStats;
 
+
+/**
+ * 
+ * @author MediumCandy
+ *
+ */
 @RestController
 public class MediumCandyController {
 
