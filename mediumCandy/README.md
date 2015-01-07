@@ -41,3 +41,16 @@ La funcionalidad mÃ¡s importante se encuentra implementada en el `UrlShortenerCo
 ## Servicio de personalizaciÃ³n de URLs acortadas
 
 ## InformaciÃ³n y estadÃ­sticas de URLs
+
+Funcionalidad que consiste en mostrar estadísticias de las URLs almacenadas en la Base de Datos con su URL corta implementado con **nivel tecnológico Tipo 2** como acordamos. 
+
+Cada vez que alguien accede a una dirección con una URL corta, se almacena en la Base de Datos. Para conocer las estadísticas de una dirección basta con hacer una petición get a la siguiente dirección del servidor, donde URL es la dirección del cual se quieren obtener las estadísticias e información: 
+
+- `http://URI_DEL_SERVIDOR/mediumcandy/linkstats?url=URL`  
+
+Esta dirección accede al `MediumCandyController` la cual a su vez llama a `UrlShortenerControllerWithLogs`. Este controller se encarga de acceder a la Base de Datos para buscar el objeto ShortURL, y con el hash de este recuperar de la Base de Datos el número de clicks (veces que se a accedido a la dirección dada por parámetro). 
+
+Este método devuelve lo siguiente: 
+
+- `OK (200)` junto con la lista de las estadísticias, en el caso de que todo haya ido bien y haya en la Base de Datos una ShortURL con la dirección dada.  
+- `BAD REQUEST (400)` en el caso de que la URL dada no este en la Base de Datos

@@ -25,6 +25,12 @@ public class MediumCandyController {
 
 	/**
 	 * Shortens a given URL if this URL is reachable via HTTP.
+	 * 
+	 * @param url
+	 * @param sponsor
+	 * @param brand
+	 * @param request
+	 * @return if OK, status.CREATED and ShortURL else, status.BAD_REQUEST
 	 */
 	@RequestMapping(value = "/mediumcandy/linkreachable", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortenerIfReachable(@RequestParam("url") String url,
@@ -51,6 +57,8 @@ public class MediumCandyController {
 	
 	/**
 	 * Return stats a given URL.
+	 * @param url
+	 * @return if OK, status.CREATED and listStatics else, status.BAD_REQUEST
 	 */
 	@RequestMapping(value = "/mediumcandy/linkstats", method = RequestMethod.GET)
 	public ResponseEntity<List<ClickStats>> getLinkStats(@RequestParam("url") String url){		
@@ -70,6 +78,10 @@ public class MediumCandyController {
 	
 	/**
 	 * Shortens and customizes a given URL.
+	 * @param url
+	 * @param brand
+	 * @param request
+	 * @return if OK status.CREATED and ShortURL else status.BAD_REQUEST
 	 */
 	@RequestMapping(value = "/mediumcandy/linkcustomized", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortenerCustomized(@RequestParam("url") String url,
