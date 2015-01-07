@@ -12,11 +12,18 @@ import urlshortener2014.taupegray.sponsor.WebSocketSponsorHandler;
 @Configuration
 @EnableWebSocket
 public class WebSocket implements WebSocketConfigurer {
+	
+	/**
+	 * Registers websocket handlers
+	 */
 	@Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(myHandler(), "/sponsor");
     }
-
+	
+	/**
+	 * Creates the websocket handler.
+	 */
     @Bean
     public WebSocketHandler myHandler() {
         return new WebSocketSponsorHandler();

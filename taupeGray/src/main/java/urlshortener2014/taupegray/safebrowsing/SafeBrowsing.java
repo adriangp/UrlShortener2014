@@ -13,6 +13,11 @@ import org.apache.http.message.BasicNameValuePair;
 import urlshortener2014.taupegray.client.StringClientHttpRequest;
 
 public class SafeBrowsing {
+	/**
+	 * Tests if an URL is saf
+	 * @param url URL to test
+	 * @return whether it's safe or not
+	 */
 	public static boolean isSafe(String url) {
 		try {
 			List<NameValuePair> qparams = new ArrayList<NameValuePair>();

@@ -1,4 +1,4 @@
-package urlshortener2014.taupegray.sponsor;
+package urlshortener2014.taupegray.common;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -18,6 +18,10 @@ public class WebToStringWrapper {
 		
 	}
 	
+	/**
+	 * Gets the content of a local webpage as String.
+	 * @return String containing the webpage requested
+	 */
 	public String getContent() {
 		
 		HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper(response) {

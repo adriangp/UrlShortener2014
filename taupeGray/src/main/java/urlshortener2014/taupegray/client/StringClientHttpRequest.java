@@ -11,6 +11,10 @@ public class StringClientHttpRequest extends ClientHttpRequest<String> {
 		super(url);
 	} 
 	
+	/**
+	 * Makes a GET Request
+	 * @return String with the response body.
+	 */
 	public String makeGetRequest() {
 		return super.makeGetRequest((Converter<String>)(HttpEntity entity) -> {try {
 			return EntityUtils.toString(entity);

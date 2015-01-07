@@ -11,6 +11,10 @@ public class ByteArrayClientHttpRequest extends ClientHttpRequest<byte[]> {
 		super(url);
 	} 
 	
+	/**
+	 * Makes a GET Request
+	 * @return byte[] with the response body.
+	 */
 	public byte[] makeGetRequest() {
 		return super.makeGetRequest((Converter<byte[]>)(HttpEntity entity) -> {try {
 			return EntityUtils.toByteArray(entity);
