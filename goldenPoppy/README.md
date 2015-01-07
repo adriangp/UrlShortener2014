@@ -18,4 +18,4 @@ Golden poppy is a tone of gold that is the color of the California poppy—the o
 
 * [Massive load](https://github.com/adriangp/UrlShortener2014/tree/master/goldenPoppy/src/main/java/urlshortener2014/goldenPoppy/massiveLoad): COMPLETAR
 
-* [QR generator](https://github.com/adriangp/UrlShortener2014/tree/master/goldenPoppy/src/main/java/urlshortener2014/goldenPoppy/qr): COMPLETAR
+* [QR generator](https://github.com/adriangp/UrlShortener2014/tree/master/goldenPoppy/src/main/java/urlshortener2014/goldenPoppy/qr): This service returns an image. That image is a QR code wich could be read with a device with an integrated camera, and is identified with the previous given URL. To check that this service works: first start the server running `gradle start` then ask for an URL at the endpoint `/qr/URL`. Once you have the image, you should compare it with Google QR generator API and check that both are the same image.
