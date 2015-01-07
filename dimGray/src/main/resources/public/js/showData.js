@@ -26,7 +26,7 @@ $(document).ready(function() {
 							var val = "click "+id+" "+hash+" "+created+" "+referrer+" "+browser+" "+platform+" "+ip+" "+country;
 							if (referrer == null)	referrer = "-";
 							if (browser == null)	browser = "-";
-							if (platform == null)	platform = "-";
+							if (platform == null)	platform = "-";    
 							if (country == null)	country = "-";
 							$("#infoTable").append('<tr><td></td><td><input type="radio" name="radDel" value="'+val+'"></td><td></td><td>'+id+'</td><td>'+created+'</td><td>'+referrer+'</td><td>'+browser+'</td><td>'+platform+'</td><td>'+ip+'</td><td>'+country+'</td><td></td></tr>');
 						}

@@ -33,7 +33,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 					rs.getString("country"));
 		}
 	};
-
+    
 	@Autowired
 	protected JdbcTemplate jdbc;
 
