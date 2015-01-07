@@ -1,9 +1,17 @@
 
 
-
 # Project "RichCarmine"
 
 The rich carmine color tone displayed at right matches the color shown as carmine in the 1930 book A Dictionary of Color. This color is also called Chinese carmine. This is the color usually referred to as carmine in fashion and interior design.
+
+
+# Team Members
+
+* Adrian Reyes (leader)
+* Sandra Campos
+* David Recuenco
+
+# Funcionalities
 
 Massive URL upload (CSV File)
 ----------------------------
@@ -47,8 +55,12 @@ Then, when receiving `"<<EOF>>"` the websocket will stop transforming urls and w
 }
 ```
 
-# Team Members
+Get QR code from ShortURL
+----------------------------
+We wanted to create a proxy over Google's QR code API. To do it, the method is simple. We have a service `/qr{id}` where `id` is the ShortURL hash. 
+When the service receives a `GET` request a new request (proxied) is sent to Google API to make a QR code. 
+Then, from its response we get the body, which is a `byte[]` containing the QR code as a PNG image, we place it in our own response and send it back.
 
-* Adrian Reyes (leader)
-* Sandra Campos
-* David Recuenco
+Geolocation via IP
+----------------------------
+As an additional feature, we do not only store user's IP but their country location too. This is done by using an [external API](http://www.telize.com/geoip/) that, given an IP, returns various location data, including the country. 

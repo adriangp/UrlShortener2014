@@ -16,7 +16,9 @@ import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,6 +37,7 @@ import urlshortener2014.richcarmine.Application;
 import urlshortener2014.richcarmine.domain.csv.CSVContent;
 import urlshortener2014.richcarmine.domain.csv.ResponseData;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -54,11 +57,11 @@ public class ApplicationTests {
     @Value("${local.server.port}")
     private int port = 0;
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
-
     @Autowired
     private WebApplicationContext ctx;
+
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
     private MockMvc mockMvc;
 
@@ -67,8 +70,9 @@ public class ApplicationTests {
     /**
      * Set up a MockMVC of this application.
      */
+    @Before
     public void setUp() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.ctx).build();
     }
 
     @Before
@@ -79,7 +83,7 @@ public class ApplicationTests {
         writer.println("smth random");
         writer.close();
     }
-
+    
     @Test
     public void testHome() throws Exception {
         ResponseEntity<String> entity = new TestRestTemplate().getForEntity(
@@ -198,7 +202,7 @@ public class ApplicationTests {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         MultiValueMap<String, String> body = new LinkedMultiValueMap<String, String>();
-        body.add("url","http://www.pistachosoft.com/");
+        body.add("url", "http://www.pistachosoft.com/");
         HttpEntity<?> entity = new HttpEntity<>(body,headers);
         ResponseEntity<String> qrResponse = new TestRestTemplate().exchange(
                 "http://localhost:" + this.port + "/qr",
@@ -269,7 +273,7 @@ public class ApplicationTests {
 
     /**
      * Method that first creates a ShortUrl, then makes a GET request with a mocked IP
-     * to check that geolocalizaton module works correctly.
+     * to check that geolocation module works correctly.
      * @throws Exception
      */
     @Test
@@ -292,13 +296,15 @@ public class ApplicationTests {
 
         //Test geoIP
         String id = json.getString("hash");
-        mockMvc.perform(get("/l{id}", id).with(new RequestPostProcessor() {
+        RequestPostProcessor rpp = new RequestPostProcessor() {
             @Override
             public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
-                request.setRemoteAddr("64.233.160.1");
+                request.setRemoteAddr("64.233.160.2");
                 return request;
             }
-        }).accept(MediaType.APPLICATION_JSON));
+        };
+        mockMvc.toString();
+        mockMvc.perform(get("/l{id}", id).with(rpp).accept(MediaType.APPLICATION_JSON));
     }
 
 }

@@ -97,15 +97,20 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        String uri = linkTo(methodOn(UrlShortenerController.class).redirectTo(id, null)).toUri().toString();
-        String url = "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=" + uri + "&choe=UTF-8";
+        String uri = linkTo(methodOn(UrlShortenerController.class)
+                .redirectTo(id, null)).toUri().toString();
+        String url = "https://chart.googleapis.com/chart?cht=qr" +
+                "&chs=300x300" +
+                "&chl=" + uri  +
+                "&choe=UTF-8";
         ResponseEntity<?> re = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 entity,
                 byte[].class);
 
-        return new ResponseEntity<>((byte[]) re.getBody(), headers, HttpStatus.CREATED);
+        return new ResponseEntity<>((byte[]) re.getBody(),
+                headers, HttpStatus.CREATED);
     }
 
     // ==========================================================================================
@@ -238,7 +243,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         public void afterConnectionEstablished(WebSocketSession session) throws Exception {
             /* get the host address, used to create the link, and clean */
             if (localAddress.equals("")) localAddress = session.getHandshakeHeaders().getFirst("host");
-            mapList.put(session.getId(), new ArrayList<>());
+            mapList.put(session.getId(), new ArrayList<CSVContent>());
             mapFileName.put(session.getId(), "csv/outputCSV" + UUID.randomUUID().toString() + ".csv");
             mapFinished.put(session.getId(), new AtomicBoolean(true));
             mapOrder.put(session.getId(), new AtomicLong(0));
@@ -267,7 +272,9 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
                 File f = new File(mapFileName.get(session.getId()));
                 if (verifyAndCreate(f)) {
                     PrintWriter writer = new PrintWriter(f);
-                    mapList.get(session.getId()).forEach(writer::println);
+                    for(CSVContent c: mapList.get(session.getId())){
+                        writer.println(c );
+                    }
 
                     writer.close();
                 }
