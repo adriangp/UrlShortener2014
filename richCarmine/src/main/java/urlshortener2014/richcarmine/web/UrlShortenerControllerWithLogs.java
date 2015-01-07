@@ -97,15 +97,20 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        String uri = linkTo(methodOn(UrlShortenerController.class).redirectTo(id, null)).toUri().toString();
-        String url = "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=" + uri + "&choe=UTF-8";
+        String uri = linkTo(methodOn(UrlShortenerController.class)
+                .redirectTo(id, null)).toUri().toString();
+        String url = "https://chart.googleapis.com/chart?cht=qr" +
+                "&chs=300x300" +
+                "&chl=" + uri  +
+                "&choe=UTF-8";
         ResponseEntity<?> re = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 entity,
                 byte[].class);
 
-        return new ResponseEntity<>((byte[]) re.getBody(), headers, HttpStatus.CREATED);
+        return new ResponseEntity<>((byte[]) re.getBody(),
+                headers, HttpStatus.CREATED);
     }
 
     // ==========================================================================================
