@@ -51,7 +51,10 @@ public class CSVController {
 				}
 				return new ResponseEntity<>(HttpStatus.OK);
 			} catch (Exception e) {
-				
+				try {
+					Thread.sleep(20);
+				} catch (InterruptedException e1) {
+				}
 			}
 		}while(i < 3);
 		
