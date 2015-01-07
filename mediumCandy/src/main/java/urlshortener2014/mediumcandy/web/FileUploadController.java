@@ -74,6 +74,7 @@ public class FileUploadController {
 			response.setContentType("application/x-download");
 			response.setHeader("Content-disposition", "attachment; filename=" + fileName + ".csv");
 			response.flushBuffer();
+			
 		} catch (NullPointerException ne){
 			// Deleting File
 			File file = new File( fileName + ".csv" );
