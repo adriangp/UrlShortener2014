@@ -13,6 +13,9 @@
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 		-->
 		<link rel="stylesheet" href="./css/style.css">
+		<script>
+			var host = "ws://" + "$host" + "/sponsor/ws";
+		</script>
 		<script src="./js/wsClient.js"></script>
 	</head>
 	<body>

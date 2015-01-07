@@ -36,6 +36,9 @@ public class UrlShortenerControllerOldBurgundy extends UrlShortenerController {
 	
 	@Autowired
 	private String hostCsv;
+
+	@Autowired
+	private String hostSponsor;
 	
 	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerOldBurgundy.class);
 	
@@ -64,7 +67,8 @@ public class UrlShortenerControllerOldBurgundy extends UrlShortenerController {
 		else{
 			context.put("sponsor", shortURL.getSponsor());
 		}
-		
+
+		context.put("host", hostSponsor != null ? hostSponsor.replace("http://", "") : hostSponsor);
 		context.put("shortURL", shortURL.getHash());
 		Velocity.mergeTemplate("sponsor.vm", "ISO-8859-1", context, writer);
 		
@@ -100,6 +104,18 @@ public class UrlShortenerControllerOldBurgundy extends UrlShortenerController {
 		}
 		
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public ResponseEntity<?> index(){
+		StringWriter writer = new StringWriter();		
+		VelocityContext context = new VelocityContext();
+		context.put("host", hostCsv.replace("http://", ""));
+		Velocity.mergeTemplate("index.vm", "ISO-8859-1", context, writer);
+
+		HttpHeaders h = new HttpHeaders();
+		h.setContentType(MediaType.TEXT_HTML);
+		return new ResponseEntity<>(writer.toString(), h, HttpStatus.OK);
 	}
 }
 
