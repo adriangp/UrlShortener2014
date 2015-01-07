@@ -15,6 +15,6 @@ dependencies {
    compile 'org.springframework:spring-context-support'
    compile 'net.sf.ehcache:ehcache:2.7.4'
    compile("org.springframework.boot:spring-boot-starter-web:1.2.0.RELEASE")
-   compile 'org.springframework:spring-test:4.0.6.RELEASE'
+   compile 'org.springframework:spring-test:4.1.4.RELEASE'
    testCompile 'junit:junit:4.10'
 }

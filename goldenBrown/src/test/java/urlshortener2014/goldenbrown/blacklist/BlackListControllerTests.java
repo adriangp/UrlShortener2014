@@ -32,7 +32,6 @@ import static org.junit.Assert.fail;
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
 @IntegrationTest("server.port=0")
-@DirtiesContext
 public class BlackListControllerTests {
 	
 	@Autowired
