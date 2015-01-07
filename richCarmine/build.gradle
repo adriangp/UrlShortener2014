@@ -4,6 +4,10 @@ eclipse {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile project(":common")
     compile("org.springframework.boot:spring-boot-starter-websocket")
