@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.hateoas.EntityLinks;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -46,9 +45,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     @Autowired
     private ShortURLRepository shortURLRepository;
 
-    @Autowired
-    EntityLinks entityLinks;
-
     public ResponseEntity<?> redirectTo(@PathVariable String id,
                                         HttpServletRequest request) {
         logger.info("Requested redirection with hash " + id);
@@ -63,6 +59,19 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         return super.shortener(url, sponsor, brand, request);
     }
 
+    // ==========================================================================================
+    //                                  QR code module
+    // ==========================================================================================
+
+    /**
+     * Method that receives post petitions for url shortener with QR code.
+     *
+     * @param url     url to be shortened
+     * @param sponsor not used
+     * @param brand   not used
+     * @param request client request containing his IP
+     * @return a response with the requested ShortURL
+     */
     @RequestMapping(value = "/qr", method = RequestMethod.POST)
     public ResponseEntity<ShortURL> QRrize(@RequestParam("url") String url,
                                            @RequestParam(value = "sponsor", required = false) String sponsor,
@@ -73,6 +82,13 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         return super.shortener(url, sponsor, brand, request);
     }
 
+    /**
+     * Method that gets a QR code for the given ShortURL hash.
+     *
+     * @param id      hash of the ShortURL to be embedded in a QR code
+     * @param request client request containing his IP
+     * @return a response with the QR code (image) of the ShortURL
+     */
     @RequestMapping(value = "/qr{id}", method = RequestMethod.GET)
     public ResponseEntity<byte[]> redirectQR(@PathVariable String id,
                                              HttpServletRequest request) {
@@ -81,7 +97,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        //TODO improve this thing
         String uri = linkTo(methodOn(UrlShortenerController.class).redirectTo(id, null)).toUri().toString();
         String url = "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=" + uri + "&choe=UTF-8";
         ResponseEntity<?> re = restTemplate.exchange(
@@ -99,6 +114,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
     /**
      * method in charge of serving every csv located in /csv
+     *
      * @param fileName
      * @return
      */
@@ -124,6 +140,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     /**
      * This method recives a file by a POST request answering back with a ResponseData that contains
      * all the shortened urls and its csv file's uri
+     *
      * @param file
      * @param sponsor
      * @param brand
@@ -173,7 +190,9 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
             PrintWriter writer = new PrintWriter(f);
 
-            list.forEach(writer::println);
+            for (CSVContent c : list) {
+                writer.println(c);
+            }
 
             writer.close();
 
@@ -198,7 +217,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     //                                  WebSocket? naive approach
     // ==========================================================================================
 
-    /***
+    /**
      * Websocket handler, it's used to manage the connection
      */
     public class MyHandler extends TextWebSocketHandler {
@@ -218,9 +237,9 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         @Override
         public void afterConnectionEstablished(WebSocketSession session) throws Exception {
             /* get the host address, used to create the link, and clean */
-            if(localAddress.equals("")) localAddress = session.getHandshakeHeaders().getFirst("host");
-            mapList.put(session.getId(),new ArrayList<>());
-            mapFileName.put(session.getId(),"csv/outputCSV" + UUID.randomUUID().toString() + ".csv");
+            if (localAddress.equals("")) localAddress = session.getHandshakeHeaders().getFirst("host");
+            mapList.put(session.getId(), new ArrayList<>());
+            mapFileName.put(session.getId(), "csv/outputCSV" + UUID.randomUUID().toString() + ".csv");
             mapFinished.put(session.getId(), new AtomicBoolean(true));
             mapOrder.put(session.getId(), new AtomicLong(0));
         }
@@ -230,7 +249,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
             /* if the message is <<EOF>> start generating the csv */
             if (!setAndGetBoolean(mapFinished.get(session.getId()), message.getPayload().trim().equals("<<EOF>>"))) {
                 String messageURL = message.getPayload().trim();
-                if(!messageURL.equals("")){
+                if (!messageURL.equals("")) {
                     /* keep the messages in order */
                     long order = mapOrder.get(session.getId()).getAndIncrement();
                     if (order == 1) mapTimer.put(session.getId(), System.currentTimeMillis());
@@ -248,7 +267,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
                 File f = new File(mapFileName.get(session.getId()));
                 if (verifyAndCreate(f)) {
                     PrintWriter writer = new PrintWriter(f);
-
                     mapList.get(session.getId()).forEach(writer::println);
 
                     writer.close();
@@ -275,7 +293,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
             mapTimer.remove(session.getId());
         }
 
-        private synchronized boolean setAndGetBoolean(AtomicBoolean atomic, boolean bool){
+        private synchronized boolean setAndGetBoolean(AtomicBoolean atomic, boolean bool) {
             atomic.set(bool);
             return bool;
         }
@@ -315,6 +333,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
         /**
          * Solves the IllegalStateException caused by linkTo as it depends on the current http context
+         *
          * @param url
          * @param sponsor
          * @param brand
@@ -341,6 +360,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
         /**
          * Generate the link by the localAddress generated at the first connection
+         *
          * @param id
          * @return
          */
@@ -349,6 +369,16 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         }
     }
 
+    // ==========================================================================================
+    //                                  Geolocation Module
+    // ==========================================================================================
+
+    /**
+     * Method that given an IP address returns the country where it belongs.
+     *
+     * @param ip address from where to retrieve country
+     * @return country where the IP belongs
+     */
     private String getLocationByIP(String ip) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -359,9 +389,9 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         String url = "http://www.telize.com/geoip/" + ip;
         String country;
         try {
-        ResponseEntity<String> re = restTemplate.exchange(url, HttpMethod.GET,
-                entity, String.class);
-        JSONObject json = new JSONObject(re.getBody());
+            ResponseEntity<String> re = restTemplate.exchange(url, HttpMethod.GET,
+                    entity, String.class);
+            JSONObject json = new JSONObject(re.getBody());
             logger.info("country: " + json.getString("country"));
             country = json.getString("country");
         } catch (Exception e) {
@@ -370,6 +400,16 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
         return country;
     }
 
+    /**
+     * Method that creates a ShortURL if it's valid, storing client's country too.
+     *
+     * @param url     url to be shortened
+     * @param sponsor not used
+     * @param brand   not used
+     * @param owner   not used
+     * @param ip      client IP
+     * @return a ShortURL object
+     */
     @Override
     protected ShortURL createAndSaveIfValid(String url, String sponsor,
                                             String brand, String owner, String ip) {
@@ -390,6 +430,13 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
             return null;
         }
     }
+
+    /**
+     * Method that creates a Click if it's valid, storing client's country too.
+     *
+     * @param hash requested hash of the ShortURL
+     * @param ip   client IP
+     */
     @Override
     protected void createAndSaveClick(String hash, String ip) {
         Click cl = new Click(null, hash, new Date(System.currentTimeMillis()),
