@@ -2,14 +2,23 @@ package urlshortener2014.oldBurgundy.repository.csv;
 
 import org.springframework.web.socket.WebSocketSession;
 
+/**
+ * URL Shortener work
+ */
 public class Work {
 	
 	private int id = -1;
 	private WebSocketSession session;
 	private int line;
 	private String url, shortUrl, sponsor;
-	private WorkStatus state;
-		
+	
+	/**
+	 * New URL Shortener work
+	 * @param session The session of the client
+	 * @param line The line of the document
+	 * @param url The url to be shortened
+	 * @param sponsor The url of the sponsor
+	 */
 	public Work(WebSocketSession session, int line, String url, String sponsor) {
 		this.session = session;
 		this.line = line;
@@ -59,13 +68,5 @@ public class Work {
 
 	public void setSponsor(String sponsor) {
 		this.sponsor = sponsor;
-	}
-
-	public WorkStatus getState() {
-		return state;
-	}
-
-	public void setState(WorkStatus state) {
-		this.state = state;
 	}
 }

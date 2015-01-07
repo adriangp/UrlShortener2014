@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import urlshortener2014.common.domain.ShortURL;
@@ -33,19 +34,17 @@ public class UrlShortenerControllerOldBurgundy extends UrlShortenerController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerOldBurgundy.class);
 	
-	public ResponseEntity<?> redirectTo(@PathVariable String id, 
-			HttpServletRequest request) {
-		logger.info("Request redirection firts with hash " + id);
+	public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
+		logger.info("Request redirection firts with hash: '" + id + "'");
 		
 		ShortURL shortURL = shortURLRepository.findByKey(id);
 		
 		if (shortURL == null){
-			logger.info("Not found");
+			logger.info("Not found hash: '" + id + "'");
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
 		}
 	
 		String uri = shortURL.getTarget();
-		logger.info("Redirect uri " + uri);
 		
 		SponsorWork work = new SponsorWork(uri, id);
 		worksRepositorySponsor.addIncomingWork(work);
@@ -72,7 +71,7 @@ public class UrlShortenerControllerOldBurgundy extends UrlShortenerController {
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand,
 			HttpServletRequest request) {
-		logger.info("Requested new short for uri "+url);
+		logger.info("Requested new short for uri " + url);
 		return super.shortener(url, sponsor, brand, request);
 	}
 	
@@ -82,12 +81,16 @@ public class UrlShortenerControllerOldBurgundy extends UrlShortenerController {
 			@RequestParam(value = "brand", required = false) String brand,
 			HttpServletRequest request) {
 		
-		logger.info("Requested new short for id: " + id + " - uri: " + url + " - sponsor: " + sponsor);
+		logger.info("Requested new short (shortener2) for id: " + id + " - uri: " + url + " - sponsor: " + sponsor);
 		
 		ResponseEntity<ShortURL> response = super.shortener(url, sponsor, brand, request);
-		logger.info("short url for id: " + id + " - uri: " + response.getBody().getHash() + " - sponsor: " + sponsor);
 
-		(new RestTemplate()).postForEntity("http://localhost:8080/csv/rest/" + id, response.getBody().getUri().toString(), null);
+		try{
+			(new RestTemplate()).postForEntity("http://localhost:8080/csv/rest/" + id, response.getBody().getUri().toString(), null);
+		}
+		catch(HttpClientErrorException e){
+		}
+		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

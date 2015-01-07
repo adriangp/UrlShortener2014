@@ -24,21 +24,36 @@ import org.springframework.web.client.RestTemplate;
 
 import urlshortener2014.common.domain.ShortURL;
 
+/**
+ * Rest controller of the validator web service
+ */
 @RestController
 public class ValidatorWebService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ValidatorWebService.class);
 
+	/**
+	 * Validate URL
+	 * @param urlParam URL to validate
+	 * @return
+	 */
 	@RequestMapping(value = "/validator", method = RequestMethod.POST, consumes = "application/json")
 	public ResponseEntity<?> validateUrl(@RequestBody Url urlParam)  {
 		
-		logger.info("Client solicitation url " + urlParam.getUrl());
+		logger.info("client request the url validation " + urlParam.getUrl());
 		
 		int status = httpRequest(urlParam.getUrl());
 		
 		return new ResponseEntity<>(HttpStatus.valueOf(status));
 	}
 
+	/**
+	 * 
+	 * Validate URL
+	 * @param id The <i>id</i> of the work
+	 * @param url URL to validate
+	 * @return
+	 */
 	@RequestMapping(value = "/validator/{id}", method = RequestMethod.POST)
 	public ResponseEntity<?> validateUrlInternal(@PathVariable int id, @RequestBody Url url)  {
 		
@@ -50,13 +65,14 @@ public class ValidatorWebService {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	/**
+	 * Check the URL
+	 * @param url URL to validate
+	 * @return The status code of the response
+	 */
 	private int httpRequest(String url){
-		HttpClient httpClient = null;  				// Objeto a traves del cual realizamos las peticiones
-		HttpMethodBase request = null;				// Objeto para realizar las peticiones HTTP GET o POST
-		
-		// Se instancia el objeto
-		httpClient = new HttpClient();
-		
+		HttpClient httpClient = new HttpClient();;
+		HttpMethodBase request = null;		
 		
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if(urlValidator.isValid(url)){
@@ -68,10 +84,8 @@ public class ValidatorWebService {
 
 		request.setFollowRedirects(false);
 		
-		// Se indica que reintente en caso de que haya errores.
 		request.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler(3, true));
 		
-		// Se lee el codigo de la respuesta HTTP que devuelve el servidor
 		try {
 			httpClient.executeMethod(request);
 		} catch (HttpException e) {
@@ -87,6 +101,9 @@ public class ValidatorWebService {
 		return request.getStatusCode();
 	}
 
+	/**
+	 * Thread to validate and send the request short URL
+	 */
 	private class HttpRequestThread implements Runnable {
 		
 		private int id;
@@ -104,7 +121,6 @@ public class ValidatorWebService {
 			
 			switch(status){
 				case 200:
-					System.out.println("valida url");
 					if(sponsor == null){
 						(new RestTemplate()).postForEntity("http://localhost:8080/link/" + this.id + "?url=" + this.url, null, ShortURL.class);
 						break;
@@ -112,7 +128,6 @@ public class ValidatorWebService {
 					else{
 						status = ValidatorWebService.this.httpRequest(sponsor);
 						if(status == 200){
-							System.out.println("valida sponsor");
 							(new RestTemplate()).postForEntity("http://localhost:8080/link/" + this.id + "?url=" + this.url + "&sponsor=" + this.sponsor, null, ShortURL.class);
 							break;
 						}
