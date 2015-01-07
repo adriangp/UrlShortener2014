@@ -34,7 +34,7 @@ public class FileUploadController {
 
 	@RequestMapping(value = "/files/{file_name}", method = RequestMethod.GET)
 	public void getFile(@PathVariable("file_name") String fileName,
-						HttpServletResponse response) {
+						HttpServletResponse response) throws IOException {
 		ShortURL su = null;
 		
 		try {
@@ -74,6 +74,12 @@ public class FileUploadController {
 			response.setContentType("application/x-download");
 			response.setHeader("Content-disposition", "attachment; filename=" + fileName + ".csv");
 			response.flushBuffer();
+		} catch (NullPointerException ne){
+			// Deleting File
+			File file = new File( fileName + ".csv" );
+			file.delete();
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, 
+					"Either your CSV has a invalid format or contains an invalid/unreachable url");
 		} catch (IOException ex) {
 			throw new RuntimeException("IOError writing file to output stream");
 		}
