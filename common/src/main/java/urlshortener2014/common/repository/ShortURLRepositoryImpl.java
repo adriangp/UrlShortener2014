@@ -2,6 +2,7 @@ package urlshortener2014.common.repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -90,7 +91,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	public void update(ShortURL su) {
 		try {
 			jdbc.update(
-					"update click set target=?, sponsor=?, created=?, owner=?, mode=?, safe=?, ip=?, country=? where hash=?",
+					"update shorturl set target=?, sponsor=?, created=?, owner=?, mode=?, safe=?, ip=?, country=? where hash=?",
 					su.getTarget(), su.getSponsor(), su.getCreated(),
 					su.getOwner(), su.getMode(), su.getSafe(), su.getIP(),
 					su.getCountry(), su.getHash());
@@ -102,7 +103,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	@Override
 	public void delete(String hash) {
 		try {
-			jdbc.update("delete from click shorturl hash=?", hash);
+			jdbc.update("delete from shorturl where hash=?", hash);
 		} catch (Exception e) {
 			log.debug("When delete for hash " + hash, e);
 		}
@@ -128,6 +129,17 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 			log.debug("When select for limit " + limit + " and offset "
 					+ offset, e);
 			return null;
+		}
+	}
+
+	@Override
+	public List<ShortURL> findByTarget(String target) {
+		try {
+			return jdbc.query("SELECT * FROM shorturl WHERE target = ?",
+					new Object[] { target }, rowMapper);
+		} catch (Exception e) {
+			log.debug("When select for target " + target , e);
+			return Collections.emptyList();
 		}
 	}
 }
