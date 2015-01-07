@@ -14,7 +14,7 @@ The color old burgundy is a dark tone of burgundy. The first recorded use of old
 
 * Rest Validator Services (100%)
 	This services have two rest endpoints:
-	https://github.com/pablooli/UrlShortener2014/blob/master/oldBurgundy/src/main/java/urlshortener2014/oldBurgundy/web/rest/validator/ValidatorWebService.java
+	https://github.com/pablooli/UrlShortener2014/blob/master/oldBurgundy/src/main/java/urlshortener2014/oldBurgundy/web/rest/validator/ValidatorWebService.java .
 	The first its for client calls  "/validator"
 		This endpoint evaluates accessibility of url taken to parameter (Post)
 		If skip an error return HttpStatus.{error.name}.value.
@@ -30,7 +30,7 @@ The color old burgundy is a dark tone of burgundy. The first recorded use of old
 		Have JS code to loading a File.
 		Have JS code to download a File.
 	First endpoint is a WebSoket "/csv/ws"
-	https://github.com/pablooli/UrlShortener2014/blob/master/oldBurgundy/src/main/java/urlshortener2014/oldBurgundy/web/websocket/csv/CSVHandler.java
+	https://github.com/pablooli/UrlShortener2014/blob/master/oldBurgundy/src/main/java/urlshortener2014/oldBurgundy/web/websocket/csv/CSVHandler.java .
 		This service is called from the client and take TextMenssage and divide
 		it by "," with split,  msg.length=2 means this msg no contains sponsor and if
 		msg.length=3 this msg contains sponsor. In both case add to url "sponsor" and session
@@ -41,7 +41,7 @@ The color old burgundy is a dark tone of burgundy. The first recorded use of old
 		Call to a shortener() method for add url to BBDD and create shorturl.
 		Call to a Third enpoint "http://localhost:8080/csv/rest/" with id and url.
 	Third is a rest endpoint "/csv/rest/{id}"
-	https://github.com/pablooli/UrlShortener2014/blob/master/oldBurgundy/src/main/java/urlshortener2014/oldBurgundy/web/rest/csv/CSVController.java
+	https://github.com/pablooli/UrlShortener2014/blob/master/oldBurgundy/src/main/java/urlshortener2014/oldBurgundy/web/rest/csv/CSVController.java .
 		This endpoint take id and msg.
 		Add to Hash pendingWork id and return HttpStatus.ok if all go ok, or 		Http.INTERNAL_SERVER_ERROR if something go wrong.
 		This services returns by websoket session to client error or shorturl.
@@ -53,12 +53,12 @@ The color old burgundy is a dark tone of burgundy. The first recorded use of old
 		And wait msg from websoket (10 seg), this msg can contains url(in this
 		case redirected to this) or error.
 	First endpoint is a Websocket "/sponsor/ws"
-	https://github.com/pablooli/UrlShortener2014/blob/master/oldBurgundy/src/main/java/urlshortener2014/oldBurgundy/web/websocket/sponsor/SponsorHandler.java
+	https://github.com/pablooli/UrlShortener2014/blob/master/oldBurgundy/src/main/java/urlshortener2014/oldBurgundy/web/websocket/sponsor/SponsorHandler.java .
 		This service is called from the client and take TextMenssage and divide
 		it by " " with split,  msg.length=1 add  shorturl  and session to Hash 
 		WaitingClient. In other case return to client session an error message.
 	Second endpoint is a rest "/l{id}"
-	https://github.com/pablooli/UrlShortener2014/blob/master/oldBurgundy/src/main/java/urlshortener2014/oldBurgundy/web/rest/UrlShortenerControllerOldBurgundy.java
+	https://github.com/pablooli/UrlShortener2014/blob/master/oldBurgundy/src/main/java/urlshortener2014/oldBurgundy/web/rest/UrlShortenerControllerOldBurgundy.java .
 		This service taken id (shorturl), check id in BBDD, is not found return
 		HttpStatus.NOT_FOUND. Its found obtained url and sponsor, if sponsor=null
 		or sponsor is empty put "default_sponsor.html", else put sponsor obtained
