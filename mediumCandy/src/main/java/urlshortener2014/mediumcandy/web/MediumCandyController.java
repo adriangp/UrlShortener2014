@@ -3,7 +3,6 @@ package urlshortener2014.mediumcandy.web;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +55,8 @@ public class MediumCandyController {
 	}
 	
 	/**
-	 * Return stats a given URL.
+	 * Return stats for a given URL.
+	 * 
 	 * @param url
 	 * @return if OK, status.CREATED and listStatics else, status.BAD_REQUEST
 	 */
@@ -77,7 +77,8 @@ public class MediumCandyController {
 	}
 	
 	/**
-	 * Shortens and customizes a given URL.
+	 * Shortens and customizes a given URL with a personalized brand from the client
+	 * 
 	 * @param url
 	 * @param brand
 	 * @param request
