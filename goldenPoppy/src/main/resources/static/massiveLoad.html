@@ -17,7 +17,7 @@
     		client.connect({}, function(frame) {
                 console.log('Connected: ' + frame);
                 client.subscribe('/user/topic/massiveloadws', function(status){
-                    showResponse(JSON.parse(status.body).percent,
+                	showResponse(JSON.parse(status.body).percent,
                     			JSON.parse(status.body).status,
                     			JSON.parse(status.body).url);
                 });
@@ -25,15 +25,20 @@
     	}
     	
     	function disconnect() {
-            stompClient.disconnect();
+            client.disconnect();
             console.log("Disconnected");
         }
+    	
+    	function getProgress(){
+            client.send("/app/massiveloadws", {}, {});
+    	}
     	
     	function sendFile(){
     		var formData = new FormData();
     		var name = document.getElementById('file').value;
     		var files = document.getElementById('file').files;
     		formData.append("file",files[0]);
+    		var temp = window.setInterval(getProgress,10);
     		$.ajax({
     			type : "POST",
     			url : "/massiveload",
@@ -46,6 +51,7 @@
     				var status = message.status;
     				var file = message.url;
     				showResponse(percent, status, file)
+    				window.clearInterval(temp);
     			},
     			error : function() {
     				alert("Failure");

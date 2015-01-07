@@ -46,7 +46,6 @@ import urlshortener2014.goldenPoppy.isAlive.Response;
 import urlshortener2014.goldenPoppy.isAlive.URL;
 import urlshortener2014.goldenPoppy.massiveLoad.Content;
 import urlshortener2014.goldenPoppy.massiveLoad.Load;
-import urlshortener2014.goldenPoppy.massiveLoad.Load;
 import urlshortener2014.goldenPoppy.massiveLoad.Status;
 
 @RestController
@@ -59,6 +58,10 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	
 	@Autowired
 	private IntersicialEndPoint inter;
+	
+	private int percent;
+	private String status;
+	private String urlFile;
 	
 	/**
 	 * Method that redirect to an URL. If the URL has an sponsor associated, 
@@ -171,20 +174,22 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			
 			InputStream input = file.getInputStream();
 			BufferedReader buffer = new BufferedReader(new InputStreamReader(input));
-			
-			long totalSize = file.getSize();
-			long nBytes = 0;
+
 			shorts = new ArrayList<Content>();
 			longs = new ArrayList<Content>();
 			int i = 0;
 			String line = buffer.readLine();
 			String url = "";
 			String sponsor = "";
+			int filename = request.hashCode();
+			
+			this.percent = 0;
+			this.status = "In progress";
+			this.urlFile = "http://" + request.getLocalName() + ":8080/files/" + 
+					filename + ".csv";
 			
 			while (line != null){
-				// Reading the files. nBytes count the bytes processed of the file 
-				// to calculate the progress of the load.
-				nBytes += line.getBytes().length;
+				// Reading the files. .
 				i++;
 				url = line.split(",")[0].trim();
 				try{
@@ -198,7 +203,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 					// Per 10 URLs about, execute a thread that load the URLs.
 					Future<List<Content>> future = executor.submit(new Load(longs, this, request));
 					futures.add(future);
-					massiveloadws(100*nBytes/totalSize, "In process", null);
 					longs = new ArrayList<Content>();
 				}
 				line = buffer.readLine();
@@ -211,39 +215,36 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			for (Future<List<Content>> f : futures){
 				// Wait all the threads and take the result of the load.
 				List<Content> l = f.get();
-				for (Content c : l)
-					shorts.add(c);
+				for (Content c : l){
+					shorts.add(c);	
+					this.percent = shorts.size();
+				}
 			}
 			
+			this.status = "Finished";
+			
 			// Create a file with the result of the load.
-			writeInFile(shorts, request.hashCode() + ".csv");
+			writeInFile(shorts, filename + ".csv");
 		}catch (IOException e){
 			logger.info("IO Error reading the file " + file.getOriginalFilename());
 		} catch (InterruptedException e) {
 			logger.info("Interrupt Error");
 		} catch (ExecutionException e) {
 			logger.info("Execution Error");
-		} 
-		return new ResponseEntity<>(new Status(100, "Finished", "http://" + 
-				request.getLocalName() + ":8080/files/" + 
-				request.hashCode() + ".csv"), HttpStatus.OK);
+		}
+		
+		return new ResponseEntity<>(new Status(100, "Finished", urlFile), HttpStatus.OK);
 	}
 	
 	/**
 	 * Method that inform to the user about the progress of the load.
 	 * 
-	 * @param progress Percent of the load.
-	 * @param status String that inform about the progress of the load.
-	 * @param url URL that contains the file with the URLs shortened when the 
-	 * progress is finished.
 	 * @return Object that contains the percent, the status and the URL with the file.
 	 */
 	@MessageMapping("/massiveloadws")
 	@SendToUser("/topic/massiveloadws")
-	public ResponseEntity<Status> massiveloadws(double progress, String status, String url){
-		// TODO: Esto deberia informar al usuario del progreso de la carga pero
-		// no funciona bien.
-		return new ResponseEntity<>(new Status(progress, status, url),HttpStatus.OK);
+	public Status massiveloadws(){
+		return new Status(this.percent, this.status, this.urlFile);
 	}
 	
 	/**
