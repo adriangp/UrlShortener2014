@@ -25,9 +25,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.repository.ShortURLRepository;
 import urlshortener2014.common.web.UrlShortenerController;
+import urlshortener2014.taupegray.common.WebToStringWrapper;
 import urlshortener2014.taupegray.qr.QRFetcher;
 import urlshortener2014.taupegray.safebrowsing.SafeBrowsing;
-import urlshortener2014.taupegray.sponsor.WebToStringWrapper;
 
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
@@ -37,13 +37,20 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	
 	private static final Logger logger = LoggerFactory
 			.getLogger(UrlShortenerControllerWithLogs.class);
-
+	
+	/**
+	 * Linker endpoint.
+	 */
 	public ResponseEntity<?> redirectTo(@PathVariable String id,
 			HttpServletRequest request) {
 		logger.info("Requested redirection with hash " + id);
 		return super.redirectTo(id, request);
 	}
 
+	
+	/**
+	 * Redirection method. All redirections made here so superclass can save clicks correctly.
+	 */
 	protected ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL l) {
 		boolean safe = SafeBrowsing.isSafe(l.getTarget());
 		if (l.getSponsor() == null) {
@@ -54,7 +61,10 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
 			}
 			else {
-				return new ResponseEntity<>("WarningWebpage", HttpStatus.OK);
+				ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+				HttpServletRequest request = sra.getRequest();
+				request.setAttribute("target", l.getTarget());
+				return new ResponseEntity<>(new WebToStringWrapper("/WEB-INF/warning.jsp",request,sra.getResponse()).getContent(), HttpStatus.FOUND);
 			}
 		}
 		else {
@@ -62,11 +72,13 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			HttpServletRequest request = sra.getRequest();
 			request.setAttribute("safe", safe);
 			request.setAttribute("id", l.getHash());
-			//request.setAttribute("sponsorsafe", SafeBrowsing.isSafe(l.getSponsor())); //Prueba para avisar que el sponsor no es seguro
-			return new ResponseEntity<>(new WebToStringWrapper("/WEB-INF/sponsor.jsp",request,sra.getResponse()).getContent(), HttpStatus.OK);
+			return new ResponseEntity<>(new WebToStringWrapper("/WEB-INF/sponsor.jsp",request,sra.getResponse()).getContent(), HttpStatus.FOUND);
 		}
 	}
-
+	
+	/**
+	 * Shortener enpoint.
+	 */
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand,
@@ -89,7 +101,13 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-
+	
+	/**
+	 * QR endpoint
+	 * @param id short URL hash
+	 * @param request HttpServletRequest provided
+	 * @return ResponseEntity containing the image if correct, Not Found otherwise.
+	 */
 	@RequestMapping(value = "/qr{id}", method = RequestMethod.GET)
 	public ResponseEntity<?> QRGenerator(@PathVariable String id,
 			HttpServletRequest request) {

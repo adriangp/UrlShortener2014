@@ -21,11 +21,17 @@ public class WebSocketSponsorHandler extends TextWebSocketHandler {
 	private static final Logger logger = LoggerFactory
 			.getLogger(WebSocketSponsorHandler.class);
 	
+	/**
+	 * Handles websocket conections.
+	 */
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		logger.info("New connection: "+session.getId());
 	}
 	
+	/**
+	 * Handles websocket messages.
+	 */
 	@Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) {
 		logger.info("Request from "+session.getId()+" : "+message.getPayload());

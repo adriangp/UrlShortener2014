@@ -28,6 +28,10 @@ public class ClientHttpRequest<Type> {
 		this.url = url;
 	}
 	
+	/**
+	 * Makes a GET Request
+	 * @return Object with the response body.
+	 */
 	public Type makeGetRequest(Converter<Type> converter) {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		Type responseBody = null;
