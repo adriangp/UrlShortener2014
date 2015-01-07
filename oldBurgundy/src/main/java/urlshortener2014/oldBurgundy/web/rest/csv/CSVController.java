@@ -1,5 +1,7 @@
 package urlshortener2014.oldBurgundy.web.rest.csv;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,11 @@ public class CSVController {
 			}
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (Exception e) {
+			try {
+				work.getSession().sendMessage(new TextMessage("error::" + work.getLine() + "::" + HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
+				logger.info("Work finish url: '" + work.getUrl() + "' error: '500'");
+			} catch (IOException e1) {
+			}
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

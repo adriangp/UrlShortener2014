@@ -6,7 +6,7 @@ import java.util.concurrent.BlockingQueue;
 /**
  * Incoming works storage
  */
-public class IncomingWorks {
+class IncomingWorks {
 
 	private BlockingQueue<Work> incomingWorks;
 	private int nextId;

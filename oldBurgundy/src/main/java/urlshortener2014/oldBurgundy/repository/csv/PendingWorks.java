@@ -5,7 +5,7 @@ import java.util.HashMap;
 /**
  * Pending works storage
  */
-public class PendingWorks {
+class PendingWorks {
 
 	private HashMap<Integer, Work> pendingWorks;
 	

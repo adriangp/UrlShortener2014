@@ -19,18 +19,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.web.UrlShortenerController;
 import urlshortener2014.oldBurgundy.repository.sponsor.SponsorWork;
 import urlshortener2014.oldBurgundy.repository.sponsor.WorksRepositorySponsor;
+import urlshortener2014.oldBurgundy.web.errorcontroler.ErrorMvcAutoConfiguration;
 
 @RestController
 public class UrlShortenerControllerOldBurgundy extends UrlShortenerController {
 	
 	@Autowired
-	WorksRepositorySponsor worksRepositorySponsor;
+	private WorksRepositorySponsor worksRepositorySponsor;
+	
+	@Autowired
+	private String hostCsv;
 	
 	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerOldBurgundy.class);
 	
@@ -41,7 +46,8 @@ public class UrlShortenerControllerOldBurgundy extends UrlShortenerController {
 		
 		if (shortURL == null){
 			logger.info("Not found hash: '" + id + "'");
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
+			
+			return ErrorMvcAutoConfiguration.responseError(HttpStatus.NOT_FOUND);
 		}
 	
 		String uri = shortURL.getTarget();
@@ -86,9 +92,11 @@ public class UrlShortenerControllerOldBurgundy extends UrlShortenerController {
 		ResponseEntity<ShortURL> response = super.shortener(url, sponsor, brand, request);
 
 		try{
-			(new RestTemplate()).postForEntity("http://localhost:8080/csv/rest/" + id, response.getBody().getUri().toString(), null);
+			(new RestTemplate()).postForEntity(hostCsv + "/csv/rest/" + id, response.getBody().getUri().toString(), null);
 		}
 		catch(HttpClientErrorException e){
+		}
+		catch(HttpServerErrorException e){
 		}
 		
 		return new ResponseEntity<>(HttpStatus.OK);

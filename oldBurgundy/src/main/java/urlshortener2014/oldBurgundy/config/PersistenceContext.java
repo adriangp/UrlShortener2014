@@ -18,7 +18,10 @@ import urlshortener2014.oldBurgundy.repository.sponsor.WorksRepositorySponsor;
 public class PersistenceContext {
 
 	@Autowired
-    protected JdbcTemplate jdbc;
+    protected JdbcTemplate jdbc;	
+
+	@Autowired
+	String hostValidator;
 
 	@Bean
 	ShortURLRepository shortURLRepository() {
@@ -33,7 +36,7 @@ public class PersistenceContext {
 	@Bean
 	WorksRepository worksRepository(){
 		WorksRepository worksRepository = new WorksRepository();
-		new Thread(new ConsumingWorks(worksRepository)).start();
+		new Thread(new ConsumingWorks(worksRepository, hostValidator)).start();
 		return worksRepository;
 	}
 	

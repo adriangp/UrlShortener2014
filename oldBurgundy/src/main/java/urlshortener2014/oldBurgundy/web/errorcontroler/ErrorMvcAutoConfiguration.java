@@ -58,6 +58,10 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -106,8 +110,19 @@ public class ErrorMvcAutoConfiguration implements EmbeddedServletContainerCustom
 
 	@Override
 	public void customize(ConfigurableEmbeddedServletContainer container) {
-		container.addErrorPages(new ErrorPage(this.properties.getServletPrefix()
-				+ this.errorPath));
+		container.addErrorPages(new ErrorPage(this.properties.getServletPrefix() + this.errorPath));
+	}
+	
+	public static ResponseEntity<?> responseError(HttpStatus httpStatus){
+		StringWriter writer = new StringWriter();		
+		VelocityContext context = new VelocityContext();
+		context.put("error", httpStatus.getReasonPhrase());
+		context.put("status", httpStatus);
+		context.put("img", "http://localhost:8080/img/" + httpStatus + ".jpg");
+		Velocity.mergeTemplate("err.vm", "ISO-8859-1", context, writer);
+		HttpHeaders h = new HttpHeaders();
+		h.setContentType(MediaType.TEXT_HTML);
+		return new ResponseEntity<>(writer.toString(), h, HttpStatus.NOT_FOUND);
 	}
 
 	@Configuration
@@ -122,7 +137,7 @@ public class ErrorMvcAutoConfiguration implements EmbeddedServletContainerCustom
 			VelocityContext context = new VelocityContext();
 			context.put("error", "${error}");
 			context.put("status", "${status}");
-			Velocity.init();
+			context.put("img", "http://localhost:8080/img/" + "${status}" + ".jpg");
 			Velocity.mergeTemplate("err.vm", "ISO-8859-1", context, writer);
 			SpelView defaultErrorView = new SpelView(writer.toString());
 			return (defaultErrorView);

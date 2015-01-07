@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -23,6 +24,9 @@ public class CSVHandler extends TextWebSocketHandler {
 
 	@Autowired
 	WorksRepository worksRepository;
+
+	@Autowired
+	private ServerProperties properties;
 
     @Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception{

@@ -10,7 +10,11 @@
 	<body>
 		<div id="banner"></div>
 		<div class="jumbotron">
-			<p>There was an unexpected error (type=$error, status=$status).</p>
+			<center>
+				<h1><b>Error: $error ($status)</b></h1>
+				<br/>
+				<img src="$img" alt="Smiley face" height="300">
+			</center>
 		</div>
 	</body>
 </html>
