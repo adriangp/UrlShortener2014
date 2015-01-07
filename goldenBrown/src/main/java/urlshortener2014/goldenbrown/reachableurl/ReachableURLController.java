@@ -61,7 +61,7 @@ public class ReachableURLController {
 		    else if (code == HttpURLConnection.HTTP_MOVED_PERM || code == HttpURLConnection.HTTP_MOVED_TEMP
 		    		|| code == HttpURLConnection.HTTP_SEE_OTHER){
 		    	logger.info("Url has redirects, \""+urlString + "\" is Not Reachable.");
-		    	return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		    	return new ResponseEntity<>(HttpStatus.TEMPORARY_REDIRECT);
 		    }
 		    else{
 		    	logger.info("\""+urlString + "\" is Not Reachable.");

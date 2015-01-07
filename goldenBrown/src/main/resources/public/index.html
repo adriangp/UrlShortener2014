@@ -46,6 +46,7 @@
 			data : link,
 			complete: function(jqXHR, textStatus) {
 				var result = false;
+				var printDefaultMessage = true;
 				switch(jqXHR.status){
 				case 200:
 					result = true;
@@ -56,12 +57,17 @@
 				case 404:
 					result = false;
 					break;
+				case 307:
+					result = false;
+					printDefaultMessage = false;
+					showFeedback("The provided URL contains a Redirection");
+					break;
 				}
 				if(result){
 					queryLink(link);
 				}
-				else{
-					showFeedback("The provided URL is not reachable!");
+				else if(printDefaultMessage){
+					showFeedback("The provided URL is not Reachable");
 				}
 			}
 		});
