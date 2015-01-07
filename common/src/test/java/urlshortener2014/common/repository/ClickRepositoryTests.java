@@ -8,6 +8,7 @@ import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.
 import static urlshortener2014.common.repository.fixture.ClickFixture.click;
 import static urlshortener2014.common.repository.fixture.ShortURLFixture.badUrl;
 import static urlshortener2014.common.repository.fixture.ShortURLFixture.url1;
+import static urlshortener2014.common.repository.fixture.ShortURLFixture.url1modified;
 import static urlshortener2014.common.repository.fixture.ShortURLFixture.url2;
 
 import org.junit.After;
@@ -18,6 +19,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 import urlshortener2014.common.domain.Click;
+import urlshortener2014.common.domain.ShortURL;
 
 public class ClickRepositoryTests {
 
@@ -71,6 +73,16 @@ public class ClickRepositoryTests {
 		repository.save(click(url2()));
 		repository.save(click(url1()));
 		assertEquals(repository.findByHash(badUrl().getHash()).size(), 0);
+	}
+
+	@Test
+	public void thatDeleteDelete() {
+		Long id1 = repository.save(click(url1())).getId();
+		Long id2 = repository.save(click(url2())).getId();
+		repository.delete(id1);
+		assertEquals(repository.count().intValue(), 1);
+		repository.delete(id2);
+		assertEquals(repository.count().intValue(), 0);
 	}
 
 	@After
