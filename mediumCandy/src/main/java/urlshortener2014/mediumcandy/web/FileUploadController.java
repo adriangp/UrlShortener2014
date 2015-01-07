@@ -32,9 +32,19 @@ public class FileUploadController {
 	
 	private byte[] fileBytes = null;
 
+	/**
+	 * Reads each line of the CSV file stored on [filyBytes] and save each line as a URI string.
+	 * 
+	 * After that, creates the shortened URIs and adds them to the response forming a new
+	 * CSV file for downloading on the client side.
+	 * 
+	 * @param fileName
+	 * @param response
+	 * @throws IOException
+	 */
 	@RequestMapping(value = "/files/{file_name}", method = RequestMethod.GET)
 	public void getFile(@PathVariable("file_name") String fileName,
-						HttpServletResponse response) {
+						HttpServletResponse response) throws IOException {
 		ShortURL su = null;
 		
 		try {
@@ -74,12 +84,21 @@ public class FileUploadController {
 			response.setContentType("application/x-download");
 			response.setHeader("Content-disposition", "attachment; filename=" + fileName + ".csv");
 			response.flushBuffer();
+			
+		} catch (NullPointerException ne){
+			// Deleting File
+			File file = new File( fileName + ".csv" );
+			file.delete();
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, 
+					"Either your CSV has a invalid format or contains an invalid/unreachable url");
 		} catch (IOException ex) {
 			throw new RuntimeException("IOError writing file to output stream");
 		}
 
 	}
 	
+	
+	/*  Generates the name for the file to download */
 	private String generateString(String name) {
 		String timest = new Timestamp(System.currentTimeMillis()).toString();
 		String concat = name + timest;
@@ -88,6 +107,15 @@ public class FileUploadController {
 		return hash;
 	}
     
+	
+	/**
+	 * Gets the uploaded CSV file from the client and transform it in an array of bytes
+	 * 
+	 * This is the way to handle de upload of the CSV file.
+	 * 
+	 * @param request
+	 * @return
+	 */
     @RequestMapping(value="/upload", method=RequestMethod.POST)
     public ResponseEntity<String> handleFileUpload(MultipartHttpServletRequest request){
         Iterator<String> iterator = request.getFileNames();

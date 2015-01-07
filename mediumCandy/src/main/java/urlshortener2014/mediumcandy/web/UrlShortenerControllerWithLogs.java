@@ -80,6 +80,12 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	
 	/**
 	 * Shortens a given URL if this URL is reachable via HTTP.
+	 * 
+	 * @param url
+	 * @param sponsor
+	 * @param brand
+	 * @param request
+	 * @return if OK, status.CREATED and ShortURL else, status.BAD_REQUEST
 	 */
 	@RequestMapping(value = "/linkreachable", method = RequestMethod.POST)
 	public ShortURL shortenerIfReachable(@RequestParam("url") String url,
@@ -99,6 +105,8 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	
 	/**
 	 * Return stats a given URL.
+	 * @param url
+	 * @return if OK, status.CREATED and listStatics else, status.BAD_REQUEST
 	 */
 	@RequestMapping(value = "/linkstats", method = RequestMethod.GET)
 	public List<ClickStats> getLinkStats(@RequestParam("url") String url){
@@ -118,7 +126,11 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	}
 	
 	/**
-	 * Shortens a given URL with a given brand.
+	 * Shortens and customizes a given URL.
+	 * @param url
+	 * @param brand
+	 * @param request
+	 * @return if OK status.CREATED and ShortURL else status.BAD_REQUEST
 	 */
 	@RequestMapping(value = "/linkcustomized", method = RequestMethod.POST)
 	public ShortURL shortenerCustomized(@RequestParam("url") String url,
