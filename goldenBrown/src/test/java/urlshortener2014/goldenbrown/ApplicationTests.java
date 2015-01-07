@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
 @IntegrationTest("server.port=0")
+@DirtiesContext
 public class ApplicationTests {
 
 	@Value("${local.server.port}")
