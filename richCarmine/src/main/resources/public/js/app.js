@@ -12,6 +12,11 @@ angular.module('shortener', ['ui.router','ui.bootstrap'])
                 url: "/massive",
                 templateUrl: "templates/main/massive.html",
                 controller: "MassiveCtrl"
+            })
+            .state('restcsv', {
+                url: "/rest/massive",
+                templateUrl: "templates/main/restMassive.html",
+                controller: "RestMassiveCtrl"
             });
         $urlRouterProvider.otherwise('inicio');
     })
@@ -92,7 +97,7 @@ angular.module('shortener', ['ui.router','ui.bootstrap'])
         }
     }])
 
-    .controller('MassiveCtrl', ['$scope', '$http', function ($scope, $http) {
+    .controller('MassiveCtrl', ['$scope', function ($scope) {
         $scope.max = 0;
         $scope.lines = [];
         $scope.hideData = true;
@@ -100,6 +105,7 @@ angular.module('shortener', ['ui.router','ui.bootstrap'])
         $scope.loaded_per = 0;
         $scope.urls = []
         $scope.csv_uri = "";
+        var data_to_show = 50;
 
         var ws_uri = "ws://" + window.location.host + "/ws/naivews";
         $scope.showContent = function($fileContent){
@@ -114,13 +120,17 @@ angular.module('shortener', ['ui.router','ui.bootstrap'])
                     $scope.$apply(function(){
                         $scope.csv_uri = "http://" + window.location.host + "/" + data.uri;
                     });
-                    console.log(data);
+                    if($scope.max > data_to_show){
+                        $scope.urls = data.csv;
+                    }
                 }
                 else{
                     $scope.$apply(function(){
                         $scope.loaded ++;
                         $scope.loaded_per = $scope.loaded/$scope.max * 100;
-                        $scope.urls.push(data);
+                        if($scope.max <= data_to_show){
+                            $scope.urls.push(data);
+                        }
                     });
                 }
             };
@@ -171,6 +181,59 @@ angular.module('shortener', ['ui.router','ui.bootstrap'])
                     reader.readAsText((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
                 });
             }
+        };
+    }])
+
+//    REST CONTROLLER AND STUFF
+    .directive('fileModel', ['$parse', function ($parse) {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attrs) {
+                var model = $parse(attrs.fileModel);
+                var modelSetter = model.assign;
+
+                element.bind('change', function(){
+                    scope.$apply(function(){
+                        modelSetter(scope, element[0].files[0]);
+                    });
+                });
+            }
+        };
+    }])
+    .service('fileUpload', ['$http', '$rootScope', function ($http, $rootScope) {
+        $rootScope.btn_hide = true;
+        $rootScope.urls = [];
+        this.uploadFileToUrl = function(file, uploadUrl){
+            var fd = new FormData();
+            fd.append('file', file);
+            $http.post(uploadUrl, fd, {
+                transformRequest: angular.identity,
+                headers: {'Content-Type': undefined}
+            })
+                .success(function(data){
+                    console.log("GOT SMTH!");
+                    console.log(data);
+                    $rootScope.btn_hide = false;
+                    $rootScope.csv_uri = data.uri;
+                    $rootScope.urls = data.csv;
+                })
+                .error(function(){
+                });
+        }
+        $rootScope.downloadCSV = function(){
+            window.location.assign($rootScope.csv_uri);
+//            console.log($rootScope.csv_uri);
+//            console.log($rootScope.btn_hide);
+//            console.log($rootScope.urls);
+        };
+        return this;
+    }])
+    .controller('RestMassiveCtrl', ['$scope', 'fileUpload', function($scope, fileUpload){
+
+        $scope.uploadFile = function(){
+            var file = $scope.myFile;
+            var uploadUrl = "/rest/csv";
+            fileUpload.uploadFileToUrl(file, uploadUrl);
         };
     }])
 

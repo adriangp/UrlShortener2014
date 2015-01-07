@@ -11,14 +11,14 @@
         </div>
         <div class="collapse navbar-collapse" id="collapsing">
             <ul class="nav navbar-nav navbar-left">
+                <li>
+                    <a href="#/massive">Upload CSV</a>
+                </li>
                 <li class="active">
-                    <a href="#/massive" class="active">Upload CSV</a>
+                    <a href="#/acerca" class="active">Upload CSV [REST]</a>
                 </li>
                 <li>
-                    <a href="#/rest/massive" >Upload CSV [REST]</a>
-                </li>
-                <li>
-                    <a href="#/acerca">About</a>
+                    <a href="#/massive">About</a>
                 </li>
                 <li>
                     <a href="https://github.com/SAReyes/UrlShortener2014">Code</a>
@@ -48,30 +48,23 @@
             <div class="jumbotron">
                 <div class="row">
                     <div class="col-md-8 col-md-offset-2">
-                        <form class="form-group" ng-submit="uploadContent()">
+                        <form class="form-group" ng-submit="uploadFile()">
                             <div class="input-group">
                                 <!--Browse your CSV&hellip;-->
-                                <input type="file" class="form-control" on-read-file="showContent($fileContent)"/>
+                                <input type="file" class="form-control" file-model="myFile"/>
                                 <span class="input-group-btn">
                                     <button class="btn btn-primary" type="submit">Shorten!</button>
                                 </span>
                             </div>
                         </form>
                         <!-- responsive data -->
-                        <div ng-hide="hideData" class="ng-hide">
+                        <div ng-hide="btn_hide" class="ng-hide">
                             <div class="container">
                                 <div class="row">
                                     <div class="col-xs-1">
                                         <label ng-click="downloadCSV()" class="btn btn-primary">
                                             <span class="glyphicon glyphicon-download"></span>
                                         </label>
-                                    </div>
-                                    <div class="col-xs-11">
-                                        <progressbar value="loaded_per" type="success">
-                                            <b>
-                                                {{loaded_per}}%
-                                            </b>
-                                        </progressbar>
                                     </div>
                                 </div>
                             </div>
