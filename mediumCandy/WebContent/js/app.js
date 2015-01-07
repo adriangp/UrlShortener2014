@@ -7,7 +7,7 @@ var SERVICE_URI = "http://localhost:8080/";
 var ALERT_SHORTEN_URL = "Unable to shorten that link. It is not a valid or reachable url.";
 var ALERT_ALREADY_SHORTEN = "That is already a shortened link!";
 var ALERT_STATS = "Could not show the stats of that link. Try with a different one.";
-var ALERT_STATS = "Unable to shorten that link. Check out your form or try a different brand";
+var ALERT_BRANDED = "Unable to shorten that link. Check out your form or try a different brand.";
 
 /* Other vars */
 var shortenedUriList = []; // list of shortened urls objects
@@ -52,9 +52,8 @@ function setBrandedSubmition() {
     var url = getBrandedUrl();
     var brand = getBrand();
     
-    if ( ! emptyUserInput(url) && ! emptyUserInput(brand) ) {
-      // AJAX Call
-      insertBrandedUriInDOM(/* brandedObj */); // Call inside 'success' function
+    if ( ! emptyUserInput(url) && !  emptyUserInput(brand) ) {
+      brandedURL(url, brand)
     }
     
     e.preventDefault(); //stop form submission
@@ -202,6 +201,14 @@ function clearStatsInput() {
 }
 
 /*
+ * Clears all text in #urlBrandedForm.
+ */
+function clearBrandedInput() {
+  $( '#brandInput' ).val('');
+  $( '#urlBrandInput' ).val('');
+}
+
+/*
  * Returns TRUE if 'input' is an empty String.
  */
 function emptyUserInput(input) {
@@ -313,30 +320,6 @@ function insertLatestShortenedUriInDOM(shortenedUri) {
 }
 
 /*
- * Inserts the HTML of the given brandedUri object, inside
- * the latest shortened URL block.
- */
-function insertBrandedUriInDOM() {
-  var branded = $(  '<div class="shorten-url-elem">' +
-                      '<div class="img-block">' +
-                        '<img src="/img/href.png">' +
-                      '</div>' +
-                      '<div class="details-block">' +
-                        '<div class="shortened-url">' +
-                          'http://localhost:8080/briiiiiiiiiiiiibriiiiiiiiiiiii' +
-                        '</div>' +
-                        '<div class="target-url"><a target="_blank" href="">jsdasdsad</a>' +
-                        '</div>' +
-                      '</div>' +
-                    '</div>' );
-  
-  $( '#branded-block' ).html( branded );
-  // animation when shown! :-)
-  $( '#branded-block' ).hide();
-  $( '#branded-block' ).slideDown();
-}
-
-/*
  * Inserts the HTML of the given shortenedUri object, inside
  * the latest shortened URL block.
  */
@@ -361,6 +344,29 @@ function insertStatsInDOM(statsObj) {
   // animation when shown! :-)
   $( '.stats-url-block' ).hide();
   $( '.stats-url-block' ).slideDown();
+}
+
+/*
+ * Inserts the HTML of the given brandedUri object, inside
+ * the latest shortened URL block.
+ */
+function insertBrandedUriInDOM(brandedObj) {
+  var branded = $(  '<div class="shorten-url-elem">' +
+                      '<div class="img-block">' +
+                        '<img src="/img/href.png">' +
+                      '</div>' +
+                      '<div class="details-block">' +
+                        '<div class="shortened-url">' + brandedObj.uri + '</div>' +
+                        '<div class="target-url"><a target="_blank" href="' 
+                        + brandedObj.target + '">' + brandedObj.target + '</a>' +
+                        '</div>' +
+                      '</div>' +
+                    '</div>' );
+  
+  $( '#branded-block' ).html( branded );
+  // animation when shown! :-)
+  $( '#branded-block' ).hide();
+  $( '#branded-block' ).slideDown();
 }
 
 /*
@@ -438,6 +444,30 @@ function shortenURL(url) {
       } else {
         showAlert(ALERT_SHORTEN_URL);
       }
+      console.log("Oops! RESPONSE Status:  " + error.status);
+    }
+  });
+}
+
+/*
+ * ( POST method ): Shortens the given URL.
+ */
+function brandedURL(url, brand) {
+  $.ajax({
+    type : 'POST',
+	contentType : 'application/json',
+	url : SERVICE_URI + "linkcustomized?url=" + url + "&brand=" + brand,
+	dataType : "json",
+	success : function(response) {
+      var brandedObj = response;
+      // update DOM with response data
+      insertBrandedUriInDOM(brandedObj)
+      // clear form
+      clearBrandedInput();
+      console.log('exito!');
+    },    
+    error : function(error) {
+      showAlert(ALERT_BRANDED);
       console.log("Oops! RESPONSE Status:  " + error.status);
     }
   });
