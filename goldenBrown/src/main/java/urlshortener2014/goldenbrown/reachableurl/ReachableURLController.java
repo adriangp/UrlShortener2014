@@ -55,28 +55,28 @@ public class ReachableURLController {
 		    huc.connect(); 
 		    code = huc.getResponseCode();
 		    if (code == HttpURLConnection.HTTP_OK){
-		    	logger.info("\""+url + "\" is Reachable.");
+		    	logger.info("\""+urlString + "\" is Reachable.");
 		    	return new ResponseEntity<>(HttpStatus.OK);
 		    }
 		    else{
-		    	logger.info("\""+url + "\" is Not Reachable.");
+		    	logger.info("\""+urlString + "\" is Not Reachable.");
 		    	return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		    }
 		}
 		catch(IllegalArgumentException e){
-			logger.error("Bad Request, cannot check if url is reachable.");
+			logger.error("Bad Request, cannot check if \""+urlString + "\" is reachable.");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} catch (MalformedURLException e) {
-			logger.error("Url is Malformed, cannot check if url is reachable.");
+			logger.error("Url is Malformed, cannot check if \""+urlString + "\" is reachable.");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} catch(SocketTimeoutException e){
-			logger.error("Connection Timeout, url is Not Reachable");
+			logger.error("Connection Timeout, \""+urlString + "\" is Not Reachable");
 			return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
 		} catch (ConnectException e){
-			logger.error("Connection Timeout, url is Not Reachable");
+			logger.error("Connection Timeout, \""+urlString + "\" is Not Reachable");
 			return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
 		} catch(IOException e){
-			logger.error("Bad Request, cannot check if url is reachable.");
+			logger.error("Bad Request, cannot check if \""+urlString + "\" is reachable.");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		finally{

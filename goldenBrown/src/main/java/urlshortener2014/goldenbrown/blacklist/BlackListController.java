@@ -103,17 +103,19 @@ public class BlackListController {
 			catch(Exception e){ }
 		    blacklisted = blackListService.isBlackListed(host);
 		    if (!blacklisted){
+		    	logger.info("\""+urlString + "\" is Not Blacklisted.");
 		    	return new ResponseEntity<>(HttpStatus.OK);
 		    }
 		    else{
+		    	logger.info("\""+urlString + "\" is Blacklisted.");
 		    	return new ResponseEntity<>(HttpStatus.LOCKED);
 		    }
 		}
 		catch(IllegalArgumentException e){
-			System.err.println(e.getMessage());
+			logger.error("Bad Request, cannot check if \""+urlString + "\" is blacklisted.");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} catch (MalformedURLException e) {
-			System.err.println(e.getMessage());
+			logger.error("Url is Malformed, cannot check if \""+urlString + "\" is blacklisted.");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}

@@ -45,7 +45,7 @@ public class PlatformIdentifierController {
 			return new ResponseEntity<PlatformIdentity>(pi, HttpStatus.OK);
 		}
 		catch(IllegalArgumentException e){
-			logger.error("Bad Request, User-Agent cannot be readed");
+			logger.error("Bad Request, User-Agent cannot be read");
 			return new ResponseEntity<PlatformIdentity>(HttpStatus.BAD_REQUEST);
 		}
 		
