@@ -43,7 +43,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	private ShortURLRepository SURLR;
 	private static final Logger logger = LoggerFactory
 			.getLogger(UrlShortenerControllerWithLogs.class);
-	
+
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand,
@@ -57,24 +57,26 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		Client c = ClientBuilder.newClient();
 		url = parse(url);
 		Response response = c
-				.target("https://sb-ssl.google.com/safebrowsing/api/lookup?client=Roberto&key=AIzaSyBbjDCPwK13dOYioVf6Cp9_lrFZ_MOEFbU&appver=1.5.2&pver=3.1&url="
+				.target("https://sb-ssl.google.com/safebrowsing/api/lookup?client=Roberto&key="
+						+ "AIzaSyBbjDCPwK13dOYioVf6Cp9_lrFZ_MOEFbU&appver=1.5.2&pver=3.1&url="
 						+ url).request(MediaType.TEXT_HTML).get();
 
-		if (response.getStatus() == 200){
-				
+		if (response.getStatus() == 200) {
+
 			SURLR.mark(su.getBody(), false);// marcar como no segura
-			new DirectFieldAccessor(su.getBody()).setPropertyValue("safe", false);
+			new DirectFieldAccessor(su.getBody()).setPropertyValue("safe",
+					false);
 		}
 		return su;
 	}
-	
+
 	public ResponseEntity<?> redirectTo(@PathVariable String id,
 			HttpServletRequest request) {
 		logger.info("Requested redirection with hash " + id);
 		String agent = request.getHeader("User-Agent");
 		String ip = request.getRemoteAddr();
 		String navegador = "", SO = "";
-		if(agent!=null){
+		if (agent != null) {
 			if (agent.indexOf("Chrome") != -1)
 				navegador = "Chrome";
 			else if (agent.indexOf("Firefox") != -1)
@@ -90,10 +92,9 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			else if (agent.indexOf("Macintosh") != -1)
 				SO = "Macintosh";
 			else
-				SO="Desconocido";
-		}
-		else{
-			navegador="Desconocido";
+				SO = "Desconocido";
+		} else {
+			navegador = "Desconocido";
 			SO = "Desconocido";
 		}
 
@@ -105,8 +106,8 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		// click con el navegador y SO, actualizar BD y return
 		ResponseEntity<?> response = super.redirectTo(id, request);
 		List<Click> listaClicks = clickRepository.findByHash(id);
-		logger.info("Se ha realizado un click con Navegador:" + navegador + ", SO: " + SO
-				+ " e ip:" + ip);
+		logger.info("Se ha realizado un click con Navegador:" + navegador
+				+ ", SO: " + SO + " e ip:" + ip);
 		logger.info("Tamano: " + listaClicks.size() + "ip: " + ip);
 		for (int i = listaClicks.size() - 1; i >= 0; i--) {
 			Click click = listaClicks.get(i);
@@ -118,19 +119,22 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				Click clickFinal = new Click(identificador, hash, fecha, null,
 						navegador, SO, ip, null);
 				clickRepository.update(clickFinal);
-				logger.info("Actualizado Click con " + navegador + " y SO: " + SO
-						+ " e ip:" + ip);
+				logger.info("Actualizado Click con " + navegador + " y SO: "
+						+ SO + " e ip:" + ip);
 				break;
 			}
 		}
-		
+
 		return response;
 	}
 
 	/**
 	 * Guarda el CSV que recibe como parametro de un formulario web
-	 * @param request peticion con el fichero
-	 * @return mensaje de confirmacion en caso de carga correcta, de error en caso contrario
+	 * 
+	 * @param request
+	 *            peticion con el fichero
+	 * @return mensaje de confirmacion en caso de carga correcta, de error en
+	 *         caso contrario
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/Upload", method = RequestMethod.POST)
@@ -139,28 +143,33 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				part.getInputStream()));
 
-		File fichero = new File("build\\resources\\main\\public\\csv\\fich_original.csv");
+		File fichero = new File(
+				"build\\resources\\main\\public\\csv\\fich_original.csv");
 		fichero.createNewFile();
 		PrintWriter f = new PrintWriter(fichero);
 		String linea = "";
 		while ((linea = reader.readLine()) != null) {
 			System.out.println(linea);
 			String[] listaURL = linea.split(",");
-			for (String url : listaURL) 
+			for (String url : listaURL)
 				f.write(url + ",");
 			f.write("\n");
 		}
 		f.close();
-		Response respuesta=analizarCSV(fichero, request);
-		if(respuesta.getStatus()==400){ return "Error con el fichero!";}
+		Response respuesta = analizarCSV(fichero, request);
+		if (respuesta.getStatus() == 400) {
+			return "Error con el fichero!";
+		}
 		return "Fichero Subido!";
 	}
 
-	
 	/**
 	 * Lee el csv que recibe como parametro, acorta todas las URL que contenga
-	 * @param csv CSV que contiene las URL a acortar
-	 * @param request necesario para llamar al acortador
+	 * 
+	 * @param csv
+	 *            CSV que contiene las URL a acortar
+	 * @param request
+	 *            necesario para llamar al acortador
 	 * @return al response le anade un "ok" o un "BAD_REQUEST" segun corresponda
 	 * @throws IOException
 	 */
@@ -169,7 +178,8 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			throws IOException {
 
 		BufferedReader br = new BufferedReader(new FileReader(csv));
-		File csvAcortado = new File("build\\resources\\main\\public\\csv\\fich_temporal.csv");
+		File csvAcortado = new File(
+				"build\\resources\\main\\public\\csv\\fich_temporal.csv");
 		csvAcortado.createNewFile();
 		PrintWriter fileResul = new PrintWriter(csvAcortado);
 		String linea = "";
@@ -180,8 +190,12 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				if (!url.equals(null) || !url.equals("")) {
 					ResponseEntity<ShortURL> urlAcortada = shortener(url, null,
 							null, request);
-					if(urlAcortada.getBody()==null) return Response.status(Status.BAD_REQUEST).build();
-					else fileResul.write(urlAcortada.getBody().getUri().toString()+ ",");
+					if (urlAcortada.getBody() == null)
+						return Response.status(Status.BAD_REQUEST).build();
+					else
+						fileResul.write(urlAcortada.getBody().getUri()
+								.toString()
+								+ ",");
 				}
 			}
 			fileResul.write("\n");
@@ -190,12 +204,15 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		br.close();
 		return Response.status(Status.OK).build();
 	}
-	
+
 	/**
-	 * Codifica los caracteres de la URL que recibe como parametro para que esta pueda ser pasada por 
-	 * parametro en un formulario
-	 * @param a  String que contiene la URL
-	 * @return String que contiene la URL con los caracteres especiales codificados
+	 * Codifica los caracteres de la URL que recibe como parametro para que esta
+	 * pueda ser pasada por parametro en un formulario
+	 * 
+	 * @param a
+	 *            String que contiene la URL
+	 * @return String que contiene la URL con los caracteres especiales
+	 *         codificados
 	 */
 	private static String parse(String a) {
 		String res = "";

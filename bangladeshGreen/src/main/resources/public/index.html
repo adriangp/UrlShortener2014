@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="shortcut icon" href="http://www.unizar.es/sites/default/files/favicon.ico" type="image/vnd.microsoft.icon" />
+<link rel="shortcut icon"
+	href="http://www.unizar.es/sites/default/files/favicon.ico"
+	type="image/vnd.microsoft.icon" />
 <title>BangladeshGreen URLShortener - Universidad de Zaragoza</title>
 <meta charset="utf-8">
 <link rel="stylesheet" href="css/reset.css" type="text/css" media="all">
@@ -39,7 +41,8 @@
 
 			document.getElementById('fileName').innerHTML = 'Nombre: '
 					+ file.name;
-			document.getElementById('fileSize').innerHTML = 'Tamaño: ' + fileSize;
+			document.getElementById('fileSize').innerHTML = 'Tamaño: '
+					+ fileSize;
 			document.getElementById('fileType').innerHTML = 'Tipo: '
 					+ file.type;
 			document.getElementById('row2').innerHTML = '<input type=\"button\" onclick=\"uploadFile()\" value=\"Upload\" class=\"subir-button\"/>';
@@ -57,7 +60,6 @@
 		xhr.open("POST", "/Upload");
 		xhr.send(fd);
 	}
-
 
 	function uploadComplete(evt) {
 		/* This event is raised when the server send back a response */
@@ -80,7 +82,6 @@
 		alert("Hubo un error al intentar cargar el fichero.");
 	}
 
-	
 	function uploadCanceled(evt) {
 		alert("La carga ha sido cancelada por el usuario o el navegador ha perdido la conexion.");
 	}
@@ -101,8 +102,12 @@
 														data : $(this)
 																.serialize(),
 														success : function(msg) {
-														if(!msg.safe){alert("¡Cuidado!La direccion acortada redirige a una URL no segura.");};
-															$("#result").html(
+															if (!msg.safe) {
+																alert("¡Cuidado!La direccion acortada redirige a una URL no segura.");
+															}
+															;
+															$("#result")
+																	.html(
 																			"<div class='result'><h1 class='result-title'>Short URL</h1><a target='_blank' href="
 																	+ msg.uri +" class='result-link'><input type='text' class='result-input' readonly value='"
 																	+msg.uri+"''></a></div>")
@@ -165,18 +170,18 @@
 												<br />
 												<div class="row1">
 													<input type="file" name="fileToUpload" id="fileToUpload"
-														onchange="fileSelected();" />
-													<br><br> <span class="desc">Arrastra ficheros o haz click para abrir el explorador</span>
+														onchange="fileSelected();" /> <br> <br> <span
+														class="desc">Arrastra ficheros o haz click para
+														abrir el explorador</span>
 												</div>
 												<div class="info">
 													<div id="fileName"></div>
 													<div id="fileSize"></div>
 													<div id="fileType"></div>
 												</div>
-												<div id="row2" class="row2">
-												</div>
+												<div id="row2" class="row2"></div>
 											</form>
-											
+
 											<div id="download"></div>
 										</div>
 									</div>
