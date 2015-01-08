@@ -18,13 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
-/**
-* Class that provide a web service that consist of prove if an URL can be reachable using
-* the HEAD petition to the URL and avoid redirections. Also the Class has a Time Out of
-* 5 seconds, after that if the page isn't reachable the answer is a Not Found HTTP.
-* @author: Jorge,Javi,Gabi
-* @version: 08/01/2015
-*/
 @RestController
 public class InterstitialController {
 	//Parameter that calculate the time out of the URL

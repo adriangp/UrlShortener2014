@@ -3,15 +3,19 @@ package urlshortener2014.goldenbrown.web;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.Random;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,7 +50,13 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			"http://localhost:8080/blacklist/onshortener/?url={url}";
 	private final static String INTERSTITIAL_URI = 
 			"http://localhost:8080/interstitial/?targetURL={targetURL}&interstitialURL={interstitialURL}";
-	private final static String BANNER_URL = "http://www.unizar.es/";
+	private final static String[] BANNER_URL = {
+		"http://www.unizar.es",
+		"http://stackoverflow.com",
+		"http://add.unizar.es/add/campusvirtual",
+		"http://www.spamhaus.org/sbl/latest/",
+		"https://es.wikipedia.org/wiki/Wikipedia:Portada"
+	};
 	/**
 	 * Method that managent all refer to user click about the short URL
 	 * In this method realize the identification of the platform and navigator using the User-Agent
@@ -161,15 +171,31 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			@RequestParam(value = "brand", required = false) String brand,
 			HttpServletRequest request) {
 		logger.info("Requested new short for uri "+url);
-		ShortURL shorturl = new ShortURL();
-		
 		boolean insertBanner = getSponsorParam(sponsor);
 		if (insertBanner){
-			sponsor = BANNER_URL;
+			sponsor = getRandomURL();
 		}
 		else{
 			sponsor = "";
 		}
+		String id = Hashing.murmur3_32()
+				.hashString(url+sponsor, StandardCharsets.UTF_8).toString();
+		ShortURL shorturl;
+		shorturl = shortURLRepository.findByKey(id);
+		if (shorturl == null){
+			shorturl = createAndSaveIfValid(id, url, sponsor, "", 
+					UUID.randomUUID().toString(), extractIP(request));
+		}
+		else{
+			// It seems to be a bug of the common framework
+			// If a ShortURL is retrieved from the database, 
+			// its "uri" field is null causing a NullPointerException
+			// So we need to generate create ShortURL (because it does 
+			// not allow to set a new URI
+			shorturl = createShortURL(id, url, sponsor, UUID
+					.randomUUID().toString(), extractIP(request));
+		}
+		
 		if(insertBanner) { logger.info("Insert banner"); }
 		
 		RestTemplate restTemplate = new RestTemplate();
@@ -180,27 +206,34 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 						null,
 						url);
 			if (response.getStatusCode().equals(HttpStatus.OK)){
-				return super.shortener(url, sponsor, brand, request);
+				HttpHeaders h = new HttpHeaders();
+				h.setLocation(shorturl.getUri());
+				return new ResponseEntity<>(shorturl, h, HttpStatus.CREATED);
 			}
 			else{
-				return new ResponseEntity<ShortURL>(shorturl, HttpStatus.UNPROCESSABLE_ENTITY);
+				return new ResponseEntity<ShortURL>(HttpStatus.UNPROCESSABLE_ENTITY);
 			}
 		}
 		catch(HttpClientErrorException e){
 			switch(e.getStatusCode()){
 			case LOCKED:
 				logger.info("Url "+url+" was considered spam.");
-				return new ResponseEntity<ShortURL>(shorturl, HttpStatus.LOCKED);
+				return new ResponseEntity<ShortURL>(HttpStatus.LOCKED);
 			default:
-				return new ResponseEntity<ShortURL>(shorturl, HttpStatus.UNPROCESSABLE_ENTITY);
+				return new ResponseEntity<ShortURL>(HttpStatus.UNPROCESSABLE_ENTITY);
 			}
 		}
 		catch(Exception e){
 			logger.info("Unkown Exception");
-			return new ResponseEntity<ShortURL>(shorturl, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<ShortURL>(HttpStatus.BAD_REQUEST);
 		}
 	}
 	
+	private String getRandomURL() {
+		Random r = new Random();
+		return BANNER_URL[r.nextInt(BANNER_URL.length)];
+	}
+
 	private boolean getSponsorParam(String sponsor) {
 		switch(sponsor){
 		case "true":
@@ -226,6 +259,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				null, browser, platform, ip, null);
 		clickRepository.save(cl);
 	}
+	
 	/**
 	 * This method  update the date of a given short URL.
 	 * @param oldsu short URL to update
@@ -238,6 +272,33 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				safe, oldsu.getIP(), oldsu.getCountry());
 		shortURLRepository.update(su);
 		return su;
+	}
+	
+	protected ShortURL createAndSaveIfValid(String id, String url, String sponsor,
+			String brand, String owner, String ip) {
+		UrlValidator urlValidator = new UrlValidator(new String[] { "http",
+				"https" });
+		if (urlValidator.isValid(url)) {
+			ShortURL su = createShortURL(id, url, sponsor, owner, ip);
+			return shortURLRepository.save(su);
+		} else {
+			return null;
+		}
+	}
+
+	private ShortURL createShortURL(String id, String url, String sponsor, String owner,
+			String ip) {
+		ShortURL su = new ShortURL(id, url,
+				generateUri(id), sponsor, new Date(
+						System.currentTimeMillis()), owner,
+				HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
+		return su;
+	}
+
+	private URI generateUri(String id) {
+		return linkTo(
+				methodOn(UrlShortenerControllerWithLogs.class).redirectTo(
+						id, null)).toUri();
 	}
 }
 
