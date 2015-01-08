@@ -1,6 +1,6 @@
 <html>
 <head>
-<script type="text/javascript" src="webjars/jquery/2.0.3/jquery.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
 <title>Redirecting</title>
 <script>
 var targetURL = "${targetURL}";
@@ -10,10 +10,11 @@ var remaining_sec = waitingTime;
 </script>
 </head>
 <body>
-	<h1>Redirecting in <label id="remaining_sec">${waitingTime}</label> seconds...
+	<h1>Redirecting in <label id="remaining_sec">${waitingTime}</label> seconds... 
 	</h1>
+	<label id="click_here_link"></label>
 	<div id="mydiv">
-		<iframe id="frame" width="80%" height="80%" src="${interstitialURL}" > </iframe>
+		<iframe id="frame" width="100%" height="80%" src="${interstitialURL}" > </iframe>
 	</div>
 <script>
 $( document ).ready(function() {
@@ -24,6 +25,8 @@ $( document ).ready(function() {
 
          if(updateTime == 0){
              window.location = (targetURL);
+             $("#remaining_sec").html(0);
+             $("#click_here_link").html("<a href=\"${targetURL}\">Please click here if you are not automatically redirected.</a>");
          }
      }, 1000);
 }); 
