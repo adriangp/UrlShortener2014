@@ -149,6 +149,9 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		logger.info("Requested new short for uri "+url);
 		ShortURL shorturl = new ShortURL();
 		
+		final String banner_url = "http://www.unizar.es/";
+		boolean insertBanner = getSponsorParam(sponsor);
+		if(insertBanner) { logger.info("Insert banner"); }
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<?> response = null;
 		try{
@@ -160,7 +163,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				return super.shortener(url, sponsor, brand, request);
 			}
 			else{
-				return new ResponseEntity<ShortURL>(shorturl, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<ShortURL>(shorturl, HttpStatus.UNPROCESSABLE_ENTITY);
 			}
 		}
 		catch(HttpClientErrorException e){
@@ -169,7 +172,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				logger.info("Url "+url+" was considered spam.");
 				return new ResponseEntity<ShortURL>(shorturl, HttpStatus.LOCKED);
 			default:
-				return new ResponseEntity<ShortURL>(shorturl, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<ShortURL>(shorturl, HttpStatus.UNPROCESSABLE_ENTITY);
 			}
 		}
 		catch(Exception e){
@@ -178,6 +181,17 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		}
 	}
 	
+	private boolean getSponsorParam(String sponsor) {
+		switch(sponsor){
+		case "true":
+			return true;
+		case "false":
+			return false;
+		default:
+			return false;
+		}
+	}
+
 	/**
 	 * This method create a Click object with the collection information in the method redirectTo
 	 * for send to the common clickRepository and save the click information with the information 
