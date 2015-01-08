@@ -1,15 +1,13 @@
-apply plugin: 'java'
-apply plugin: 'eclipse'
-
-
-repositories {
-   mavenCentral()                                               
+// Demo project specific stuff
+eclipse {
+   project {
+      name = "UrlShortener2014.demo"
+   }
 }
 
 dependencies {
-   compile 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:2.13'
-   compile 'org.glassfish.jersey.core:jersey-server:2.13'
-   compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.13'
-   compile 'org.glassfish.jersey.media:jersey-media-moxy:2.13'
-   testCompile 'junit:junit:4.11'
+   compile project(":common")
+   // Provides java script libraries for static content
+   compile("org.webjars:bootstrap:3.0.3")
+   compile("org.webjars:jquery:2.0.3-1")
 }
