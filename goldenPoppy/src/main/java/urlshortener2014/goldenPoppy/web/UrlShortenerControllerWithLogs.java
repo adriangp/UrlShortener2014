@@ -201,23 +201,21 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				
 				if (i % 10 == 0){
 					// Per 10 URLs about, execute a thread that load the URLs.
-					Future<List<Content>> future = executor.submit(new Load(longs, this, request));
-					futures.add(future);
+					futures.add(executor.submit(new Load(longs, this, request)));
 					longs = new ArrayList<Content>();
 				}
 				line = buffer.readLine();
 			}
 			
 			// Process the rest of the file
-			Future<List<Content>> future = executor.submit(new Load(longs, this, request));
-			futures.add(future);
+			futures.add(executor.submit(new Load(longs, this, request)));
 			
 			for (Future<List<Content>> f : futures){
 				// Wait all the threads and take the result of the load.
+				this.percent = shorts.size();
 				List<Content> l = f.get();
 				for (Content c : l){
-					shorts.add(c);	
-					this.percent = shorts.size();
+					shorts.add(c);
 				}
 			}
 			
@@ -225,6 +223,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			
 			// Create a file with the result of the load.
 			writeInFile(shorts, filename + ".csv");
+			
 		}catch (IOException e){
 			logger.info("IO Error reading the file " + file.getOriginalFilename());
 		} catch (InterruptedException e) {
@@ -283,19 +282,14 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		FileWriter fileWriter = null;
 		try{
 			fileWriter = new FileWriter("tmp/files/"+hash);
+			logger.info("File tmp/files/"+hash + " created");
 			for (Content c : shorts){
 				fileWriter.write(c.getURL() + ", " + c.getSponsor() + "\n");
 			}			
-		} catch (Exception e) {
+		} catch (FileNotFoundException e) {
+			logger.info("Massive load: File not exists.");
+		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if (null != fileWriter)
-					fileWriter.close();
-			} catch (Exception e2) {
-				e2.printStackTrace();
-			}
 		}
 	}
-
 }
