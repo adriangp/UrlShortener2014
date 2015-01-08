@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import urlshortener2014.goldenbrown.web.UrlShortenerControllerWithLogs;
 
 /**
 * Class that provide a web service that consist of prove if an URL can be reachable using
