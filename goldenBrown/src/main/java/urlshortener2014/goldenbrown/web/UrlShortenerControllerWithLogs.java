@@ -40,13 +40,13 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
 	private final static String PLATFORMIDENTIFIER_URI = 
 			"http://localhost:8080/platformidentifier/?us={us}";
-//	private final static String BLACKLIST_ONREDIRECTTO_URI = 
-//			"http://localhost:8080/blacklist/onredirectto/?url={url}?date={date}?safe={safe}";
 	private final static String BLACKLIST_ONREDIRECTTO_URI = 
 	"http://localhost:8080/blacklist/onredirectto/?url={url}&date={date}&safe={safe}";
 	private final static String BLACKLIST_ONSHORTENER_URI = 
 			"http://localhost:8080/blacklist/onshortener/?url={url}";
-
+	private final static String INTERSTITIAL_URI = 
+			"http://localhost:8080/interstitial/?targetURL={targetURL}&interstitialURL={interstitialURL}";
+	private final static String BANNER_URL = "http://www.unizar.es/";
 	/**
 	 * Method that managent all refer to user click about the short URL
 	 * In this method realize the identification of the platform and navigator using the User-Agent
@@ -64,7 +64,9 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     		useragentstring = request.getHeader("User-Agent");
     		
     		RestTemplate restTemplate = new RestTemplate();
-    		ResponseEntity<PlatformIdentity> respPlatform, respBlackList;
+    		ResponseEntity<PlatformIdentity> respPlatform; 
+    		ResponseEntity<?> respBlackList;
+    		ResponseEntity<String> respInterstitial;
     		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     		String dateString = sdf.format(l.getCreated());
     		try{
@@ -106,7 +108,19 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	    			platform = pi.getOs();
 	    		}
 				createAndSaveClick(id, extractIP(request), browser, platform);
-				return createSuccessfulRedirectToResponse(l);
+				
+				if(l.getSponsor().length() != 0){
+					respInterstitial = restTemplate.getForEntity(
+							INTERSTITIAL_URI,
+							String.class,
+							l.getTarget(),
+							l.getSponsor());
+					return new ResponseEntity<>(respInterstitial.getBody(), 
+							respInterstitial.getHeaders(), respInterstitial.getStatusCode());
+				}
+				else{
+					return createSuccessfulRedirectToResponse(l);
+				}
     		}
     		catch(HttpClientErrorException e){
     			switch(e.getStatusCode()){
@@ -149,9 +163,15 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		logger.info("Requested new short for uri "+url);
 		ShortURL shorturl = new ShortURL();
 		
-		final String banner_url = "http://www.unizar.es/";
 		boolean insertBanner = getSponsorParam(sponsor);
+		if (insertBanner){
+			sponsor = BANNER_URL;
+		}
+		else{
+			sponsor = "";
+		}
 		if(insertBanner) { logger.info("Insert banner"); }
+		
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<?> response = null;
 		try{

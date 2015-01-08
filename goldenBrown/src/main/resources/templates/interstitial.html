@@ -1,0 +1,32 @@
+<html>
+<head>
+<script type="text/javascript" src="webjars/jquery/2.0.3/jquery.min.js"></script>
+<title>Redirecting</title>
+<script>
+var targetURL = "${targetURL}";
+var interstitialURL = "${interstitialURL}";
+var waitingTime = "${waitingTime}";
+var remaining_sec = waitingTime;
+</script>
+</head>
+<body>
+	<h1>Redirecting in <label id="remaining_sec">${waitingTime}</label> seconds...
+	</h1>
+	<div id="mydiv">
+		<iframe id="frame" width="80%" height="80%" src="${interstitialURL}" > </iframe>
+	</div>
+<script>
+$( document ).ready(function() {
+	 window.setInterval(function() {
+         var timeCounter = $("#remaining_sec").html();
+         var updateTime = eval(timeCounter)- eval(1);
+         $("#remaining_sec").html(updateTime);
+
+         if(updateTime == 0){
+             window.location = (targetURL);
+         }
+     }, 1000);
+}); 
+</script>
+</body>
+</html>
