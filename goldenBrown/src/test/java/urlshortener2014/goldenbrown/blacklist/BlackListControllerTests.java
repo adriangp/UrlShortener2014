@@ -61,7 +61,7 @@ public class BlackListControllerTests {
 	 * It's recommended to try first from Windows cmd:
 	 * 		nslookup <blacklisted_site>.zen.spamhaus.org
 	 */
-	private String urlBlackListed = "http://104.221.128.0";
+	private String urlBlackListed = "http://104.28.13.40";
 	
 	private String urlNotBlackListed = "http://www.google.com";
 

@@ -18,7 +18,7 @@ If either the timeout expire without any response, or the URL tries to redirect 
 or response contains any error status (4XXX, 5XX), then the URL is not reachable.
 
 This Service is used directly by the front-end of the UrlShortener2014 application.
-When the user introduces a URL to shorten, an Ajax call is made to this service in order to check if the URL is reachable or not.
+When the user introduces a URL to shorten, an Ajax call is made to this service in order to check if the URL is reachable or not, only if the user selects the "Check reachable" check box.
 
 Relevant libraries used:
 * java.net.HttpURLConnection
@@ -31,7 +31,7 @@ This Service is used by the UrlShortenerControllerWithLogs Service of the UrlSho
 When the UrlShortenerControllerWithLogs service is asked for a redirection, a Rest call is made to this service in order to obtain the platform and browser of the client device.
 
 Relevant libraries used:
-* nl.bitwalker.useragentutils.UserAgent;
+* nl.bitwalker.useragentutils.UserAgent
 
 ### BlackList (Implemented)
 It is a Web Service that checks if a given URL is considered as Spam by some third-party anti-spam DNS Servers.
@@ -49,6 +49,16 @@ If the URL was created (or checked) up to two hours ago, there is no need to exe
 Otherwise, if the URL was checked more than two hours ago, then the DNS query is executed.
 
 Relevant libraries used:
-* java.util.concurrent.ExecutorService;
+* java.util.concurrent.ExecutorService
 
-### Interstitial Ad (Not implemented)
+### Interstitial Ad (Implemented)
+It is a Web Service that generates a Short URL from a given targetURL and sponsorURL. In that Short URL, a sponsor banner is shown for 10 seconds, and then it is automatically redirected to the target URL.
+The sponsorURL will be randomly chosen from a list of websites.
+
+This Service is used by the UrlShortenerControllerWithLogs Service of the UrlShortener2014 application.
+The user can decide if he wants to insert a sponsorURL or not, using the "Insert banner" checkbox from the interface.
+When the UrlShortenerControllerWithLogs service is asked for a new short url with banner, a Rest call is made to this service in order to generate the new ShortURL and return it to the user, including the html body which has to be shown when it is accessed. 
+
+Relevant libraries used:
+* org.apache.velocity.app.VelocityEngine
+* org.springframework.ui.velocity.VelocityEngineUtils
