@@ -10,9 +10,11 @@ var remaining_sec = waitingTime;
 </script>
 </head>
 <body>
-	<h1>Redirecting in <label id="remaining_sec">${waitingTime}</label> seconds... 
+	<b>Redirecting in <label id="remaining_sec">${waitingTime}</label> seconds... 
 	</h1>
-	<label id="click_here_link"></label>
+	<button type="button" id="redirect_btn" disabled style="float: right;">
+		Not ready yet!
+	</button>
 	<div id="mydiv">
 		<iframe id="frame" width="100%" height="80%" src="${interstitialURL}" > </iframe>
 	</div>
@@ -21,14 +23,28 @@ $( document ).ready(function() {
 	 window.setInterval(function() {
          var timeCounter = $("#remaining_sec").html();
          var updateTime = eval(timeCounter)- eval(1);
-         $("#remaining_sec").html(updateTime);
-         if(updateTime == 0){
-             window.location = (targetURL);
-             $("#remaining_sec").html(0);
-             $("#click_here_link").html("<a href=\"${targetURL}\">Please click here if you are not automatically redirected.</a>");
+         if (updateTime >= 0){
+	         $("#remaining_sec").html(updateTime);
+	         if (updateTime == 1){
+	        	 enableButton();
+	         }
+	         if(updateTime == 0){
+	             window.location = (targetURL);
+	             $("#remaining_sec").html(0);
+	             //$("#click_here_link").html("<a href=\"${targetURL}\">Please click here if you are not automatically redirected.</a>");
+	             
+	         }
          }
      }, 1000);
-}); 
+});
+
+function enableButton(){
+	 $("#redirect_btn").prop('disabled', false);
+     $("#redirect_btn").text('Click to Redirect!');
+     $("#redirect_btn").click(function(){
+		 window.location = (targetURL);
+	 });
+}
 </script>
 </body>
 </html>
