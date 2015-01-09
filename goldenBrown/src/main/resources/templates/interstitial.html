@@ -10,10 +10,11 @@ var remaining_sec = waitingTime;
 </script>
 </head>
 <body>
-	<h1>Redirecting in <label id="remaining_sec">${waitingTime}</label> seconds...
+	<h1>Redirecting in <label id="remaining_sec">${waitingTime}</label> seconds... 
 	</h1>
+	<label id="click_here_link"></label>
 	<div id="mydiv">
-		<iframe id="frame" width="80%" height="80%" src="${interstitialURL}" > </iframe>
+		<iframe id="frame" width="100%" height="80%" src="${interstitialURL}" > </iframe>
 	</div>
 <script>
 $( document ).ready(function() {
@@ -21,9 +22,10 @@ $( document ).ready(function() {
          var timeCounter = $("#remaining_sec").html();
          var updateTime = eval(timeCounter)- eval(1);
          $("#remaining_sec").html(updateTime);
-
          if(updateTime == 0){
              window.location = (targetURL);
+             $("#remaining_sec").html(0);
+             $("#click_here_link").html("<a href=\"${targetURL}\">Please click here if you are not automatically redirected.</a>");
          }
      }, 1000);
 }); 
