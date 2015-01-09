@@ -174,29 +174,11 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		boolean insertBanner = getSponsorParam(sponsor);
 		if (insertBanner){
 			sponsor = getRandomURL();
+			logger.info("Insert banner: "+sponsor);
 		}
 		else{
 			sponsor = "";
 		}
-		String id = Hashing.murmur3_32()
-				.hashString(url+sponsor, StandardCharsets.UTF_8).toString();
-		ShortURL shorturl;
-		shorturl = shortURLRepository.findByKey(id);
-		if (shorturl == null){
-			shorturl = createAndSaveIfValid(id, url, sponsor, "", 
-					UUID.randomUUID().toString(), extractIP(request));
-		}
-		else{
-			// It seems to be a bug of the common framework
-			// If a ShortURL is retrieved from the database, 
-			// its "uri" field is null causing a NullPointerException
-			// So we need to generate create ShortURL (because it does 
-			// not allow to set a new URI
-			shorturl = createShortURL(id, url, sponsor, UUID
-					.randomUUID().toString(), extractIP(request));
-		}
-		
-		if(insertBanner) { logger.info("Insert banner"); }
 		
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<?> response = null;
@@ -206,9 +188,15 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 						null,
 						url);
 			if (response.getStatusCode().equals(HttpStatus.OK)){
-				HttpHeaders h = new HttpHeaders();
-				h.setLocation(shorturl.getUri());
-				return new ResponseEntity<>(shorturl, h, HttpStatus.CREATED);
+				String uuid = UUID.randomUUID().toString();
+				ShortURL su = this.createAndSaveIfValid(url, sponsor, brand, uuid, extractIP(request));
+				if (su != null) {
+					HttpHeaders h = new HttpHeaders();
+					h.setLocation(su.getUri());
+					return new ResponseEntity<>(su, h, HttpStatus.CREATED);
+				} else {
+					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				}
 			}
 			else{
 				return new ResponseEntity<ShortURL>(HttpStatus.UNPROCESSABLE_ENTITY);
@@ -274,25 +262,21 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return su;
 	}
 	
-	protected ShortURL createAndSaveIfValid(String id, String url, String sponsor,
+	protected ShortURL createAndSaveIfValid(String url, String sponsor,
 			String brand, String owner, String ip) {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http",
 				"https" });
 		if (urlValidator.isValid(url)) {
-			ShortURL su = createShortURL(id, url, sponsor, owner, ip);
+			String id = Hashing.murmur3_32()
+					.hashString(url+sponsor+owner, StandardCharsets.UTF_8).toString();
+			ShortURL su = new ShortURL(id, url,
+					generateUri(id), sponsor, new Date(
+							System.currentTimeMillis()), owner,
+					HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
 			return shortURLRepository.save(su);
 		} else {
 			return null;
 		}
-	}
-
-	private ShortURL createShortURL(String id, String url, String sponsor, String owner,
-			String ip) {
-		ShortURL su = new ShortURL(id, url,
-				generateUri(id), sponsor, new Date(
-						System.currentTimeMillis()), owner,
-				HttpStatus.TEMPORARY_REDIRECT.value(), true, ip, null);
-		return su;
 	}
 
 	private URI generateUri(String id) {
