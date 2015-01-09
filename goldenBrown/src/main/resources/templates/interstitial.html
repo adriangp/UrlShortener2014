@@ -1,6 +1,8 @@
 <html>
 <head>
 <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="webjars/bootstrap/3.0.3/css/bootstrap.min.css" />
 <title>Redirecting</title>
 <script>
 var targetURL = "${targetURL}";
@@ -12,7 +14,7 @@ var remaining_sec = waitingTime;
 <body>
 	<b>Redirecting in <label id="remaining_sec">${waitingTime}</label> seconds... 
 	</h1>
-	<button type="button" id="redirect_btn" disabled style="float: right;">
+	<button type="button" class="btn btn-lg btn-primary" id="redirect_btn" disabled style="float: right;">
 		Not ready yet!
 	</button>
 	<div id="mydiv">
