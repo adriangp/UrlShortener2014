@@ -1,6 +1,9 @@
-/build/
 /bin/
 /.settings/
 /.classpath
 /.project
+<<<<<<< HEAD
+/build/
+=======
 /goldenPoppy.iml
+>>>>>>> upstream/master

@@ -52,7 +52,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			"http://localhost:8080/interstitial/?targetURL={targetURL}&interstitialURL={interstitialURL}";
 	private final static String[] BANNER_URL = {
 		"http://www.unizar.es",
-		"http://stackoverflow.com",
+		"http://www.rae.es/",
 		"http://add.unizar.es/add/campusvirtual",
 		"http://www.spamhaus.org/sbl/latest/",
 		"https://es.wikipedia.org/wiki/Wikipedia:Portada"

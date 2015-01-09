@@ -17,7 +17,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
+/**
+ * Class that provides a web service to a interstitial page generator.
+ * This web service is implemented as a Rest Controller. 
+ * @author Gabriel, Javier, Jorge
+ * @version 08/01/2015
+ */
 @RestController
 public class InterstitialController {
 	//Parameter that calculate the time out of the URL
@@ -28,6 +33,14 @@ public class InterstitialController {
 	@Autowired
 	private VelocityEngine velocityEngine;
 
+	/**
+	 * Get method of the Interstitial Service.
+	 * Given a target url and the interstitial url, generates a html page showing
+	 * the interstitial with a timer configured to redirect to target url.
+	 * @param targetURL the redirect request
+	 * @param interstitialURL the page to show at the interstitial
+	 * @return ResponseEntity with the interstitial page 
+	 */
 	@RequestMapping(value = "/interstitial", method = RequestMethod.GET)
 	public ResponseEntity<String> getInterstitial(@RequestParam("targetURL") String targetURL, 
 			@RequestParam("interstitialURL") String interstitialURL){

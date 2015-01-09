@@ -1,0 +1,15 @@
+#header{
+	height: 140px;
+	background-color: #43302E;
+	margin-bottom: -5px;
+}
+
+#banner{
+	height: 100px;
+	background-image: url("../img/logo.png");
+	background-repeat: round;
+}
+
+#wait_text{
+	color: white;
+}

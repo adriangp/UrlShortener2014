@@ -23,12 +23,23 @@ import static org.junit.Assert.assertTrue;
 @IntegrationTest("server.port=0")
 @DirtiesContext
 public class ApplicationTests {
+	
+	/*
+	 * Nomenclature of junit methods described in (with examples):
+	 * http://osherove.com/blog/2005/4/3/naming-standards-for-unit-tests.html
+	 * 
+	 * [test_UnitOfWork_StateUnderTest_ExpectedBehavior] 
+	 * - test : inherited from JUnit3 
+	 * - UnitOfWork : e.g. method being tested, classes functionality being tested... etc 
+	 * - StateUnderTest : e.g. the input of the method, the class attributes... etc 
+	 * - ExpectedBehaviour : e.g. expected method output, final state, Exception being thrown.. etc
+	 */
 
 	@Value("${local.server.port}")
 	private int port = 0;
 
 	@Test
-	public void testHome() throws Exception {
+	public void test_Application_Home_CorrectBody() throws Exception {
 		ResponseEntity<String> entity = new TestRestTemplate().getForEntity(
 				"http://localhost:" + this.port, String.class);
 		assertEquals(HttpStatus.OK, entity.getStatusCode());
@@ -37,14 +48,14 @@ public class ApplicationTests {
 	}
 
 	@Test
-	public void testCss() throws Exception {
+	public void test_Application_Css_CorrectBodyANDContent() throws Exception {
 		ResponseEntity<String> entity = new TestRestTemplate().getForEntity(
 				"http://localhost:" + this.port
 						+ "/webjars/bootstrap/3.0.3/css/bootstrap.min.css", String.class);
 		assertEquals(HttpStatus.OK, entity.getStatusCode());
 		assertTrue("Wrong body:\n" + entity.getBody(), entity.getBody().contains("body"));
-		/*assertEquals("Wrong content type:\n" + entity.getHeaders().getContentType(),
-				MediaType.valueOf("text/css"), entity.getHeaders().getContentType());*/
+		assertEquals("Wrong content type:\n" + entity.getHeaders().getContentType(),
+				MediaType.valueOf("text/css;charset=UTF-8"), entity.getHeaders().getContentType());
 	}
 
 }

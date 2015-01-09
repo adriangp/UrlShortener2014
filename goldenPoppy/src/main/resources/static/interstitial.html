@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Interstitial Ad</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css"
+	href="webjars/bootstrap/3.0.3/css/bootstrap.min.css" />
+</head>
+<body>
+	<script type="text/javascript" src="webjars/jquery/2.0.3/jquery.min.js"></script>
+	<div class="jumbotron">
+		<h1>Interstitial Ad</h1>
+		<form role="form" id="inter">
+			<div class="form-group">
+				<label for="uri">Long URL</label> <input type="text"
+					class="form-control" id="uri" placeholder="Long URL" name="url" />
+				<label for="uri">Sponsor</label> <input type="text"
+					class="form-control" id="sponsor" placeholder="Sponsor" name="sponsor" />
+			</div>
+			<button type="submit" class="btn btn-lg btn-primary">Add sponsor!</button>
+		</form>
+		<p/>
+		<div id="result"></div>
+		<button id="back" class="btn btn-lg btn-primary" onclick="location.href='index.html'">Back</button>
+		
+	</div>
+	<script type="text/javascript"
+		src="webjars/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+	<script>
+	 $(document).ready(function() {
+		$("#inter").submit(function(event){
+			event.preventDefault();
+			$.ajax({
+				type : "POST",
+				url : "/inter",
+				data : $(this).serialize(),
+				success : function(msg) {
+					$("#result").html("<a target='_blank' href='"+msg.uri+"' class='btn btn-default btn-lg' role='button'>"+msg.uri+"</a>")
+				},
+				error : function() {
+					alert("failure");
+				}
+			});
+		});
+	});
+	</script>
+</body>
+</html>
