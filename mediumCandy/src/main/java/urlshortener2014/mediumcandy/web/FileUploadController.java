@@ -3,8 +3,10 @@ package urlshortener2014.mediumcandy.web;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,8 +38,6 @@ import urlshortener2014.common.domain.ShortURL;
  */
 @Controller
 public class FileUploadController {
-	
-	private byte[] fileBytes = null;
 
 	/**
 	 * Reads each line of the CSV file stored on [filyBytes] and save each line as a URI string.
@@ -50,27 +50,48 @@ public class FileUploadController {
 	 * @throws IOException
 	 */
 	@RequestMapping(value = "/files/{file_name}", method = RequestMethod.GET)
-	public void getFile(@PathVariable("file_name") String fileName,
+	public void getFile(@PathVariable("file_name") String fileNameServer,
 						HttpServletResponse response) throws IOException {
 		ShortURL su = null;
+		File csvFile = new File("csv/"+fileNameServer+".csv");
 		
-		try {
+		try(BufferedInputStream bis = new BufferedInputStream(
+				new FileInputStream(
+						new File(csvFile.getAbsolutePath())));) {
+			
 			OutputStream fileOut = response.getOutputStream();
 			
 			String uri = "", restURI="";
     		ArrayList<String> listURIs = new ArrayList<String>();
     		
-    		//Read each line of the uploaded file and save each line as a URI string
-    		for (int i=0; i<fileBytes.length; i++){
-				if (fileBytes[i] == 13){
-					listURIs.add(uri);
-					i++;
-					uri = "";
+    		int _char = 0;
+    		
+    		//Read each line of the CSV file and parses it to a String
+    		while((_char = bis.read())!=-1){
+    			if (_char == 13){
+    				System.out.println(uri);
+    				if (uri.startsWith("\"") && uri.endsWith("\"")){
+    					//CSV file with quoted uris
+    					uri = uri.substring(1, uri.length()-1);
+    				}
+    				if (!(listURIs.contains(uri))){
+    					listURIs.add(uri);
+    					bis.read();
+    					uri = "";
+    				}
 				} else {
-					uri += Character.toString ((char) fileBytes[i]);
+					uri += Character.toString ((char) _char);
 				}
-			}
+    		}
+    		if (uri.length()>0){
+    			//CSV file with no \r\n EOF --> add last uri
+    			if (!(listURIs.contains(uri))){
+					listURIs.add(uri);
+					bis.read();
+				}
+    		}
 			
+    		int validURL = 0;
     		//Short the URIs from the uploaded CSV file
 			for (String s : listURIs){
 				restURI = linkTo(methodOn(UrlShortenerControllerWithLogs.class).
@@ -79,27 +100,35 @@ public class FileUploadController {
 				su = restTemplate.postForObject(restURI, null, ShortURL.class);
 				
 				//If the URI is shortened succesfully --> add to the response
-				if (su.getUri() != null){
-					String result = "\"" + s + "\",\"" +su.getUri().toString()+"\"\r\n"; 
-					fileOut.write(result.getBytes());
+				try{
+					if (su.getUri() != null){
+						String result = "\"" + s + "\",\"" +su.getUri().toString()+"\"\r\n"; 
+						fileOut.write(result.getBytes());
+					}
+					validURL++;
+				} catch (NullPointerException ne){
+					//Invalid URI
 				}
 			}
-			// Deleting File
-			File file = new File( fileName + ".csv" );
-			file.delete();
-			// Setting up headers
-			response.setContentType("application/x-download");
-			response.setHeader("Content-disposition", "attachment; filename=" + fileName + ".csv");
-			response.flushBuffer();
+			
+			if (validURL == 0){
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, 
+					"All uris the CSV file contains are either invalid or unreachable");
+			} else {			
+				// Setting up headers
+				response.setContentType("application/x-download");
+				response.setHeader("Content-disposition", "attachment; filename=" + fileNameServer + ".csv");
+				response.flushBuffer();
+			}
 			
 		} catch (NullPointerException ne){
-			// Deleting File
-			File file = new File( fileName + ".csv" );
-			file.delete();
+			ne.printStackTrace();
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, 
 					"Either your CSV has a invalid format or contains an invalid/unreachable url");
 		} catch (IOException ex) {
 			throw new RuntimeException("IOError writing file to output stream");
+		} finally {
+			csvFile.delete();
 		}
 
 	}
@@ -122,9 +151,10 @@ public class FileUploadController {
 	 * 
 	 * @param request
 	 * @return
+	 * @throws InterruptedException 
 	 */
     @RequestMapping(value="/upload", method=RequestMethod.POST)
-    public ResponseEntity<String> handleFileUpload(MultipartHttpServletRequest request){
+    public ResponseEntity<String> handleFileUpload(MultipartHttpServletRequest request) throws InterruptedException{
         Iterator<String> iterator = request.getFileNames();
         
         if ( iterator.hasNext() ) {
@@ -135,10 +165,9 @@ public class FileUploadController {
             	try {
             		String fileNameServer = "medcandy-" + generateString(fileName);
     				byte[] file = multipartFile.getBytes();
-    				fileBytes = file;
     				
     				BufferedOutputStream stream =
-                            new BufferedOutputStream(new FileOutputStream(new File( fileNameServer + ".csv" )));
+                            new BufferedOutputStream(new FileOutputStream(new File("csv/"+fileNameServer + ".csv" )));
                     stream.write(file);
                     stream.close();
                     
