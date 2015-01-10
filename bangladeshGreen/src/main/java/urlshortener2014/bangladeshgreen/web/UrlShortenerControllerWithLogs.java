@@ -21,6 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import urlshortener2014.common.domain.Click;
 import urlshortener2014.common.domain.ShortURL;
-import urlshortener2014.common.repository.ClickRepository;
+import urlshortener2014.common.repository.ClickRepositoryImpl;
 import urlshortener2014.common.repository.ShortURLRepository;
 import urlshortener2014.common.web.UrlShortenerController;
 
@@ -38,7 +40,7 @@ import urlshortener2014.common.web.UrlShortenerController;
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
 	@Autowired
-	private ClickRepository clickRepository;
+	private ClickRepositoryImpl clickRepository;
 	@Autowired
 	private ShortURLRepository SURLR;
 	private static final Logger logger = LoggerFactory
@@ -72,7 +74,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
 	public ResponseEntity<?> redirectTo(@PathVariable String id,
 			HttpServletRequest request) {
-		logger.info("Requested redirection with hash " + id);
 		String agent = request.getHeader("User-Agent");
 		String ip = request.getRemoteAddr();
 		String navegador = "", SO = "";
@@ -98,7 +99,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			SO = "Desconocido";
 		}
 
-		logger.info("Requested redirection with hash " + id);
 		// Guardar en un objeto la llamada al padre, guardarme en una lista la
 		// consulta
 		// a los Cliks, y quedarme con el ultimo con la IP del request,
@@ -106,21 +106,28 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		// click con el navegador y SO, actualizar BD y return
 		ResponseEntity<?> response = super.redirectTo(id, request);
 		List<Click> listaClicks = clickRepository.findByHash(id);
-		logger.info("Se ha realizado un click con Navegador:" + navegador
-				+ ", SO: " + SO + " e ip:" + ip);
-		logger.info("Tamano: " + listaClicks.size() + "ip: " + ip);
 		for (int i = listaClicks.size() - 1; i >= 0; i--) {
 			Click click = listaClicks.get(i);
 			logger.info("Click con ip: " + click.getIp());
 			if (click.getIp().equals(ip)) {
 				String hash = click.getHash();
 				Long identificador = click.getId();
+				logger.info("ID del click: "+identificador);
 				Date fecha = click.getCreated();
 				Click clickFinal = new Click(identificador, hash, fecha, null,
 						navegador, SO, ip, null);
 				clickRepository.update(clickFinal);
-				logger.info("Actualizado Click con " + navegador + " y SO: "
-						+ SO + " e ip:" + ip);
+				break;
+			}
+		}
+		List<Click> listaClicks2 = clickRepository.findByHash(id);
+		for (int i = listaClicks2.size() - 1; i >= 0; i--) {
+			Click click = listaClicks2.get(i);
+			logger.info("Click con ip: " + click.getIp());
+			
+			if (click.getIp().equals(ip)) {
+				logger.info("Actualizado Click con " + click.getBrowser() + " y SO: "
+						+ click.getPlatform()+" e ID: "+click.getId());
 				break;
 			}
 		}
@@ -139,12 +146,15 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	 */
 	@RequestMapping(value = "/Upload", method = RequestMethod.POST)
 	public String upload(HttpServletRequest request) throws Exception {
+		
 		Part part = request.getPart("fileToUpload");
+		
+		Part integerAtomic=request.getPart("atomic");
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				part.getInputStream()));
-
-		File fichero = new File(
-				"build\\resources\\main\\public\\csv\\fich_original.csv");
+		Resource fich=new FileSystemResource("fich_original2.csv");
+		if(!fich.exists()) fich.createRelative("fich_original2.csv");
+		File fichero =fich.getFile();
 		fichero.createNewFile();
 		PrintWriter f = new PrintWriter(fichero);
 		String linea = "";
@@ -155,7 +165,8 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			f.write("\n");
 		}
 		f.close();
-		Response respuesta = analizarCSV(fichero, request);
+		reader.close();
+		Response respuesta = analizarCSV(fich,4, request);
 		if (respuesta.getStatus() == 400) {
 			return "Error con el fichero!";
 		}
@@ -173,12 +184,13 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	 * @throws IOException
 	 */
 	@SuppressWarnings("resource")
-	public Response analizarCSV(File csv, HttpServletRequest request)
+	public Response analizarCSV(Resource csv, int atomicInteger,HttpServletRequest request)
 			throws IOException {
-
-		BufferedReader br = new BufferedReader(new FileReader(csv));
-		File csvAcortado = new File(
-				"build\\resources\\main\\public\\csv\\fich_temporal.csv");
+		File fichero=csv.getFile();
+		BufferedReader br = new BufferedReader(new FileReader(fichero));
+		Resource fich=new FileSystemResource("fich_temporal2.csv");
+		if(!fich.exists()) fich.createRelative("fich_temporal2.csv");
+		File csvAcortado =fich.getFile();
 		csvAcortado.createNewFile();
 		PrintWriter fileResul = new PrintWriter(csvAcortado);
 		String linea = "";
@@ -200,6 +212,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		}
 		fileResul.close();
 		br.close();
+		fichero.delete();
 		return Response.status(Status.OK).build();
 	}
 
