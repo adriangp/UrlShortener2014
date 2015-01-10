@@ -22,6 +22,7 @@ import org.springframework.stereotype.Repository;
 
 import urlshortener2014.common.domain.Click;
 
+
 @Repository
 public class ClickRepositoryImpl implements ClickRepository {
 
@@ -97,14 +98,16 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	@Override
 	public void update(Click cl) {
+		log.info("ID2: "+cl.getId()+"navegador: "+cl.getBrowser()+" SO: "+cl.getPlatform()+" Date:"+cl.getCreated());
 		try {
 			jdbc.update(
-					"update click set hash=?, date=?, created=?, referrer=?, browser=?, platform=?, ip=?, country=? where id=?",
+					"update click set hash=?, created=?, referrer=?, browser=?, platform=?, ip=?, country=? where id=?",
 					cl.getHash(), cl.getCreated(), cl.getReferrer(),
 					cl.getBrowser(), cl.getPlatform(), cl.getIp(),
 					cl.getCountry(), cl.getId());
+			
 		} catch (Exception e) {
-			log.debug("When update for id " + cl.getId(), e);
+			log.info("When update for id " + cl.getId(), e);
 		}
 	}
 
