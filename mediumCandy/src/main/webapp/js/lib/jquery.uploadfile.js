@@ -689,8 +689,7 @@
                 },
                 error: function (xhr, status, errMsg) {
                   $('.ajax-file-upload-statusbar').remove();
-                  console.log(xhr);
-                  
+
                     pd.abort.hide();
                     if(xhr.statusText == "abort") //we aborted it
                     {
@@ -704,7 +703,7 @@
                             if ( errMsg.length == 0 ){
                               showAlert( "Failed to upload file. Server not responding.");
                             } else {
-                              showAlert( "Failed to upload file. Server says: <strong>" + errMsg +"<strong>.");
+                              showAlert( "Failed to upload file. <strong>" + xhr.responseText +"<strong>.");
                             }
                         } else {
                             pd.statusbar.hide();
