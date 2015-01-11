@@ -2,14 +2,20 @@ package urlshortener2014.bangladeshgreen.web;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -38,6 +44,8 @@ import urlshortener2014.common.web.UrlShortenerController;
 
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
+
+	private AtomicInteger numeroAtomico = new AtomicInteger();
 
 	@Autowired
 	private ClickRepositoryImpl clickRepository;
@@ -112,7 +120,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			if (click.getIp().equals(ip)) {
 				String hash = click.getHash();
 				Long identificador = click.getId();
-				logger.info("ID del click: "+identificador);
+				logger.info("ID del click: " + identificador);
 				Date fecha = click.getCreated();
 				Click clickFinal = new Click(identificador, hash, fecha, null,
 						navegador, SO, ip, null);
@@ -124,10 +132,11 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		for (int i = listaClicks2.size() - 1; i >= 0; i--) {
 			Click click = listaClicks2.get(i);
 			logger.info("Click con ip: " + click.getIp());
-			
+
 			if (click.getIp().equals(ip)) {
-				logger.info("Actualizado Click con " + click.getBrowser() + " y SO: "
-						+ click.getPlatform()+" e ID: "+click.getId());
+				logger.info("Actualizado Click con " + click.getBrowser()
+						+ " y SO: " + click.getPlatform() + " e ID: "
+						+ click.getId());
 				break;
 			}
 		}
@@ -146,15 +155,17 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	 */
 	@RequestMapping(value = "/Upload", method = RequestMethod.POST)
 	public String upload(HttpServletRequest request) throws Exception {
-		
+
+		int atomico = Integer.parseInt(request.getParameter("atomic"));
+
 		Part part = request.getPart("fileToUpload");
-		
-		Part integerAtomic=request.getPart("atomic");
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				part.getInputStream()));
-		Resource fich=new FileSystemResource("fich_original2.csv");
-		if(!fich.exists()) fich.createRelative("fich_original2.csv");
-		File fichero =fich.getFile();
+		Resource fich = new FileSystemResource("fich_original_" + atomico
+				+ ".csv");
+		if (!fich.exists())
+			fich.createRelative("fich_original_" + atomico + ".csv");
+		File fichero = fich.getFile();
 		fichero.createNewFile();
 		PrintWriter f = new PrintWriter(fichero);
 		String linea = "";
@@ -166,11 +177,11 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		}
 		f.close();
 		reader.close();
-		Response respuesta = analizarCSV(fich,4, request);
+		Response respuesta = analizarCSV(fich, atomico, request);
 		if (respuesta.getStatus() == 400) {
 			return "Error con el fichero!";
 		}
-		return "Fichero Subido!";
+		return "Fichero Subido!"+atomico;
 	}
 
 	/**
@@ -184,14 +195,18 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	 * @throws IOException
 	 */
 	@SuppressWarnings("resource")
-	public Response analizarCSV(Resource csv, int atomicInteger,HttpServletRequest request)
-			throws IOException {
-		File fichero=csv.getFile();
+	public Response analizarCSV(Resource csv, int atomicInteger,
+			HttpServletRequest request) throws IOException {
+		File fichero = csv.getFile();
 		BufferedReader br = new BufferedReader(new FileReader(fichero));
-		Resource fich=new FileSystemResource("fich_temporal2.csv");
-		if(!fich.exists()) fich.createRelative("fich_temporal2.csv");
-		File csvAcortado =fich.getFile();
+		Resource fich = new FileSystemResource("fich_temporal_" + atomicInteger
+				+ ".csv");
+		if (!fich.exists())
+			fich.createRelative("fich_temporal_" + atomicInteger + ".csv");
+		
+		File csvAcortado = fich.getFile();
 		csvAcortado.createNewFile();
+		csvAcortado.deleteOnExit();
 		PrintWriter fileResul = new PrintWriter(csvAcortado);
 		String linea = "";
 		while ((linea = br.readLine()) != null) {
@@ -268,5 +283,44 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 			}
 		}
 		return res;
+	}
+
+	@RequestMapping(value = "/atomic", method = RequestMethod.GET)
+	private int generarTurno() {
+		return numeroAtomico.incrementAndGet();
+	}
+
+	@RequestMapping(value = "/download/{id}/{nombre}", method = RequestMethod.GET)
+	public void doDownload(@PathVariable int id, @PathVariable String nombre, HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+
+		Resource fich = new FileSystemResource("fich_temporal_" + id
+				+ ".csv");
+		File downloadFile = fich.getFile();
+		FileInputStream inputStream = new FileInputStream(downloadFile);
+		String mimeType =  "application/vnd.ms-excel";
+		
+		// set content attributes for the response
+		response.setContentType(mimeType);
+		response.setContentLength((int) downloadFile.length());
+		nombre=nombre+"_acortado.csv";
+		// set headers for the response
+		String headerKey = "Content-Disposition";
+		String headerValue = String.format("attachment; filename=\"%s\"",
+				nombre);
+		response.setHeader(headerKey, headerValue);
+
+		// get output stream of the response
+		OutputStream outStream = response.getOutputStream();
+		byte[] buffer = new byte[2048];
+		int bytesRead = -1;
+
+		// write bytes read from the input stream into the output stream
+		while ((bytesRead = inputStream.read(buffer)) != -1) {
+			outStream.write(buffer, 0, bytesRead);
+		}
+		
+		inputStream.close();
+		outStream.close();
 	}
 }

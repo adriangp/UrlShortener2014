@@ -50,32 +50,49 @@
 	}
 
 	function uploadFile() {
+		var xhr = new XMLHttpRequest();
+		xhr.addEventListener("load", uploadComplete, false);
+		xhr.open("GET", "/atomic");
+		xhr.send();
+	}
+	
+	function uploadComplete(evt) {
 		var fd = new FormData();
 		fd.append("fileToUpload",
 				document.getElementById('fileToUpload').files[0]);
+		fd.append("atomic", evt.target.responseText);
 		var xhr = new XMLHttpRequest();
-		xhr.addEventListener("load", uploadComplete, false);
+		xhr.addEventListener("load", uploadComplete2, false);
 		xhr.addEventListener("error", uploadFailed, false);
 		xhr.addEventListener("abort", uploadCanceled, false);
 		xhr.open("POST", "/Upload");
 		xhr.send(fd);
 	}
 
-	function uploadComplete(evt) {
+	function uploadComplete2(evt) {
 		/* This event is raised when the server send back a response */
-		alert(evt.target.responseText);
-		var file = document.getElementById('fileToUpload').files[0];
-		var name = "";
-		var name_tmp = "";
-		if (file) {
-			name = file.name;
+		var res = evt.target.responseText;
+		var n = res.localeCompare("Error con el fichero!");
+		if (n==0){
+			alert(res);
+			document.getElementById('download').innerHTML = '';
 		}
-		for (i = 0; i < (name.length) - 4; i++) {
-			name_tmp += name[i]
-		}
+		else{
+			var num = res.split("!");
+			alert(num[0]+"!");
+			var file = document.getElementById('fileToUpload').files[0];
+			var name = "";
+			var name_tmp = "";
+			if (file) {
+				name = file.name;
+			}
+			for (i = 0; i < (name.length) - 4; i++) {
+				name_tmp += name[i]
+			}
 
-		document.getElementById('download').innerHTML = '<a href=\"csv\\fich_temporal.csv\" download=\"'
-			+name_tmp+'_acortado.csv\"><input type=\"button\" value=\"Descargar fichero acortado\" class=\"desc-button\"/></a>'
+			document.getElementById('download').innerHTML = '<a href=\"/download/'+num[1]+'/'+name_tmp+'\"><input type=\"button\" value=\"Descargar fichero acortado\" class=\"desc-button\"/></a>'
+		}
+	
 	}
 
 	function uploadFailed(evt) {
