@@ -1,16 +1,14 @@
 package urlshortener2014.mediumcandy.web;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,11 +19,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import urlshortener2014.common.domain.ShortURL;
 /**
  * 
  * Class in charge of controling the upload of a CSV file with a list of urls, and treat this file
@@ -37,71 +33,42 @@ import urlshortener2014.common.domain.ShortURL;
 @Controller
 public class FileUploadController {
 	
-	private byte[] fileBytes = null;
-
+	private ExecutorService executor;
+	
 	/**
-	 * Reads each line of the CSV file stored on [filyBytes] and save each line as a URI string.
+	 * Returns the content of the CSV file that has been requested to be downlaoded.
 	 * 
-	 * After that, creates the shortened URIs and adds them to the response forming a new
-	 * CSV file for downloading on the client side.
-	 * 
-	 * @param fileName
+	 * @param fileNameServer
 	 * @param response
 	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws ExecutionException
 	 */
 	@RequestMapping(value = "/files/{file_name}", method = RequestMethod.GET)
-	public void getFile(@PathVariable("file_name") String fileName,
-						HttpServletResponse response) throws IOException {
-		ShortURL su = null;
+	public void getFile(@PathVariable("file_name") String fileNameServer,
+						HttpServletResponse response) throws IOException, InterruptedException, ExecutionException {
 		
-		try {
-			OutputStream fileOut = response.getOutputStream();
-			
-			String uri = "", restURI="";
-    		ArrayList<String> listURIs = new ArrayList<String>();
-    		
-    		//Read each line of the uploaded file and save each line as a URI string
-    		for (int i=0; i<fileBytes.length; i++){
-				if (fileBytes[i] == 13){
-					listURIs.add(uri);
-					i++;
-					uri = "";
-				} else {
-					uri += Character.toString ((char) fileBytes[i]);
-				}
-			}
-			
-    		//Short the URIs from the uploaded CSV file
-			for (String s : listURIs){
-				restURI = linkTo(methodOn(UrlShortenerControllerWithLogs.class).
-		                shortenerIfReachable(s, null, null, null)).toString();
-				RestTemplate restTemplate = new RestTemplate();
-				su = restTemplate.postForObject(restURI, null, ShortURL.class);
-				
-				//If the URI is shortened succesfully --> add to the response
-				if (su.getUri() != null){
-					String result = "\"" + s + "\",\"" +su.getUri().toString()+"\"\r\n"; 
-					fileOut.write(result.getBytes());
-				}
-			}
-			// Deleting File
-			File file = new File( fileName + ".csv" );
-			file.delete();
-			// Setting up headers
+		//Delegates the CSV reading into a Task, passing it the name of the file
+		executor = Executors.newCachedThreadPool();
+		CompletionService<byte[]> pool = new ExecutorCompletionService<>(executor);
+		CSVFileDownload answer = new CSVFileDownload(fileNameServer);
+		
+		pool.submit(answer);
+		
+		//Takes the Task answer and fill up the HttpServletResponse to the client
+		try{
+			byte[] res = pool.take().get();
+			response.getOutputStream().write(res);
 			response.setContentType("application/x-download");
-			response.setHeader("Content-disposition", "attachment; filename=" + fileName + ".csv");
+			response.setHeader("Content-disposition", "attachment; filename=" + fileNameServer + ".csv");
+			response.setHeader("Content-Lenght", String.valueOf(res.length));
 			response.flushBuffer();
-			
-		} catch (NullPointerException ne){
-			// Deleting File
-			File file = new File( fileName + ".csv" );
-			file.delete();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, 
-					"Either your CSV has a invalid format or contains an invalid/unreachable url");
-		} catch (IOException ex) {
-			throw new RuntimeException("IOError writing file to output stream");
-		}
-
+		} catch (InterruptedException | ExecutionException ex) {
+			ex.printStackTrace();
+            throw new IllegalStateException("Cannot get the answer", ex);
+        } finally {
+        	executor.shutdown();
+        }
 	}
 	
 	
@@ -116,43 +83,65 @@ public class FileUploadController {
     
 	
 	/**
-	 * Gets the uploaded CSV file from the client and transform it in an array of bytes
 	 * 
-	 * This is the way to handle de upload of the CSV file.
+	 * Uploads the CSV file and passes its content to a new Task for its treatment
+	 * 
+	 * After the CSV treatment, reads the answer of the Thread and returns a response in consecuence.
 	 * 
 	 * @param request
 	 * @return
+	 * @throws InterruptedException
 	 */
     @RequestMapping(value="/upload", method=RequestMethod.POST)
-    public ResponseEntity<String> handleFileUpload(MultipartHttpServletRequest request){
+    public ResponseEntity<String> handleFileUpload(MultipartHttpServletRequest request) throws InterruptedException{
         Iterator<String> iterator = request.getFileNames();
         
         if ( iterator.hasNext() ) {
             String fileName = iterator.next();
             MultipartFile multipartFile = request.getFile(fileName);
             
+            String fileNameServer = "medcandy-" + generateString(fileName);
             if ( !multipartFile.isEmpty() ) {
             	try {
-            		String fileNameServer = "medcandy-" + generateString(fileName);
-    				byte[] file = multipartFile.getBytes();
-    				fileBytes = file;
-    				
-    				BufferedOutputStream stream =
-                            new BufferedOutputStream(new FileOutputStream(new File( fileNameServer + ".csv" )));
-                    stream.write(file);
-                    stream.close();
-                    
-                    return new ResponseEntity<>(fileNameServer, new HttpHeaders(), HttpStatus.OK);
-    			} catch (IOException e) {
-    				return new ResponseEntity<>("File is empty", new HttpHeaders(), HttpStatus.BAD_REQUEST);
+            		byte[] fileContent = multipartFile.getBytes();
+
+            		/*Delegates the CSV treatment into a Task, passing it the temporary name of the file
+            		  in the server and the file content  */
+            		executor = Executors.newCachedThreadPool();
+            		CompletionService<String> pool = new ExecutorCompletionService<>(executor);
+            		CSVFileTreatment answer = new CSVFileTreatment(fileNameServer, fileContent);
+
+            		pool.submit(answer);
+
+            		//Takes the Task answer and returns an error or success status
+            		String res = pool.take().get();
+            		if (res.startsWith("Error: ")){
+            			executor.shutdown();
+            			res = res.substring("Error: ".length());
+            			File csvFile = new File("csv/"+fileNameServer+".csv");
+            			csvFile.delete();
+            			return new ResponseEntity<>(res, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+            		} else {
+            			executor.shutdown();
+            			return new ResponseEntity<>(fileNameServer, new HttpHeaders(), HttpStatus.OK);
+            		}
+
+            	//In case of error, always delete the temporary created file
+            	} catch (IOException e) {
+            		File csvFile = new File("csv/"+fileNameServer+".csv");
+            		csvFile.delete();
+            		return new ResponseEntity<>("File is empty", new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    			} catch (InterruptedException | ExecutionException ex) {
+    				File csvFile = new File("csv/"+fileNameServer+".csv");
+    				csvFile.delete();
+    				return new ResponseEntity<>("Server Internal Error --> Threads failure", new HttpHeaders(), HttpStatus.BAD_REQUEST);
     			}
             } else {
+            	File csvFile = new File("csv/"+fileNameServer+".csv");
+				csvFile.delete();
             	return new ResponseEntity<>("Server Internal Error", new HttpHeaders(), HttpStatus.BAD_REQUEST);
             }
-            
         }
-        
         return new ResponseEntity<>("Empty Request", new HttpHeaders(), HttpStatus.BAD_REQUEST); 
     }
-
 }
