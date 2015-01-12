@@ -84,14 +84,15 @@ public class BlackListControllerTests {
 	}
 	
 	/*
-	 * NOTE: The following 2 commented Tests requires a urlBlackListed that is
-	 * considered as SPAM by any of the 3 DNS servers.
+	 * IMPORTANT NOTE: The following 2 commented Tests require an address (IP or domain)
+	 * considered as SPAM by any of the 3 DNS servers in the time of execution.
 	 * 
-	 * The status (SPAM or not SPAM) is dinamic, so can change any time in the future.
-	 * It's impossible to mantain a IP that is always considerer as SPAM.
+	 * The status (SPAM or not SPAM) it is not static, so it is able to change any time in the future.
+	 * We cannot guarantee that some IP or domain is contained in any of the blacklists every moment from now.
 	 * 
-	 * In order to execute these 2 test, uncomment both tests and change the 
-	 * String value of "urlBlackListed" to an IP that is considered SPAM.
+	 * So in order to execute these 2 test, we encourage the user to update the value of <urlBlackListed>
+	 *  to the URL of an IP which is recently added to the spamhaus provider (http://www.spamhaus.org/sbl/latest/)  
+	 * and then uncomment both test functions.
 	 * 
 	 * See urlBlacklisted commentary for more info.
 	 */
