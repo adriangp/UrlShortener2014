@@ -17,16 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
-
-import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.goldenbrown.Application;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
@@ -61,7 +54,7 @@ public class BlackListControllerTests {
 	 * It's recommended to try first from Windows cmd:
 	 * 		nslookup <blacklisted_site>.zen.spamhaus.org
 	 */
-	private String urlBlackListed = "http://104.221.128.0";
+	private String urlBlackListed = "http://104.28.13.40";
 	
 	private String urlNotBlackListed = "http://www.google.com";
 
@@ -89,7 +82,23 @@ public class BlackListControllerTests {
 		ResponseEntity<?> entity = performTestRequestOnShortener(urlNotBlackListed);
 		assertEquals(HttpStatus.OK, entity.getStatusCode());
 	}
+	
+	/*
+	 * IMPORTANT NOTE: The following 2 commented Tests require an address (IP or domain)
+	 * considered as SPAM by any of the 3 DNS servers in the time of execution.
+	 * 
+	 * The status (SPAM or not SPAM) it is not static, so it is able to change any time in the future.
+	 * We cannot guarantee that some IP or domain is contained in any of the blacklists every moment from now.
+	 * 
+	 * So in order to execute these 2 test, we encourage the user to update the value of <urlBlackListed>
+	 *  to the URL of an IP which is recently added to the spamhaus provider (http://www.spamhaus.org/sbl/latest/)  
+	 * and then uncomment both test functions.
+	 * 
+	 * See urlBlacklisted commentary for more info.
+	 */
 
+	/*
+  
 	@Test
 	public void test_BlackList_DomainBlackListed_423Locked() throws Exception {
 		ResponseEntity<?> entity = performTestRequestOnShortener(urlBlackListed);
@@ -128,6 +137,8 @@ public class BlackListControllerTests {
 		// It should be checked again, and it should return LOCKED
 		assertEquals(HttpStatus.LOCKED, entity.getStatusCode());
 	}
+	
+	*/
 	
 	@Test
 	public void test_BlackList_CheckCacheAfterPetition_ContainsData() throws Exception {
