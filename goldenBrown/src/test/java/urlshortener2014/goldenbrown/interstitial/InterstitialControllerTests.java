@@ -1,10 +1,5 @@
 package urlshortener2014.goldenbrown.interstitial;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +16,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import urlshortener2014.goldenbrown.Application;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
@@ -82,7 +76,6 @@ public class InterstitialControllerTests {
 	@Test
 	public void test_Interstitial_EmptyInterstitialUrl_200Ok() throws Exception {
 		ResponseEntity<String> entity = performTestRequest("SAMPLE_TARGET", "");
-		System.out.println(entity.getBody());
 		// This is OK because html response do what is called to do:
 		// show an interstitial with no publicity ("") and redirects to the targetUrl 
 		assertEquals(HttpStatus.OK, entity.getStatusCode());
@@ -91,7 +84,6 @@ public class InterstitialControllerTests {
 	@Test
 	public void test_Interstitial_EmptyUrls_200Ok() throws Exception {
 		ResponseEntity<String> entity = performTestRequest("", "");
-		System.out.println(entity.getBody());
 		// This is OK because html response do what is called to do:
 		// show an interstitial with no publicity ("") and redirects to "" 
 		// (that is the interstitial again, provoking a 10 second redirection loop :D)

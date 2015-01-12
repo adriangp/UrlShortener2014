@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import urlshortener2014.goldenbrown.blacklist.BlackListController;
-
 /**
 * Class that consist of read the headers User-Agent of the request HTTP and about it,
 * clasify navigator and platform of the click. For that, we use the library UserAgentUtils

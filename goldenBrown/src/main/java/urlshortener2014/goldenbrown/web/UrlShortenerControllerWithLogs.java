@@ -151,7 +151,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
     			}
     		}
     		catch(Exception e){
-    			logger.info("Unkown Exception");
+    			logger.info("Unknown Exception");
 				createAndSaveClick(id, extractIP(request));
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     		}

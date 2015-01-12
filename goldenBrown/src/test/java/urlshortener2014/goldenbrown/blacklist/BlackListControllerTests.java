@@ -17,16 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
-
-import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.goldenbrown.Application;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
@@ -89,7 +82,22 @@ public class BlackListControllerTests {
 		ResponseEntity<?> entity = performTestRequestOnShortener(urlNotBlackListed);
 		assertEquals(HttpStatus.OK, entity.getStatusCode());
 	}
+	
+	/*
+	 * NOTE: The following 2 commented Tests requires a urlBlackListed that is
+	 * considered as SPAM by any of the 3 DNS servers.
+	 * 
+	 * The status (SPAM or not SPAM) is dinamic, so can change any time in the future.
+	 * It's impossible to mantain a IP that is always considerer as SPAM.
+	 * 
+	 * In order to execute these 2 test, uncomment both tests and change the 
+	 * String value of "urlBlackListed" to an IP that is considered SPAM.
+	 * 
+	 * See urlBlacklisted commentary for more info.
+	 */
 
+	/*
+  
 	@Test
 	public void test_BlackList_DomainBlackListed_423Locked() throws Exception {
 		ResponseEntity<?> entity = performTestRequestOnShortener(urlBlackListed);
@@ -128,6 +136,8 @@ public class BlackListControllerTests {
 		// It should be checked again, and it should return LOCKED
 		assertEquals(HttpStatus.LOCKED, entity.getStatusCode());
 	}
+	
+	*/
 	
 	@Test
 	public void test_BlackList_CheckCacheAfterPetition_ContainsData() throws Exception {
