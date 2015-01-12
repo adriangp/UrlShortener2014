@@ -37,16 +37,15 @@ La funcionalidad más importante se encuentra implementada en el `UrlShortenerCon
 
 
 ## Acortamiento masivo de URLs mediante fichero CSV
-Este servicio permite, a partir de un fichero en formato CSV con una url por línea, generar las urls acortadas de cada una de las urls en archivo CSV y devolver un nuevo
-fichero CSV que incluye las urls originales y las acortadas. Ha sido implementado siguiendo las características del **Nivel Tecnológico Tipo 2** como se indicó en la propuesta del proyecto.
+Este servicio permite, a partir de un fichero en formato CSV con una url por línea, generar las urls acortadas de cada una de las urls en archivo CSV y devolver un nuevo fichero CSV que incluye las urls originales y las acortadas. Ha sido implementado siguiendo las características del **Nivel Tecnológico Tipo 2** como se indicó en la propuesta del proyecto.
 
 El cliente debe realizar una llamada de tipo `POST` al servicio
 
-- `http://URI_DEL_SERVIDOR/upload/` para subir el archivo CSV al servidor  y almacenarlo
+- `http://URI_DEL_SERVIDOR/upload/` para subir el archivo CSV al servidor, realizar su tratamiento (convertir las urls en urls acortadas) y almacenarlo en el servidor para poder ser descargado.
 
 Y una llamada `GET` al servicio
 
-- `http://URI_DEL_SERVIDOR/files/{file_name}` que realizará el tratamiento del archivo CSV subido anteriormente para devolver el nuevo archivo CSV con las urls acortadas ya incluídas.
+- `http://URI_DEL_SERVIDOR/files/{file_name}` que devolverá el nuevo archivo CSV con las urls acortadas ya incluídas.
 
 La respuesta del servidor puede ser de dos tipos:
 
@@ -54,6 +53,8 @@ La respuesta del servidor puede ser de dos tipos:
 - `BAD REQUEST (400)` si la el formato del archivo CSV no es válido o si alguna de las urls del archivo no es válida o alcanzable.
 
 El método encargado del tratamiento del fichero CSV, para acortar las urls incluidas en este hace uso del método  `shortenerIfReachable` de la clase `UrlShortenerControllerWithLogs` del proyecto `MediumCandy` para asegurarse de que las urls son válidas y alcanzables y entonces crearlas o no.
+
+Se ha hecho uso de las clases del paquete `java.utils.concurrent` para que tanto las tareas de tratamiento del CSV como de descarga del mismo se puedan realizar de manera concurrente ante múltiples peticiones de varios clientes.
 
 ## Servicio de personalización de URLs acortadas
 
