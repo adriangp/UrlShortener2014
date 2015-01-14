@@ -2,7 +2,7 @@ package urlshortener2014.goldenPoppy.massiveLoad;
 
 public class Status {
 
-	private double percent;
+	private int percent;
 	private String status;
 	private String url; 
 	
@@ -13,18 +13,33 @@ public class Status {
 	 * @param s Status of the load.
 	 * @param u Url that contains the file with the URLs shortened.
 	 */
-	public Status(double p, String s, String u){
+	public Status(int p, String s, String u){
 		this.percent = p;
 		this.status = s;
 		this.url = u;
 	}
 	
 	/**
+	 * Generic Constructor
+	 */
+	public Status(){
+		
+	}
+	
+	/**
 	 * Method to get the percent of the load.
 	 * @return Percent of the load.
 	 */
-	public double getPercent(){
+	public int getPercent(){
 		return this.percent;
+	}
+	
+	/**
+	 * Method to set the percent of the load
+	 * @param percent New percent
+	 */
+	public void setPercent(int percent){
+		this.percent = percent;
 	}
 	
 	/**
@@ -36,10 +51,26 @@ public class Status {
 	}
 	
 	/**
+	 * Method to set the status of the load
+	 * @param percent New status
+	 */
+	public void setStatus(String status){
+		this.status = status;
+	}
+	
+	/**
 	 * Method to get the URL that contains the file with the URLs shortened.
 	 * @return URL that contains the file with the URLs shortened.
 	 */
 	public String getUrl(){
 		return this.url;
+	}
+	
+	/**
+	 * Method to set the URL of the file of the load
+	 * @param percent New URL of the file
+	 */
+	public void setURL(String url){
+		this.url = url;
 	}
 }

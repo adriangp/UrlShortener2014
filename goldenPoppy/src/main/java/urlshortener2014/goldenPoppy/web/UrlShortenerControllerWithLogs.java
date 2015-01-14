@@ -4,10 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -59,9 +59,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	@Autowired
 	private IntersicialEndPoint inter;
 	
-	private int percent;
-	private String status;
-	private String urlFile;
+	private Status status = new Status();
 	
 	/**
 	 * Method that redirect to an URL. If the URL has an sponsor associated, 
@@ -166,30 +164,34 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	@RequestMapping(value = "/massiveload", method = RequestMethod.POST)
 	public ResponseEntity<Status> massiveLoad(@RequestParam("file") MultipartFile file,
 					HttpServletRequest request){
-		List<Content> shorts = null;
+		status = new Status();
+		int filename = request.hashCode();
+		String urlFile = "http://" + request.getLocalName() + ":8080/files/" + 
+				filename + ".csv"; 
+		
+		status.setPercent(0);
+		status.setStatus("Loading...");
+		status.setURL(urlFile);
+		
+		List<Content> shorts = new ArrayList<Content>();
 		List<Content> longs = null;
-		List<Future<List<Content>>> futures = new ArrayList<Future<List<Content>>>();
+		List<Future<Content>> futures = new ArrayList<Future<Content>>();
+		InputStream input;
 		try {
 			ExecutorService executor = Executors.newFixedThreadPool(100);
 			
-			InputStream input = file.getInputStream();
+			input = file.getInputStream();
 			BufferedReader buffer = new BufferedReader(new InputStreamReader(input));
-
-			shorts = new ArrayList<Content>();
 			longs = new ArrayList<Content>();
+			
 			int i = 0;
-			String line = buffer.readLine();
 			String url = "";
 			String sponsor = "";
-			int filename = request.hashCode();
+			String line = buffer.readLine();
 			
-			this.percent = 0;
-			this.status = "In progress";
-			this.urlFile = "http://" + request.getLocalName() + ":8080/files/" + 
-					filename + ".csv";
-			
+		
 			while (line != null){
-				// Reading the files. .
+				// Reading the file.
 				i++;
 				url = line.split(",")[0].trim();
 				try{
@@ -197,42 +199,37 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				} catch (IndexOutOfBoundsException e1){
 					sponsor = null;
 				}
-				longs.add(new Content(i, url, sponsor));
-				
-				if (i % 10 == 0){
-					// Per 10 URLs about, execute a thread that load the URLs.
-					futures.add(executor.submit(new Load(longs, this, request)));
-					longs = new ArrayList<Content>();
-				}
+				Content c = new Content(i, url, sponsor);
+				longs.add(c);
 				line = buffer.readLine();
 			}
 			
-			// Process the rest of the file
-			futures.add(executor.submit(new Load(longs, this, request)));
-			
-			for (Future<List<Content>> f : futures){
-				// Wait all the threads and take the result of the load.
-				this.percent = shorts.size();
-				List<Content> l = f.get();
-				for (Content c : l){
-					shorts.add(c);
-				}
+			int j = 0;
+			for (Content c : longs){
+				j++;
+				status.setStatus("In Process");
+				status.setPercent(100*j/longs.size());
+				futures.add(executor.submit(new Load(c, this, request)));
 			}
 			
-			this.status = "Finished";
+			for (Future<Content> f : futures){
+				// Wait all the threads and take the result of the load.
+				shorts.add(f.get());
+				status.setPercent(100*shorts.size()/longs.size());
+			}
 			
 			// Create a file with the result of the load.
+			status.setStatus("Writing in file. Wait to the work be finished.");
 			writeInFile(shorts, filename + ".csv");
-			
-		}catch (IOException e){
-			logger.info("IO Error reading the file " + file.getOriginalFilename());
+			status.setStatus("Finished");
+		} catch (IOException e) {
+			e.printStackTrace();
 		} catch (InterruptedException e) {
 			logger.info("Interrupt Error");
 		} catch (ExecutionException e) {
 			logger.info("Execution Error");
 		}
-		
-		return new ResponseEntity<>(new Status(100, "Finished", urlFile), HttpStatus.OK);
+		return new ResponseEntity<>(status, HttpStatus.OK);
 	}
 	
 	/**
@@ -243,7 +240,35 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	@MessageMapping("/massiveloadws")
 	@SendToUser("/topic/massiveloadws")
 	public Status massiveloadws(){
-		return new Status(this.percent, this.status, this.urlFile);
+		return new Status(this.status.getPercent(), this.status.getStatus(),
+				this.status.getUrl());
+	}
+	
+	/**
+	 * Private method that write in a file the result of the massive load.
+	 * 
+	 * @param shorts List with the URLs shortened.
+	 * @param hash Name of the file that will contains the URL shortened.
+	 */
+	private void writeInFile(List<Content> shorts, String hash){
+		try {
+			File path = new File("tmp/files");
+			if (path.mkdirs())
+				logger.info("Massive Load: Folder created");
+			else 
+				logger.info("Massive Load: Folder already exists");
+			
+			File f = new File("tmp/files/"+hash);
+			f.createNewFile();
+
+			PrintWriter writer = new PrintWriter(f);
+			for (Content c : shorts) {
+				writer.println(c.getURL() + ", " + c.getSponsor());
+			}
+			writer.close();
+		} catch (IOException e) {
+			logger.info("Massive Load: Error writing at the file.");
+		}
 	}
 	
 	/**
@@ -265,31 +290,12 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	    	 result = IOUtils.toByteArray(new FileInputStream(file));
 	    	 FileUtils.writeByteArrayToFile(file, result);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			logger.info("Massive Load: Error: File don't exists");
+			return new ResponseEntity<>(h,HttpStatus.BAD_REQUEST);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.info("Massive Load: Error: Can't Read the file");
+			return new ResponseEntity<>(h,HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<>(result,h,HttpStatus.OK);
-	}
-	
-	/**
-	 * Private method that write in a file the result of the massive load.
-	 * 
-	 * @param shorts List with the URLs shortened.
-	 * @param hash Name of the file that will contains the URL shortened.
-	 */
-	private void writeInFile(List<Content> shorts, String hash){
-		FileWriter fileWriter = null;
-		try{
-			fileWriter = new FileWriter("tmp/files/"+hash);
-			logger.info("File tmp/files/"+hash + " created");
-			for (Content c : shorts){
-				fileWriter.write(c.getURL() + ", " + c.getSponsor() + "\n");
-			}			
-		} catch (FileNotFoundException e) {
-			logger.info("Massive load: File not exists.");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 }
