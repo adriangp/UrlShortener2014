@@ -195,132 +195,182 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	 * @param request
 	 * @return HttpStatus
 	 */
-	@RequestMapping(value = "/modify", method = RequestMethod.GET)
-	public ResponseEntity modify(@RequestParam("modOrDel") String modo,
-			@RequestParam(value = "radMod", required = false) String key1,
-			@RequestParam(value = "radDel", required = false) String key2,
-			@RequestParam(value = "campo", required = false) String clave,
-			@RequestParam(value = "valor", required = false) String valor,
+	@RequestMapping(value = "/modify/{parametros}", method = RequestMethod.POST)
+	public ResponseEntity modify(@PathVariable("parametros") String parametros,
 			HttpServletRequest request) {
-		/*
-		 * Descubrir si es click o url
-		 */
-		boolean click;
-		Scanner s;
-		Long id = null;
-		String hash = null;
-		logger.info("key1: "+key1+"____key2: "+key2);
-		if (key1!=null){
-			s = new Scanner(key1);
-			if (s.next().equals("click")){
-				click=true;	id = s.nextLong();
-			}
-			else{
-				click = false;hash = s.next();
-			}
+		logger.info("dentro con: "+parametros);
+		Scanner sc = new Scanner(parametros);
+		sc.useDelimiter("[&]");
+		List<String> listParameters = new ArrayList();
+		while(sc.hasNext())
+			listParameters.add(sc.next());
+		logger.info("paso dos");
+		
+		// Averiguamos el modo en el que estamos
+		String modo = listParameters.get(1);
+		logger.info("modo = "+modo);
+		for (int i = 0; i < listParameters.size(); i++)
+			logger.info("pos = "+i+": "+listParameters.get(i));
+		Scanner sm = new Scanner(modo);
+		sm.useDelimiter("[=]");
+		sm.next();
+		modo = sm.next();
+		if (!modo.equals("delete") && !modo.equals("modify"))  {
+			modo = listParameters.get(listParameters.size()-1);
+			sm = new Scanner(modo);
+			sm.useDelimiter("[=]");
+			sm.next();
+			modo = sm.next();
 		}
-		else{
-			s = new Scanner(key2);
-			if (s.next().equals("click")){
-				click=true;	id = s.nextLong();
-			}
-			else{
-				click = false;hash = s.next();
-			}			
-		}
+		logger.info("modo = "+modo);
+		// ****************************************
+		
+		sm = new Scanner(listParameters.get(0));	
+		sm.useDelimiter("[=]");
+		logger.info("Pruebas = "+sm.next());
+		sm.useDelimiter("[+]");
+		String urlOrClick = sm.next().substring(1);
+		logger.info("urlOrClick = "+urlOrClick);
 		if (modo.equals("delete")){
-			// Borra la url de la base de datos
-			if (!click){
-				logger.info("Borrando url con hash: "+hash);
+			// Trabajamos con una url
+			if (urlOrClick.equals("url")){
+				sm = new Scanner(sm.next());
+				sm.useDelimiter("[+]");
+				String hash = sm.next();
+				logger.info("hash = "+hash);
 				shortURLRepository.delete(hash);
 			}
-			// Borra el click de la base de datos
-			else {
-				// Convertir String a Long
-				logger.info("Borrando click con id: "+id);
+			//Trabajamos con un click
+			else{
+				sm = new Scanner(sm.next());
+				sm.useDelimiter("[+]");
+				Long id = sm.nextLong();
+				logger.info("id = "+id);
 				clickRepository.delete(id);
-			}
-		}
-		else {
-			//modificar - Click tiene bug
-			if (!click){
-				String  url = s.next(), ur = s.next(), sponsor = s.next(),
-						created = s.next(), owner = s.next(), 
-						m = s.next(), sa = s.next(), ip = s.next(), country = s.next();
-				int mode = Integer.parseInt(m);
-				URI uri = null;
-				try {
-					uri = new URI(ur);
-				}
-				catch(URISyntaxException e) {
-					return new ResponseEntity(HttpStatus.BAD_REQUEST);
-				}
-					
-				boolean safe = Boolean.parseBoolean(sa);
-				// Se convierte la fecha
-				logger.info("Borrando click con id: "+id);
-				
-				Date date = shortURLRepository.findByKey(hash).getCreated();	
-
-				if (clave.toUpperCase().equals("SPONSOR")){
-					ShortURL su = new ShortURL(hash, url, uri, valor,
-							date, owner, mode,safe, ip, country);					
-					shortURLRepository.update(su);
-				}else if (clave.toUpperCase().equals("OWNER")){
-					ShortURL su = new ShortURL(hash, url, uri, sponsor,
-							date, valor, mode,safe, ip, country);	
-					shortURLRepository.update(su);
-				}else if (clave.toUpperCase().equals("IP")){
-					ShortURL su = new ShortURL(hash, url, uri, sponsor,
-							date, owner, mode,safe, valor, country);	
-					shortURLRepository.update(su);
-				}else if (clave.toUpperCase().equals("COUNTRY")){
-					ShortURL su = new ShortURL(hash, url, uri, sponsor,
-							date, owner, mode,safe, ip, valor);	
-					shortURLRepository.update(su);
-				}else {
-					return new ResponseEntity(HttpStatus.BAD_REQUEST);	
-				}		
-			}else{
-				hash = s.next();
-				String  created = s.next(), referrer = s.next(),
-						browser = s.next(), platform = s.next(), 
-						ip = s.next(), country = s.next();
-				// Se convierte la fecha
-				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
-				Date date = new Date(Integer.parseInt(created.substring(1,4)),
-						Integer.parseInt(created.substring(6,7)),
-						Integer.parseInt(created.substring(9,10)));	
-				// Comprobamos si el campo es adecuado
-				// La fecha no tiene sentido modificarla, pero es campo correcto	
-				if (clave.toUpperCase().equals("REFERRER")){
-					Click cl = new Click(id, hash, date, valor,
-							browser, platform, ip, country);					
-					clickRepository.update(cl);
-				}else if (clave.toUpperCase().equals("BROWSER")){
-					Click cl = new Click(id, hash, date, referrer,
-							valor, platform, ip, country);
-					clickRepository.update(cl);
-				}else if (clave.toUpperCase().equals("PLATFORM")){
-					Click cl = new Click(id, hash, date, referrer,
-							browser, valor, ip, country);
-					clickRepository.update(cl);
-				}else if (clave.toUpperCase().equals("IP")){
-					Click cl = new Click(id, hash, date, referrer,
-							browser, platform, valor, country);
-					clickRepository.update(cl);
-				}else if (clave.toUpperCase().equals("COUNTRY")){
-					Click cl = new Click(id, hash, date, referrer,
-							browser, platform, ip, valor);
-					clickRepository.update(cl);
-				}else {
-					// si el campo era incorrecto se informa
-					return new ResponseEntity(HttpStatus.BAD_REQUEST);	
-				}				
 			}
 			
 		}
-		
+		//Modificar ********************************
+		else {			
+			if (urlOrClick.equals("url")){
+				sm = new Scanner(sm.next());
+				sm.useDelimiter("[+]");
+				String hash = sm.next();
+				logger.info("hash = "+hash);
+				ShortURL su = shortURLRepository.findByKey(hash);
+				
+				String  url = su.getTarget(), sponsor = su.getSponsor(), owner = su.getOwner(),
+						ip = su.getIP(), country = su.getCountry();				
+				int mode = su.getMode();
+				URI  uri = su.getUri();
+				boolean safe = su.getSafe();
+				Date date = su.getCreated();	
+
+				// Obtenemos la clave y el valor		
+				sm = new Scanner(listParameters.get(2));
+				sm.useDelimiter("[=]");
+				sm.next();
+				String clave = sm.next();
+				sm = new Scanner(listParameters.get(3));
+				sm.useDelimiter("[=]");
+				sm.next();
+				String valor = sm.next().replace("+"," ");
+				
+				logger.info("clave: "+clave+", valor:"+valor);
+				//Modificamos
+				switch(clave.toUpperCase()){
+				case "SPONSOR": 
+					su = new ShortURL(hash, url, uri, valor,
+							date, owner, mode,safe, ip, country);					
+					shortURLRepository.update(su);
+					break;
+				case "OWNER": 
+					su = new ShortURL(hash, url, uri, sponsor,
+							date, valor, mode,safe, ip, country);	
+					shortURLRepository.update(su);
+					break;
+				case "IP":  
+					su = new ShortURL(hash, url, uri, sponsor,
+							date, owner, mode,safe, valor, country);	
+					shortURLRepository.update(su);
+					break;
+				case "COUNTRY":
+					su = new ShortURL(hash, url, uri, sponsor,
+							date, owner, mode,safe, ip, valor);	
+					shortURLRepository.update(su);
+					break;
+				default:
+					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
+				}
+			}
+			//Trabajamos con un click
+			else{
+				Long id = sm.nextLong();
+				String hash = sm.next();
+				logger.info("id = "+id+". Hash :"+hash);
+				List<Click> lc = clickRepository.findByHash(hash);
+				Click cl = null;
+				boolean encontrado = false;
+				// Buscamos el click
+				for (int i = 0; i < lc.size() && !encontrado; i++)	{
+					logger.info("buscando");
+					cl = lc.get(i);
+					logger.info("2- busqueda");
+					if (cl.getId() == id)
+						encontrado = true;
+				}				
+				logger.info("despues de busqueda");
+						
+				String  referrer = cl.getReferrer(),browser = cl.getBrowser(), 
+						platform = cl.getPlatform(), ip = cl.getIp(), 
+						country = cl.getCountry();
+				Date date = cl.getCreated();
+
+				logger.info("Consiguiendo la clave y el valor");
+				// Obtenemos la clave y el valor		
+				sm = new Scanner(listParameters.get(2));
+				sm.useDelimiter("[=]");
+				sm.next();
+				String clave = sm.next();
+				sm = new Scanner(listParameters.get(3));
+				sm.useDelimiter("[=]");
+				sm.next();
+				String valor = sm.next().replace("+"," ");
+				logger.info("clave: "+clave+", valor:"+valor);
+				
+				// Comprobamos si el campo es adecuado
+				// La fecha no tiene sentido modificarla, pero es campo correcto	
+				switch(clave.toUpperCase()){
+				case "REFERRER": 
+					cl = new Click(id, hash, date, valor,
+							browser, platform, ip, country);					
+					clickRepository.update(cl);
+					break;
+				case "BROWSER": 
+					cl = new Click(id, hash, date, referrer,
+							valor, platform, ip, country);
+					clickRepository.update(cl);
+					break;
+				case "PLATFORM":  
+					cl = new Click(id, hash, date, referrer,
+							browser, valor, ip, country);
+					clickRepository.update(cl);
+					break;
+				case "IP":
+					cl = new Click(id, hash, date, referrer,
+							browser, platform, valor, country);
+					clickRepository.update(cl);
+					break;
+				case "COUNTRY":
+					cl = new Click(id, hash, date, referrer,
+							browser, platform, ip, valor);
+					clickRepository.update(cl);
+					break;
+				default:
+					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
+				}		
+			}
+		}
 		return new ResponseEntity(HttpStatus.OK);		
 		
 	}
