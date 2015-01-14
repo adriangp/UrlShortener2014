@@ -61,5 +61,10 @@ public class MassiveLoadTest {
 		Status status = resp.getBody();
 		assertEquals(status.getPercent(),100);
 		assertEquals(status.getStatus(), "Finished");
+
+		// Get the file with the shortened URLs
+		url = status.getUrl();
+		ResponseEntity<byte[]> resp2 = template.exchange(url, HttpMethod.GET, entity, byte[].class);
+		assertEquals(HttpStatus.OK, resp2.getStatusCode());
 	}
 }
