@@ -1,6 +1,6 @@
 package urlshortener2014.goldenPoppy.intersicial;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,8 +8,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import net.minidev.json.JSONArray;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -24,7 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.json.JsonParserFactory;
 
-public class interstitialTest {
+public class InterstitialTest {
 	
 	String target = "https://www.google.it";
 	String sponsor = "http://www.unizar.es";
