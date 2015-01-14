@@ -12,9 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -47,7 +45,7 @@ import urlshortener2014.dimgray.domain.InfoDB;
  * Acortador, redireccionador, CSV, QR y de bolcado de la BD.
  * @author Ivan y Paulo
  *
- */
+ */    
 @RestController
 public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 
@@ -134,7 +132,6 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		return new ResponseEntity<>(png,headers,HttpStatus.CREATED);
 	}
 
-
 	/**
 	 * Servicio que devuelve los datos de clicks, usuarios y url de la base de datos
 	 * 
@@ -149,6 +146,7 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 		logger.info("Datos de clicks: "+clickRepository.list(limit,offset).size());
 		List<ShortURL> sul = shortURLRepository.list(limit,offset);
 		List<InfoDB> result  = new ArrayList<InfoDB>();
+
 		// Los datos se añaden a una lista de InfoDB. InfoDB es la clase que contiene o un click
 		// o una ShortURL
 		for (int i = 0; i < sul.size(); i++){
@@ -186,76 +184,93 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	 * @param request
 	 * @return HttpStatus
 	 */
-	@RequestMapping(value = "/modify", method = RequestMethod.GET)
-	public ResponseEntity modify(@RequestParam("modOrDel") String modo,
-			@RequestParam(value = "radMod", required = false) String key1,
-			@RequestParam(value = "radDel", required = false) String key2,
-			@RequestParam(value = "campo", required = false) String clave,
-			@RequestParam(value = "valor", required = false) String valor,
+
+	@RequestMapping(value = "/modify/{parametros}", method = RequestMethod.POST)
+	public ResponseEntity modify(@PathVariable("parametros") String parametros,
 			HttpServletRequest request) {
-		/*
-		 * Descubrir si es click o url
-		 */
-		boolean click;
-		Scanner s;
-		Long id = null;
-		String hash = null;
-		logger.info("key1: "+key1+"____key2: "+key2);
-		if (key1!=null){
-			s = new Scanner(key1);
-			if (s.next().equals("click")){
-				click=true;	id = s.nextLong();
-			}
-			else{
-				click = false;hash = s.next();
-			}
+		logger.info("dentro con: "+parametros);
+		Scanner sc = new Scanner(parametros);
+		sc.useDelimiter("[&]");
+		List<String> listParameters = new ArrayList();
+		while(sc.hasNext())
+			listParameters.add(sc.next());
+		logger.info("paso dos");
+		
+		// Averiguamos el modo en el que estamos
+		String modo = listParameters.get(1);
+		logger.info("modo = "+modo);
+		for (int i = 0; i < listParameters.size(); i++)
+			logger.info("pos = "+i+": "+listParameters.get(i));
+		Scanner sm = new Scanner(modo);
+		sm.useDelimiter("[=]");
+		sm.next();
+		modo = sm.next();
+		if (!modo.equals("delete") && !modo.equals("modify"))  {
+			modo = listParameters.get(listParameters.size()-1);
+			sm = new Scanner(modo);
+			sm.useDelimiter("[=]");
+			sm.next();
+			modo = sm.next();
 		}
-		else{
-			s = new Scanner(key2);
-			if (s.next().equals("click")){
-				click=true;	id = s.nextLong();
-			}
-			else{
-				click = false;hash = s.next();
-			}			
-		}
+		logger.info("modo = "+modo);
+		// ****************************************
+		
+		sm = new Scanner(listParameters.get(0));	
+		sm.useDelimiter("[=]");
+		logger.info("Pruebas = "+sm.next());
+		sm.useDelimiter("[+]");
+		String urlOrClick = sm.next().substring(1);
+		logger.info("urlOrClick = "+urlOrClick);
 		if (modo.equals("delete")){
-			// Borra la url de la base de datos
-			if (!click){
-				logger.info("Borrando url con hash: "+hash);
+			// Trabajamos con una url
+			if (urlOrClick.equals("url")){
+				sm = new Scanner(sm.next());
+				sm.useDelimiter("[+]");
+				String hash = sm.next();
+				logger.info("hash = "+hash);
 				shortURLRepository.delete(hash);
 			}
-			// Borra el click de la base de datos
-			else {
-				// Convertir String a Long
-				logger.info("Borrando click con id: "+id);
+			//Trabajamos con un click
+			else{
+				sm = new Scanner(sm.next());
+				sm.useDelimiter("[+]");
+				Long id = sm.nextLong();
+				logger.info("id = "+id);
 				clickRepository.delete(id);
 			}
+			
 		}
-		else {
-			//modificar - Click tiene bug
-			if (!click){
-				String  url = s.next(), ur = s.next(), sponsor = s.next(),
-						created = s.next(), owner = s.next(), 
-						m = s.next(), sa = s.next(), ip = s.next(), country = s.next();
-				int mode = Integer.parseInt(m);
-				URI uri = null;
-				try {
-					uri = new URI(ur);
-				}
-				catch(URISyntaxException e) {
-					return new ResponseEntity(HttpStatus.BAD_REQUEST);
-				}
+		//Modificar ********************************
+		else {			
+			if (urlOrClick.equals("url")){
+				sm = new Scanner(sm.next());
+				sm.useDelimiter("[+]");
+				String hash = sm.next();
+				logger.info("hash = "+hash);
+				ShortURL su = shortURLRepository.findByKey(hash);
+				
+				String  url = su.getTarget(), sponsor = su.getSponsor(), owner = su.getOwner(),
+						ip = su.getIP(), country = su.getCountry();				
+				int mode = su.getMode();
+				URI  uri = su.getUri();
+				boolean safe = su.getSafe();
+				Date date = su.getCreated();	
 
-				boolean safe = Boolean.parseBoolean(sa);
-				// Se convierte la fecha
-				logger.info("Borrando click con id: "+id);
-
-				Date date = shortURLRepository.findByKey(hash).getCreated();	
-
+				// Obtenemos la clave y el valor		
+				sm = new Scanner(listParameters.get(2));
+				sm.useDelimiter("[=]");
+				sm.next();
+				String clave = sm.next();
+				sm = new Scanner(listParameters.get(3));
+				sm.useDelimiter("[=]");
+				sm.next();
+				String valor = sm.next().replace("+"," ");
+				
+				logger.info("clave: "+clave+", valor:"+valor);
+				//Modificamos
 				switch(clave.toUpperCase()){
 				case "SPONSOR": 
-					ShortURL su = new ShortURL(hash, url, uri, valor,
+					su = new ShortURL(hash, url, uri, valor,
 							date, owner, mode,safe, ip, country);					
 					shortURLRepository.update(su);
 					break;
@@ -277,22 +292,47 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 				default:
 					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
 				}
+			}
+			//Trabajamos con un click
+			else{
+				Long id = sm.nextLong();
+				String hash = sm.next();
+				logger.info("id = "+id+". Hash :"+hash);
+				List<Click> lc = clickRepository.findByHash(hash);
+				Click cl = null;
+				boolean encontrado = false;
+				// Buscamos el click
+				for (int i = 0; i < lc.size() && !encontrado; i++)	{
+					logger.info("buscando");
+					cl = lc.get(i);
+					logger.info("2- busqueda");
+					if (cl.getId() == id)
+						encontrado = true;
+				}				
+				logger.info("despues de busqueda");
+						
+				String  referrer = cl.getReferrer(),browser = cl.getBrowser(), 
+						platform = cl.getPlatform(), ip = cl.getIp(), 
+						country = cl.getCountry();
+				Date date = cl.getCreated();
 
-			}else{
-				hash = s.next();
-				String  created = s.next(), referrer = s.next(),
-						browser = s.next(), platform = s.next(), 
-						ip = s.next(), country = s.next();
-				// Se convierte la fecha
-				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
-				Date date = new Date(Integer.parseInt(created.substring(1,4)),
-						Integer.parseInt(created.substring(6,7)),
-						Integer.parseInt(created.substring(9,10)));	
+				logger.info("Consiguiendo la clave y el valor");
+				// Obtenemos la clave y el valor		
+				sm = new Scanner(listParameters.get(2));
+				sm.useDelimiter("[=]");
+				sm.next();
+				String clave = sm.next();
+				sm = new Scanner(listParameters.get(3));
+				sm.useDelimiter("[=]");
+				sm.next();
+				String valor = sm.next().replace("+"," ");
+				logger.info("clave: "+clave+", valor:"+valor);
+				
 				// Comprobamos si el campo es adecuado
 				// La fecha no tiene sentido modificarla, pero es campo correcto	
 				switch(clave.toUpperCase()){
 				case "REFERRER": 
-					Click cl = new Click(id, hash, date, valor,
+					cl = new Click(id, hash, date, valor,
 							browser, platform, ip, country);					
 					clickRepository.update(cl);
 					break;
@@ -320,10 +360,8 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
 				}		
 			}
-
 		}
-
-		return new ResponseEntity<>(HttpStatus.OK);		
+		return new ResponseEntity(HttpStatus.OK);		
 
 	}
 }
