@@ -1,0 +1,52 @@
+package urlshortener2014.goldenPoppy.qr;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.HandlerMapping;
+
+import urlshortener2014.common.domain.ShortURL;
+import urlshortener2014.common.repository.ShortURLRepository;
+import urlshortener2014.goldenPoppy.web.UrlShortenerControllerWithLogs;
+
+
+@RestController
+public class QREndPoint {	
+	
+	@Autowired
+	private ShortURLRepository shortURLRepository;
+	
+	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
+	
+	@RequestMapping(value = "/qr/**", method = RequestMethod.GET)
+	public ResponseEntity<byte[]> redirectQR(@PathVariable String uri,
+			 									HttpServletRequest request) {
+		RestTemplate restTemplate = new RestTemplate();
+		HttpHeaders h = new HttpHeaders();
+		h.setContentType(MediaType.IMAGE_PNG);
+		HttpEntity<String> entity = new HttpEntity<>(h);
+		
+		String url2 = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+		url2 = url2.replace("/", "%2F");
+		logger.info(url2);
+						
+		String url = "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=" + url2 + "&choe=UTF-8";
+		
+		ResponseEntity<?> re = restTemplate.exchange(url, HttpMethod.GET, entity, byte[].class);
+		return new ResponseEntity<>((byte[]) re.getBody(), h, HttpStatus.OK);
+	}
+}
