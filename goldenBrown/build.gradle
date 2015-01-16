@@ -6,4 +6,16 @@ eclipse {
 
 dependencies {
    compile project(":common")
+     // Provides java script libraries for static content
+   compile("org.webjars:bootstrap:3.0.3")
+   compile("org.webjars:jquery:2.0.3-1")
+   compile 'org.apache.httpcomponents:httpclient:4.3.6'
+   compile 'nl.bitwalker:UserAgentUtils:1.2.4'
+   compile 'org.springframework:spring-context'
+   compile 'org.springframework:spring-context-support'
+   compile 'net.sf.ehcache:ehcache:2.7.4'
+   compile("org.springframework.boot:spring-boot-starter-web:1.2.0.RELEASE")
+   compile 'org.springframework:spring-test:4.1.4.RELEASE'
+   compile 'org.apache.velocity:velocity:1.7'
+   testCompile 'junit:junit:4.10'
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Generate QR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css"
+	href="webjars/bootstrap/3.0.3/css/bootstrap.min.css" />
+</head>
+<body>
+	<script type="text/javascript" src="webjars/jquery/2.0.3/jquery.min.js"></script>
+	<div class="jumbotron">
+		<h1>Generate QR</h1>
+		<form role="form" id="qrform">
+			<div class="form-group">
+				<label for="uri">Enter URL</label> <input type="text"
+					class="form-control" id="uri" placeholder="URL" name="url" />
+			</div>
+			<button type="submit" class="btn btn-lg btn-primary">Generate QR</button>
+		</form>
+		<p/>
+		<div id="result">
+			<img id="image">	
+		</div>
+		<button id="back" class="btn btn-lg btn-primary" onclick="location.href='index.html'">Back</button>
+		
+	</div>
+	<script type="text/javascript"
+		src="webjars/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+	<script>
+	 $(document).ready(function() {
+		$("#qrform").submit(function(event){
+			event.preventDefault();
+			$.ajax({
+				type : "POST",
+				url : "/generateqr",
+				data : $(this).serialize(),
+				success : function(msg) {
+					var res = document.getElementById('image');
+					res.src = "data:image/png;base64,"+msg;
+					res.style.visibility="visible";
+					//$("#result").html("<img src='"+ msg+"' class='btn btn-default btn-lg' role='button'>")
+				},
+				error : function() {
+					alert("failure");
+				}
+			});
+			//$("#result").empty();
+			//$("#result").html("" + uri);
+			//$("#result").html("<img src='qr/"+ $("#uri").val() +"' class='btn btn-default btn-lg' role='button'>");
+		});
+	});
+	</script>
+</body>
+</html>

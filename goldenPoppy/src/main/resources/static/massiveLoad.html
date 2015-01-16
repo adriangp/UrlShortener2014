@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Massive Load</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css"
+		href="webjars/bootstrap/3.0.3/css/bootstrap.min.css" />
+	<script type="text/javascript" src="webjars/stomp-websocket/2.3.1-1/stomp.js"></script>
+	<script type="text/javascript" src="webjars/sockjs-client/0.3.4-1/sockjs.js"></script>
+    <script type="text/javascript">
+    
+    	var client = null;
+    	
+    	function connect(){
+    		var socket = new SockJS('/massiveloadws');
+    		client = Stomp.over(socket);
+    		client.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+                client.subscribe('/user/topic/massiveloadws', function(status){
+                	showResponse(JSON.parse(status.body).percent,
+                    			JSON.parse(status.body).status,
+                    			JSON.parse(status.body).url);
+                });
+            });
+    	}
+    	
+    	function disconnect() {
+            client.disconnect();
+            console.log("Disconnected");
+        }
+    	
+    	function getProgress(){
+            client.send("/app/massiveloadws", {}, {});
+    	}
+    	
+    	function sendFile(){
+    		var formData = new FormData();
+    		var name = document.getElementById('file').value;
+    		var files = document.getElementById('file').files;
+    		formData.append("file",files[0]);
+    		var temp = window.setInterval(getProgress,10);
+    		$.ajax({
+    			type : "POST",
+    			url : "/massiveload",
+    			enctype : "multipart/form-data",
+    			data : formData,
+    			processData: false,
+    			contentType: false,
+    			success : function(message) {
+    				var percent = message.percent;
+    				var status = message.status;
+    				var file = message.url;
+    				showResponse(percent, status, file)
+    				window.clearInterval(temp);
+    			},
+    			error : function() {
+    				alert("Failure");
+    			}
+    		});
+    	}
+    	
+    	function showResponse(percent, status, url){
+			var presp = document.getElementById('presp');
+			var pinforeturnfile = document.getElementById('pinforeturnfile');
+			presp.innerHTML = status + ": " + percent + "%"; 
+			pinforeturnfile.innerHTML = "Visit the following link to get a file with the shortened URLS:"
+			$("#purlreturnfile").html("<a target='_blank' href='"+url+"' class='btn btn-default btn-lg' role='button'>"+url+"</a>")
+		}
+    </script>
+</head>
+<body onLoad="connect()" onUnLoad="disconnect()">
+	<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! 
+		Websocket relies on Javascript being enabled. Please enable Javascript and reload this page!
+	</h2></noscript>
+	<script type="text/javascript" src="webjars/jquery/2.0.3/jquery.min.js"></script>
+	<div class="jumbotron">
+		<h1>Massive Load</h1>
+		<form role="form" id="massiveLoad" enctype="multipart/form-data">
+			<div class="form-group">
+				<label for="file">File CSV</label><input type="file" name="file" id="file">
+			</div>
+			<button type="submit" class="btn btn-lg btn-primary">Send</button>
+		</form>
+		<div id="response">
+			<p id="presp"></p>
+			<p id="pinforeturnfile"></p>
+			<div id="purlreturnfile"></div>
+		</div>
+		<button id="back" class="btn btn-lg btn-primary" onclick="location.href='index.html'">Back</button>
+	</div>
+	<script type="text/javascript"
+		src="webjars/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+	<script>
+	 $(document).ready(function() {
+		$("#massiveLoad").submit(function(event){
+			event.preventDefault();
+			sendFile();
+		});
+	});
+	</script>
+</body>
+</html>

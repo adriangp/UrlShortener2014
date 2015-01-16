@@ -11,6 +11,8 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.validator.routines.UrlValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,13 +26,15 @@ import org.springframework.web.bind.annotation.RestController;
 import urlshortener2014.common.domain.Click;
 import urlshortener2014.common.domain.ShortURL;
 import urlshortener2014.common.repository.ClickRepository;
+import urlshortener2014.common.repository.ClickRepositoryImpl;
 import urlshortener2014.common.repository.ShortURLRepository;
 
 import com.google.common.hash.Hashing;
 
 @RestController
 public class UrlShortenerController {
-
+	private static final Logger log = LoggerFactory
+			.getLogger(UrlShortenerController.class);
 	@Autowired
 	protected ShortURLRepository shortURLRepository;
 
@@ -52,7 +56,8 @@ public class UrlShortenerController {
 	protected void createAndSaveClick(String hash, String ip) {
 		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()),
 				null, null, null, ip, null);
-		clickRepository.save(cl);
+		cl=clickRepository.save(cl);
+		log.info("Id del click; "+cl.getId());
 	}
 
 	protected String extractIP(HttpServletRequest request) {

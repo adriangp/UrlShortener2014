@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html>	
+	<head>
+		<title>URL Shortener - OldBurgundy</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="webjars/bootstrap/3.0.3/css/bootstrap.min.css" />
+		<script type="text/javascript" src="webjars/jquery/2.0.3/jquery.min.js"></script>
+		<script type="text/javascript" src="webjars/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+		
+		<!--
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+		-->
+		<link rel="stylesheet" href="./css/style.css">
+		<script>
+			var host = "ws://" + "$host" + "/sponsor/ws";
+		</script>
+		<script src="./js/wsClient.js"></script>
+	</head>
+	<body>
+		<div id="header">
+			<div id="banner"></div>
+			<div id="wait_text"><h4><span id="text">Wait to be redirected <span id="dots">. . .</span></span></h4></div>
+		</div>
+		<input id="link" type="Hidden" value="$shortURL"/>
+		<embed id="sponsor" src="$sponsor"></embed>
+	</body>
+</html>
